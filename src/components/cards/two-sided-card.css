@@ -1,0 +1,119 @@
+.two-sided-card {
+  border-radius: 12px;
+}
+.two-tilt,
+.two-rotor {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  transform-style: preserve-3d;
+}
+.two-tilt {
+  transform: rotateX(var(--rx)) rotateY(var(--ry));
+}
+.two-rotor {
+  transform: rotateY(0deg);
+  transition: transform 0.6s cubic-bezier(0.22, 0.7, 0.25, 1);
+}
+.two-sided-card[data-face='back'] .two-rotor {
+  transform: rotateY(180deg);
+}
+.two-face {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.two-front {
+  transform: rotateY(0deg);
+}
+.two-back {
+  transform: rotateY(180deg);
+  overflow: hidden;
+  background: #090e17;
+  border: 1px solid #a895703d;
+  box-shadow:
+    0 2px 0 #6a604e,
+    0 18px 40px #0007;
+}
+.two-back img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  /* The prototype PNG includes a dark outer margin. Trim it optically,
+     keeping the artwork proportional and its gold frame at the card edge. */
+  transform: translateY(1.5%) scale(1.09);
+  transform-origin: center;
+  display: block;
+}
+.two-back-light {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at var(--mx) var(--my),
+    #fff3d923,
+    transparent 58%
+  );
+}
+.two-front > .sr-card,
+.two-front > .tcg-card {
+  width: 100% !important;
+  height: 100%;
+}
+/* One shared outer tilt; front layers only keep their local depth and light. */
+.two-front > .tcg-card,
+.two-front .sr-body {
+  transform: none;
+}
+.two-front > .sr-card {
+  perspective: none !important;
+  --px: inherit;
+  --py: inherit;
+  --rx: inherit;
+  --ry: inherit;
+  --mx: inherit;
+  --my: inherit;
+  --foil-x: inherit;
+  --foil-y: inherit;
+  --foil-angle: inherit;
+  --edge-angle: inherit;
+  --foil-strength: inherit;
+  --specular-strength: inherit;
+  --presence: inherit;
+}
+.two-sided-card[data-effects='off'] .sr-finish,
+.two-sided-card[data-effects='off'] .sr-particles,
+.two-sided-card[data-effects='off'] .sr-glass,
+.two-sided-card[data-effects='off'] .sr-atmosphere,
+.two-sided-card[data-effects='off'] .card-foil {
+  visibility: hidden;
+}
+.two-sided-card[data-face='back'] .two-front {
+  pointer-events: none;
+}
+.two-sided-card[data-face='front'] .two-back {
+  pointer-events: none;
+}
+.normal-reveal[data-stage='charging'] .two-tilt {
+  transform: translateY(2px) scale(0.992);
+  transition: transform 0.18s;
+}
+.reveal-button .two-sided-card {
+  width: 290px;
+}
+@media (max-width: 520px) {
+  .reveal-button .two-sided-card {
+    width: 250px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .two-tilt {
+    transform: none !important;
+  }
+  .two-rotor {
+    transition: none;
+  }
+}

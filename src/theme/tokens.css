@@ -1,0 +1,26 @@
+/* Website-only theme. Rarity colors and card finishes remain in their existing files. */
+:root {
+  --fe-navy: #142541;
+  --fe-royal: #284a77;
+  --fe-gold: #c8a86a;
+  --fe-gold-light: #e2c992;
+  --fe-parchment: #f0e5cf;
+  --fe-background: #0a1220;
+  --fe-crimson: #a43d47;
+  --fe-muted: #a6b1c3;
+  --fe-line: #c8a86a38;
+  --fe-panel: #101e34;
+  --fe-serif: 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif;
+  --fe-sans: 'Segoe UI', Arial, sans-serif;
+  --fe-space-1: 8px;
+  --fe-space-2: 16px;
+  --fe-space-3: 24px;
+  --fe-space-4: 40px;
+  --fe-radius: 6px;
+  --fe-shadow: 0 18px 55px #03081255;
+  --fe-parchment-texture: repeating-linear-gradient(
+    0deg,
+    #c8a86a03 0 1px,
+    transparent 1px 4px
+  );
+}

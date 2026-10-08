@@ -1,0 +1,259 @@
+/* Independent print frame: artwork contains no baked-in stats or labels. */
+.common-hero-card {
+  --common-description-top: 65%;
+  --common-description-inset: 6.2%;
+  width: 290px;
+  aspect-ratio: 0.686;
+  position: relative;
+  container-type: inline-size;
+  perspective: 1100px;
+  text-align: left;
+}
+.common-hero-card.small {
+  width: 100%;
+}
+.common-hero-body {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f7f3e9;
+  border: 1px solid #d2caba;
+  box-shadow:
+    0 0 0 1px #d6d0c6,
+    0 16px 35px #0006;
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+}
+.common-art-field {
+  position: absolute;
+  inset: 3.5% 5% 4.3%;
+  clip-path: polygon(0 0, 64.5% 0, 71% 4.5%, 100% 4.5%, 100% 100%, 0 100%);
+  overflow: hidden;
+  background: radial-gradient(
+    ellipse at 50% 45%,
+    #667a89,
+    #233b54 65%,
+    #12243b
+  );
+}
+.common-art-field img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.common-stat-bar {
+  position: absolute;
+  z-index: 3;
+  top: 1%;
+  left: 1.6%;
+  right: 7%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.common-cost {
+  width: 14cqw;
+  height: 14cqw;
+  border-radius: 50%;
+  border: 1px solid #c8b58c;
+  background: #122540;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 7px #0006;
+  color: #f7edda;
+}
+.common-cost span {
+  font:
+    500 2.3cqw/1 'Segoe UI',
+    sans-serif;
+  letter-spacing: 0.12em;
+}
+.common-cost b {
+  font:
+    700 8cqw/1.1 Georgia,
+    serif;
+  margin-top: -1.7cqw;
+}
+.common-power {
+  transform: translateY(-2cqw);
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-end;
+  padding: 0;
+  color: #142541;
+}
+.common-power span {
+  font:
+    500 2.3cqw/1.2 'Segoe UI',
+    sans-serif;
+  letter-spacing: 0.16em;
+  margin-top: -1cqw;
+}
+.common-power b {
+  font:
+    700 8cqw/1.1 Georgia,
+    serif;
+}
+/* Slim royal trim sits above the panel, separate from its scrolling text. */
+.common-description-trim {
+  position: absolute;
+  z-index: 1;
+  top: var(--common-description-top);
+  left: var(--common-description-inset);
+  width: calc(100% - var(--common-description-inset) * 2);
+  height: 4cqw;
+  transform: translateY(-100%);
+  overflow: visible;
+  pointer-events: none;
+}
+.common-description {
+  position: absolute;
+  top: var(--common-description-top);
+  left: var(--common-description-inset);
+  right: var(--common-description-inset);
+  height: 26.4%;
+  padding: 3cqw 2.6cqw;
+  background: #f0e5cf;
+  border-top: 1px solid #c8a86a;
+  border-bottom: 0;
+  overflow: auto;
+  scrollbar-width: thin;
+}
+.common-description p {
+  margin: 0;
+  color: #252e3a;
+  font:
+    400 3.4cqw/1.45 'Segoe UI',
+    sans-serif;
+  overflow-wrap: anywhere;
+}
+.common-identity {
+  position: absolute;
+  top: 82.5%;
+  bottom: 4.4%;
+  left: 5.6%;
+  right: 5.6%;
+  padding: 4.4cqw 12cqw 0;
+  text-align: center;
+  background: #284a77;
+}
+.common-shape-definitions {
+  position: absolute;
+  pointer-events: none;
+}
+.common-category {
+  position: absolute;
+  top: 1.5cqw;
+  left: 0;
+  right: 0;
+  font:
+    600 2.15cqw/1.1 'Segoe UI',
+    sans-serif;
+  letter-spacing: 0.24em;
+  color: #f0e5cf;
+}
+.common-identity h3 {
+  margin-top: 1.5cqw;
+  font:
+    700 6cqw/1.05 Georgia,
+    serif;
+  color: #f5e6c7;
+  overflow-wrap: anywhere;
+}
+.common-identity p {
+  margin: 0.65cqw 0 0;
+  font:
+    400 2.75cqw/1.2 'Segoe UI',
+    sans-serif;
+  color: #c9c5b9;
+  overflow-wrap: anywhere;
+}
+.common-card-footer {
+  position: absolute;
+  z-index: 3;
+  bottom: 6%;
+  left: 9%;
+  right: 7%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+.common-rarity {
+  /* Center the badge over the lower-left printed frame corner. */
+  transform: translate(-5.3cqw, 5cqw);
+  width: 7cqw;
+  height: 7cqw;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  color: #f0e5cf;
+  font:
+    700 3.8cqw/1 Georgia,
+    serif;
+}
+.common-rarity-seal {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  transform: scale(1.7);
+  transform-origin: center;
+  pointer-events: none;
+}
+.common-card-id {
+  font:
+    600 2.4cqw/1.2 'Segoe UI',
+    sans-serif;
+  letter-spacing: 0.1em;
+  color: #e1d3b6;
+}
+.common-print-frame {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.common-unknown {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font:
+    20cqw Georgia,
+    serif;
+  color: #c8b58c;
+}
+.two-front > .common-hero-card {
+  width: 100%;
+  height: 100%;
+  perspective: none;
+}
+.two-front .common-hero-body {
+  transform: none;
+}
+.marth-preview-stage {
+  display: grid;
+  place-items: center;
+  padding: 38px 0;
+}
+.marth-preview-size {
+  width: min(var(--preview-width, 320px), calc(100vw - 72px));
+}
+.common-preview-note {
+  max-width: 560px;
+  margin: 24px auto 0;
+  font-size: 11px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .common-hero-body {
+    transform: none !important;
+  }
+}
