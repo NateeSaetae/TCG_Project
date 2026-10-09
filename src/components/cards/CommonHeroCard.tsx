@@ -100,7 +100,7 @@ export function CommonHeroCard({
           <defs>
             <clipPath id={identityClipId} clipPathUnits="objectBoundingBox">
               {/* Curved outer shoulders round the description's lower corners. */}
-              <path d="M0 0H.007Q.007 .14 .025 .14H.29L.33 0H.67L.71 .14H.975Q.993 .14 .993 0H1V1H0Z" />
+              <path d="M0 0Q0 .14 .018 .14H.287L.328 0H.672L.713 .14H.982Q1 .14 1 0V1H0Z" />
             </clipPath>
           </defs>
         </svg>

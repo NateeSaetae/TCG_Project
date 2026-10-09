@@ -135,8 +135,8 @@
   position: absolute;
   top: 82.5%;
   bottom: 4.4%;
-  left: 5.6%;
-  right: 5.6%;
+  left: var(--common-description-inset);
+  right: var(--common-description-inset);
   padding: 4.4cqw 12cqw 0;
   text-align: center;
   background: #284a77;
