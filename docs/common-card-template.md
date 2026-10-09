@@ -10,9 +10,9 @@ The existing artwork was found at `public/art/aether/characters/marth_hero-king.
 
 - `src/types/heroCard.ts`: separate presentation data model with layout discriminant, power and characterType; avoids inventing legacy attack/defense fields.
 - `src/data/marthPreview.ts`: FE-001 fixture only, with Common internally and C displayed via existing rarityLabels. It is not imported by the catalog/randomizer.
-- `src/components/cards/CommonHeroCard.tsx`: reusable printed face; cost and power, artwork, opaque description panel, centered identity and bottom corner rarity/ID.
+- `src/components/cards/CommonHeroCard.tsx`: compatibility export of `HeroCardLayout`; the shared printed face retains cost and power, artwork, opaque description panel, centered identity and bottom corner rarity/ID.
 - `src/components/cards/common-hero-card.css`: independent navy/parchment frame. Container-relative typography, proportional regions and full-card artwork scale together. The description wraps and permits scrolling for unusually long future rules text instead of truncation. Future exceptionally long names/types should be visually checked at the smallest supported size.
-- `src/components/cards/Card.tsx`: adds an opt-in branch for HeroCardData. All existing CardData records retain the old renderer.
+- `src/components/cards/Card.tsx`: compatibility export of the shared `CardRenderer`. All existing CardData records retain the old renderer.
 - `src/pages/MarthCommonPreview.tsx`: front/back, flip and 200–400px size controls, with mobile width limits.
 - `src/App.tsx`: dev-only lazy route.
 - `src/pages/CardShowcase.tsx`: adds a link to the Common preview; keeps existing controls and effects.
@@ -22,7 +22,7 @@ Common uses a quiet satin reflection, without Secret Rare foil. Shared TwoSidedC
 
 ## Future cards
 
-Create another HeroCardData record with `layout: 'hero-common'` and pass it to Card. This selects the new template without replacing legacy records. Full rarity names remain typed and short display labels come from rarityLabels. Add additional layout variants for future rarity frame designs; no new rarity visuals or gameplay effects are implemented here.
+Create another HeroCardData record with `layout: 'hero'` and pass it to Card or CardRenderer. The existing `hero-common` value remains supported. Full rarity names and C/U/R/SR/UR/SEC are accepted at this presentation boundary. Configure future frame styles in `src/config/rarityDesigns.ts`; unimplemented variants use the approved Common layout. Existing catalog records and the Secret Rare showcase keep their renderers. See [Rarity-aware card rendering](rarity-card-renderer.md) for slots, artwork layers, effects and regression coverage.
 
 ## Verification
 

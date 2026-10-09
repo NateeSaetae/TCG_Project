@@ -294,3 +294,112 @@ test('Marth preview supports shared flip faces and existing card-back artwork', 
   for (const label of ['Show Front', 'Show Back', 'Flip Card', 'Preview size'])
     assert.ok(preview.includes(label));
 });
+
+const { readFile } = await import('node:fs/promises');
+const { createHash } = await import('node:crypto');
+const { marthPreview } = await server.ssrLoadModule(
+  '/src/data/marthPreview.ts',
+);
+const { CardRenderer } = await server.ssrLoadModule(
+  '/src/components/cards/CardRenderer.tsx',
+);
+const { HeroCardLayout } = await server.ssrLoadModule(
+  '/src/components/cards/HeroCardLayout.tsx',
+);
+const { rarityNames, rarityCode, rarityDesigns, resolveRarityDesign } =
+  await server.ssrLoadModule('/src/config/rarityDesigns.ts');
+
+test('approved Common markup and CSS stay identical across sizes, hidden and flip states', async () => {
+  const baseline = JSON.parse(
+    await readFile(
+      new URL('./fixtures/common-baseline.json', import.meta.url),
+      'utf8',
+    ),
+  );
+  for (const [index, props] of baseline.props.entries()) {
+    assert.equal(
+      render(CardRenderer, { card: marthPreview, ...props }),
+      baseline.markup[index],
+    );
+    assert.equal(
+      render(Card, { card: marthPreview, ...props }),
+      baseline.markup[index],
+    );
+  }
+  const css = await readFile(
+    new URL('../src/components/cards/common-hero-card.css', import.meta.url),
+    'utf8',
+  );
+  assert.equal(
+    createHash('sha256').update(css).digest('hex'),
+    baseline.cssHash,
+  );
+});
+
+test('all six rarity names and codes select Common fallback without changing identity', () => {
+  for (const [code, name] of Object.entries(rarityNames)) {
+    assert.equal(rarityCode(code), code);
+    assert.equal(rarityCode(name), code);
+    assert.equal(resolveRarityDesign(code), rarityDesigns.C);
+    const card = { ...marthPreview, layout: 'hero', rarity: code };
+    const byCode = render(CardRenderer, { card });
+    const byName = render(CardRenderer, { card: { ...card, rarity: name } });
+    assert.equal(byCode, byName);
+    assert.ok(byCode.includes('aria-label="' + name + '">' + code));
+    assert.ok(byCode.includes('common-print-frame'));
+    assert.ok(byCode.includes('FE-001'));
+    assert.ok(!byCode.includes('sr-rainbow'));
+    assert.equal(card.rarity, code);
+  }
+});
+
+test('implemented variants use shared slots and can opt into artwork layers and separate effects', () => {
+  const previous = rarityDesigns.U;
+  const Effects = ({ active }) =>
+    React.createElement('div', { 'data-test-holo': active ? 'on' : 'off' });
+  rarityDesigns.U = {
+    implemented: true,
+    layout: 'hero-common',
+    design: {
+      frame: { className: 'test-frame' },
+      description: { style: { background: 'pink' } },
+      background: { className: 'test-background' },
+      artwork: { layers: true, className: 'test-art' },
+      Effects,
+    },
+  };
+  const card = {
+    ...marthPreview,
+    rarity: 'U',
+    artwork: {
+      background: '/test-bg.png',
+      character: '/test-character.png',
+      foreground: '/test-front.png',
+    },
+  };
+  try {
+    const html = render(CardRenderer, { card });
+    for (const value of [
+      'test-frame',
+      'background:pink',
+      'test-background',
+      'test-art',
+      '/test-bg.png',
+      '/test-character.png',
+      '/test-front.png',
+      'data-test-holo="on"',
+    ])
+      assert.ok(html.includes(value));
+    assert.ok(!html.includes(marthPreview.image));
+    const disabled = render(CardRenderer, { card, effectsActive: false });
+    assert.ok(disabled.includes('data-test-holo="off"'));
+    const hidden = render(CardRenderer, { card, hidden: true });
+    assert.ok(!hidden.includes('/test-'));
+    assert.ok(!hidden.includes('data-test-holo'));
+    const fallback = render(HeroCardLayout, { card });
+    assert.ok(fallback.includes(marthPreview.image));
+    assert.ok(!fallback.includes('/test-bg.png'));
+  } finally {
+    rarityDesigns.U = previous;
+  }
+});

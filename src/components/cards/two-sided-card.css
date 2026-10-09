@@ -42,9 +42,8 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
-  /* The prototype PNG includes a dark outer margin. Trim it optically,
-     keeping the artwork proportional and its gold frame at the card edge. */
-  transform: translateY(1.5%) scale(1.09);
+  /* This asset includes white padding, with more space below the artwork. */
+  transform: translateY(-1%) scale(1.06);
   transform-origin: center;
   display: block;
 }
