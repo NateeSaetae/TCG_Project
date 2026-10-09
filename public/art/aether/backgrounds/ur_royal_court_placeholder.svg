@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 437.32">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#164271"/><stop offset=".39" stop-color="#8bb9db"/><stop offset=".68" stop-color="#ecdfc0"/><stop offset="1" stop-color="#324f78"/>
+    </linearGradient>
+    <radialGradient id="light"><stop stop-color="#fff6de" stop-opacity=".86"/><stop offset=".55" stop-color="#e3edec" stop-opacity=".23"/><stop offset="1" stop-color="#d9e8ed" stop-opacity="0"/></radialGradient>
+    <linearGradient id="stone" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#a8bbcb"/><stop offset=".5" stop-color="#536e94"/><stop offset="1" stop-color="#223e67"/></linearGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#748cb0"/><stop offset="1" stop-color="#142a4d"/></linearGradient>
+  </defs>
+  <rect width="300" height="437.32" fill="url(#sky)"/>
+  <ellipse cx="156" cy="105" rx="136" ry="153" fill="url(#light)"/>
+  <!-- Distant ivory court: intentionally low detail behind the portrait. -->
+  <path d="M76 218v-96l9-8V85l8-9 8 9v29l9 8v96Zm125 0v-96l9-8V77l8-12 8 12v37l9 8v96Z" fill="#dbe6e7" opacity=".54"/>
+  <path d="M113 225v-67l12-9v-36l9-9v-21l15-17 15 17v21l9 9v36l13 9v67Z" fill="#e7e9e1" opacity=".63"/>
+  <path d="M131 151v-26l18-22 18 22v26m-8 0v-25l-10-12-10 12v25" fill="#81a8c6" opacity=".45"/>
+  <path d="M101 224h100M85 196h30m80 0h30M118 167h62" stroke="#d4ac68" stroke-opacity=".43" stroke-width="1.4"/>
+  <!-- Framing pillars and pointed arches keep the center open. -->
+  <path d="M0 0h49v319H0Zm251 0h49v319h-49Z" fill="url(#stone)" opacity=".88"/>
+  <path d="M0 0h15v315H0Zm285 0h15v315h-15Z" fill="#183b67" opacity=".82"/>
+  <path d="M0 0h70c8 55 32 70 80 74 48-4 72-19 80-74h70v16c-15 76-55 98-150 103C55 114 15 92 0 16Z" fill="#21466f" opacity=".62"/>
+  <path d="M0 16c22 76 66 100 150 102 84-2 128-26 150-102M15 0c17 60 55 76 135 81 80-5 118-21 135-81" fill="none" stroke="#e2c68a" stroke-opacity=".56" stroke-width="2"/>
+  <path d="M26 0v267M274 0v267" stroke="#e5c78a" stroke-opacity=".45" stroke-width="2"/>
+  <path d="M14 66h23m-23 88h23m226-88h23m-23 88h23" stroke="#e3d8bd" stroke-opacity=".35" stroke-width="2"/>
+  <path d="M0 280c57-22 102-28 150-28s93 6 150 28v157.32H0Z" fill="url(#floor)"/>
+  <path d="M0 315h300M0 363h300M150 252 42 437.32M150 252l108 185.32M150 252l-43 185.32M150 252l43 185.32" stroke="#c4b68d" stroke-opacity=".27" stroke-width="1.5"/>
+  <ellipse cx="151" cy="288" rx="119" ry="38" fill="url(#light)" opacity=".22"/>
+</svg>

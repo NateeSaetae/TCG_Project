@@ -114,7 +114,9 @@ test('both faces share the physical card; backs use the same neutral artwork for
     assert.ok(html.includes('data-effects="off"'));
     const back = html.slice(html.indexOf('class="two-face two-back"'));
     assert.ok(back.includes(CARD_BACK_IMAGE));
-    assert.ok(back.includes('two-back-light'));
+    assert.ok(back.includes('fe-card-back-image'));
+    assert.ok(!back.includes('card-back-frame-foil'));
+    assert.ok(!back.includes('card-back-logo-foil'));
     assert.ok(!back.includes('sr-rainbow'));
     assert.ok(!back.includes('card-foil'));
   }
@@ -316,14 +318,25 @@ test('approved Common markup and CSS stay identical across sizes, hidden and fli
       'utf8',
     ),
   );
+  // The approved FRONT remains byte-identical; the back is intentionally replaced.
+  const approvedFront = (html, props) =>
+    props.face
+      ? html.slice(
+          html.indexOf('<div class="two-face two-front"'),
+          html.indexOf('<div class="two-face two-back"'),
+        )
+      : html;
   for (const [index, props] of baseline.props.entries()) {
     assert.equal(
-      render(CardRenderer, { card: marthPreview, ...props }),
-      baseline.markup[index],
+      approvedFront(
+        render(CardRenderer, { card: marthPreview, ...props }),
+        props,
+      ),
+      approvedFront(baseline.markup[index], props),
     );
     assert.equal(
-      render(Card, { card: marthPreview, ...props }),
-      baseline.markup[index],
+      approvedFront(render(Card, { card: marthPreview, ...props }), props),
+      approvedFront(baseline.markup[index], props),
     );
   }
   const css = await readFile(
@@ -336,11 +349,16 @@ test('approved Common markup and CSS stay identical across sizes, hidden and fli
   );
 });
 
-test('all six rarity names and codes select Common fallback without changing identity', () => {
+test('rarity names and codes select their implemented design without changing identity', () => {
   for (const [code, name] of Object.entries(rarityNames)) {
     assert.equal(rarityCode(code), code);
     assert.equal(rarityCode(name), code);
-    assert.equal(resolveRarityDesign(code), rarityDesigns.C);
+    assert.equal(
+      resolveRarityDesign(code),
+      code === 'U' || code === 'R' || code === 'SR' || code === 'UR'
+        ? rarityDesigns[code]
+        : rarityDesigns.C,
+    );
     const card = { ...marthPreview, layout: 'hero', rarity: code };
     const byCode = render(CardRenderer, { card });
     const byName = render(CardRenderer, { card: { ...card, rarity: name } });
@@ -402,4 +420,313 @@ test('implemented variants use shared slots and can opt into artwork layers and 
   } finally {
     rarityDesigns.U = previous;
   }
+});
+
+test('card back renders one approved image without legacy stack classes or foil layers', async () => {
+  const { CardBack } = await server.ssrLoadModule(
+    '/src/components/cards/CardBack.tsx',
+  );
+  const { cardBackImage } = await server.ssrLoadModule(
+    '/src/config/cardBack.ts',
+  );
+  await access(new URL('../public' + cardBackImage, import.meta.url));
+  const html = render(CardBack, { interactive: false });
+  assert.equal((html.match(/<img /g) || []).length, 1);
+  assert.ok(html.includes('src="' + cardBackImage + '"'));
+  assert.ok(!html.includes('class="card-back"'));
+  assert.ok(!html.includes('foil'));
+  assert.ok(!html.includes('mask'));
+  assert.ok(render(CardBack, {}).includes('fe-card-back-interactive'));
+});
+
+test('Marth Uncommon has independent grassland and character art without changing Common data', async () => {
+  const { marthUncommonPreview } = await server.ssrLoadModule(
+    '/src/data/marthUncommonPreview.ts',
+  );
+  assert.equal(marthPreview.id, 'FE-001');
+  assert.equal(
+    marthPreview.image,
+    '/art/aether/characters/marth_hero-king_C.png',
+  );
+  assert.equal(marthUncommonPreview.id, 'FE-002');
+  assert.equal(
+    marthUncommonPreview.image,
+    '/art/aether/characters/marth_hero-king.png',
+  );
+  assert.equal(
+    marthUncommonPreview.artwork.character,
+    marthUncommonPreview.image,
+  );
+  assert.equal(marthUncommonPreview.rarity, 'U');
+  assert.equal(marthUncommonPreview.cost, marthPreview.cost);
+  assert.equal(marthUncommonPreview.power, marthPreview.power);
+  assert.equal(marthUncommonPreview.description, marthPreview.description);
+  assert.ok(!cards.some((card) => card.id === marthUncommonPreview.id));
+  for (const path of [
+    marthUncommonPreview.artwork.background,
+    marthUncommonPreview.artwork.character,
+  ]) {
+    await access(new URL('../public' + path, import.meta.url));
+  }
+  const html = render(Card, { card: marthUncommonPreview });
+  assert.ok(
+    html.indexOf('hero-artwork-background') <
+      html.indexOf('hero-artwork-character'),
+  );
+  for (const value of [
+    marthUncommonPreview.artwork.background,
+    marthUncommonPreview.artwork.character,
+    'uncommon-description',
+    'uncommon-print-frame',
+    'aria-label="Uncommon">U',
+    'FE-002',
+    'Cost 3',
+    '2000',
+    marthPreview.description,
+  ]) {
+    assert.ok(html.includes(value), value);
+  }
+  assert.ok(!html.includes('sr-rainbow'));
+  assert.ok(!html.includes('card-foil'));
+  const hidden = render(Card, { card: marthUncommonPreview, hidden: true });
+  assert.ok(!hidden.includes(marthUncommonPreview.artwork.background));
+  assert.ok(!hidden.includes(marthUncommonPreview.artwork.character));
+  const { default: MarthCommonPreview } = await server.ssrLoadModule(
+    '/src/pages/MarthCommonPreview.tsx',
+  );
+  const preview = render(MarthCommonPreview, {});
+  assert.ok(preview.includes('FE-001'));
+  assert.ok(preview.includes('FE-002'));
+});
+
+test('FE-003 reuses Uncommon assets and data in a full-art Rare design', async () => {
+  const { marthUncommonPreview } = await server.ssrLoadModule(
+    '/src/data/marthUncommonPreview.ts',
+  );
+  const { marthRarePreview } = await server.ssrLoadModule(
+    '/src/data/marthRarePreview.ts',
+  );
+  assert.equal(marthRarePreview.id, 'FE-003');
+  assert.equal(marthRarePreview.rarity, 'R');
+  assert.equal(marthRarePreview.cost, 3);
+  assert.equal(marthRarePreview.power, 2000);
+  assert.equal(marthRarePreview.description, marthUncommonPreview.description);
+  assert.deepEqual(marthRarePreview.artwork, marthUncommonPreview.artwork);
+  assert.ok(!cards.some((card) => card.id === 'FE-003'));
+  const html = render(Card, { card: marthRarePreview });
+  for (const value of [
+    'rare-hero-body',
+    'rare-art-field',
+    'rare-print-frame',
+    'rare-description',
+    'rare-nameplate',
+    'aria-label="Rare">R',
+    'FE-003',
+    'Cost 3',
+    '2000',
+    marthRarePreview.description,
+  ])
+    assert.ok(html.includes(value), value);
+  assert.ok(
+    html.indexOf('hero-artwork-background') <
+      html.indexOf('hero-artwork-character'),
+  );
+  assert.ok(!html.includes('sr-rainbow'));
+  assert.ok(!html.includes('card-foil'));
+  const css = await readFile(
+    new URL('../src/components/cards/rare-hero-card.css', import.meta.url),
+    'utf8',
+  );
+  assert.match(css, /\.common-art-field\.rare-art-field\s*\{[^}]*inset:\s*0;/);
+  assert.match(
+    css,
+    /\.common-description\.rare-description\s*\{[^}]*background:\s*transparent;/,
+  );
+  assert.match(
+    css,
+    /\.common-identity\.rare-nameplate\s*\{[^}]*left:\s*5%;[^}]*right:\s*5%;[^}]*background:\s*var\(--rare-frame-color\);/,
+  );
+  const hidden = render(Card, { card: marthRarePreview, hidden: true });
+  assert.ok(!hidden.includes(marthRarePreview.artwork.background));
+  assert.ok(!hidden.includes(marthRarePreview.artwork.character));
+  const { default: MarthCommonPreview } = await server.ssrLoadModule(
+    '/src/pages/MarthCommonPreview.tsx',
+  );
+  const preview = render(MarthCommonPreview, {});
+  for (const id of ['FE-001', 'FE-002', 'FE-003'])
+    assert.ok(preview.includes(id));
+});
+
+test('FE-004 uses its alternate transparent Marth art over the battlefield with fixed stats', async () => {
+  const { marthRarePreview } = await server.ssrLoadModule(
+    '/src/data/marthRarePreview.ts',
+  );
+  const { marthSuperRarePreview } = await server.ssrLoadModule(
+    '/src/data/marthSuperRarePreview.ts',
+  );
+  assert.equal(marthSuperRarePreview.id, 'FE-004');
+  assert.equal(marthSuperRarePreview.rarity, 'SR');
+  for (const field of [
+    'name',
+    'cost',
+    'power',
+    'characterType',
+    'description',
+  ]) {
+    assert.equal(marthSuperRarePreview[field], marthRarePreview[field]);
+  }
+  assert.ok(!cards.some((card) => card.id === 'FE-004'));
+  assert.notEqual(
+    marthSuperRarePreview.artwork.background,
+    marthRarePreview.artwork.background,
+  );
+  assert.notEqual(
+    marthSuperRarePreview.artwork.character,
+    marthRarePreview.artwork.character,
+  );
+  for (const path of [
+    marthSuperRarePreview.artwork.background,
+    marthSuperRarePreview.artwork.character,
+  ]) {
+    await access(new URL('../public' + path, import.meta.url));
+  }
+  const html = render(Card, { card: marthSuperRarePreview });
+  for (const value of [
+    'super-rare-hero-body',
+    'super-rare-art-field',
+    'super-rare-print-frame',
+    'super-rare-description',
+    'super-rare-nameplate',
+    'aria-label="Super Rare">SR',
+    'FE-004',
+    'Cost 3',
+    '2000',
+    marthRarePreview.description,
+    ...Object.values(marthSuperRarePreview.artwork),
+  ]) {
+    assert.ok(html.includes(value), value);
+  }
+  assert.ok(
+    html.indexOf('hero-artwork-background') <
+      html.indexOf('hero-artwork-character'),
+  );
+  assert.ok(!html.includes('sr-rainbow'));
+  assert.ok(!html.includes('card-foil'));
+  const hidden = render(Card, { card: marthSuperRarePreview, hidden: true });
+  assert.ok(!hidden.includes(marthSuperRarePreview.artwork.background));
+  assert.ok(!hidden.includes(marthSuperRarePreview.artwork.character));
+  const css = await readFile(
+    new URL(
+      '../src/components/cards/super-rare-hero-card.css',
+      import.meta.url,
+    ),
+    'utf8',
+  );
+  assert.match(
+    css,
+    /\.super-rare-art-field img\.hero-artwork-character\s*\{[^}]*object-fit:\s*contain;/,
+  );
+  assert.match(
+    css,
+    /\.common-description\.super-rare-description\s*\{[^}]*background:\s*transparent;/,
+  );
+  const { default: MarthCommonPreview } = await server.ssrLoadModule(
+    '/src/pages/MarthCommonPreview.tsx',
+  );
+  const preview = render(MarthCommonPreview, {});
+  for (const id of ['FE-001', 'FE-002', 'FE-003', 'FE-004'])
+    assert.ok(preview.includes(id));
+});
+
+test('FE-004 keeps two independent effect assets around the character', async () => {
+  const { marthSuperRarePreview } = await server.ssrLoadModule(
+    '/src/data/marthSuperRarePreview.ts',
+  );
+  const art = marthSuperRarePreview.artwork;
+  for (const path of [art.midground, art.foreground])
+    await access(new URL('../public' + path, import.meta.url));
+  const html = render(CardRenderer, { card: marthSuperRarePreview });
+  assert.ok(
+    html.indexOf('hero-artwork-midground') <
+      html.indexOf('hero-artwork-character'),
+  );
+  assert.ok(
+    html.indexOf('hero-artwork-character') <
+      html.indexOf('hero-artwork-foreground'),
+  );
+  const { marthUncommonPreview } = await server.ssrLoadModule(
+    '/src/data/marthUncommonPreview.ts',
+  );
+  const { marthRarePreview } = await server.ssrLoadModule(
+    '/src/data/marthRarePreview.ts',
+  );
+  for (const card of [marthPreview, marthUncommonPreview, marthRarePreview]) {
+    const variant = render(CardRenderer, { card });
+    assert.ok(!variant.includes(art.midground));
+    assert.ok(!variant.includes(art.foreground));
+  }
+});
+
+test('FE-005 UR keeps independent art, selective foil, and prior rarities intact', async () => {
+  const { marthUltraRarePreview } = await server.ssrLoadModule(
+    '/src/data/marthUltraRarePreview.ts',
+  );
+  const { marthSuperRarePreview } = await server.ssrLoadModule(
+    '/src/data/marthSuperRarePreview.ts',
+  );
+  assert.equal(marthUltraRarePreview.id, 'FE-005');
+  assert.equal(marthUltraRarePreview.rarity, 'UR');
+  for (const field of ['cost', 'power', 'name', 'characterType', 'description'])
+    assert.equal(marthUltraRarePreview[field], marthSuperRarePreview[field]);
+  assert.ok(!cards.some((card) => card.id === 'FE-005'));
+  assert.notEqual(
+    marthUltraRarePreview.artwork.character,
+    marthSuperRarePreview.artwork.character,
+  );
+  for (const asset of [
+    ...Object.values(marthUltraRarePreview.artwork),
+    '/art/aether/frames/ur_foil_mask.svg',
+  ])
+    await access(new URL('../public' + asset, import.meta.url));
+  const html = render(CardRenderer, { card: marthUltraRarePreview });
+  for (const value of [
+    'ultra-rare-hero-body',
+    'ultra-rare-art-field',
+    'ultra-rare-nameplate',
+    'ultra-rare-description',
+    'ultra-rare-badge',
+    'ultra-rare-print-frame',
+    'ultra-rare-foil',
+    'FE-005',
+    'aria-label="Ultra Rare">UR',
+    ...Object.values(marthUltraRarePreview.artwork),
+  ])
+    assert.ok(html.includes(value), value);
+  assert.ok(
+    html.indexOf('hero-artwork-background') <
+      html.indexOf('hero-artwork-character'),
+  );
+  assert.ok(
+    html.indexOf('hero-artwork-character') <
+      html.indexOf('hero-artwork-foreground'),
+  );
+  assert.ok(!html.includes('hero-frame-overlay'));
+  assert.ok(!html.includes('sr-rainbow'));
+  assert.ok(
+    !render(CardRenderer, {
+      card: marthUltraRarePreview,
+      effectsActive: false,
+    }).includes('ultra-rare-foil'),
+  );
+  const hidden = render(CardRenderer, {
+    card: marthUltraRarePreview,
+    hidden: true,
+  });
+  assert.ok(!hidden.includes(marthUltraRarePreview.artwork.character));
+  for (const card of [marthPreview, marthSuperRarePreview])
+    assert.ok(!render(CardRenderer, { card }).includes('ultra-rare-foil'));
+  const { default: MarthCommonPreview } = await server.ssrLoadModule(
+    '/src/pages/MarthCommonPreview.tsx',
+  );
+  assert.ok(render(MarthCommonPreview, {}).includes('FE-005'));
 });

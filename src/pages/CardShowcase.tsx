@@ -27,7 +27,7 @@ export default function CardShowcase({ sound }: { sound: boolean }) {
         Move across the card to explore its foil, reflected light and depth.
       </p>
       <a className="text-button" href="#/dev/marth-common">
-        Preview Marth · Common template →
+        Preview Marth rarities →
       </a>
       <div className="showcase-stage">
         {mode === 'inspect' ? (

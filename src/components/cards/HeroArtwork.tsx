@@ -20,10 +20,11 @@ export function HeroArtwork({
             card.artwork?.[layer] && (
               <img
                 key={layer}
+                className={'hero-artwork-' + layer}
                 src={card.artwork[layer]}
                 alt={layer === 'character' ? card.name : ''}
                 draggable={false}
-                style={style}
+                style={layer === 'character' ? style : undefined}
               />
             ),
         )}

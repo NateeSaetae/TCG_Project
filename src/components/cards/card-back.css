@@ -1,0 +1,41 @@
+/* Use a dedicated namespace: .card-back belongs to the legacy pack stack. */
+.fe-card-back {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: inherit;
+}
+.fe-card-back-interactive {
+  width: min(100%, 300px);
+  border-radius: 12px;
+  perspective: 1100px;
+}
+.fe-card-back-surface {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  background: transparent;
+}
+.fe-card-back-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+  user-select: none;
+}
+.fe-card-back-interactive .fe-card-back-surface {
+  transform: rotateX(calc(var(--py, 0) * -6deg))
+    rotateY(calc(var(--px, 0) * 7deg));
+}
+.two-back > .fe-card-back {
+  height: 100%;
+  aspect-ratio: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .fe-card-back-interactive .fe-card-back-surface {
+    transform: none;
+  }
+}

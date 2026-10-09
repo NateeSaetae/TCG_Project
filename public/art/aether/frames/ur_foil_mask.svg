@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 145.773">
+  <!-- The two print lines retain the Common/Uncommon Power-notch geometry. -->
+  <g fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M5 13V5H63L69 11H95V139.5H5Z" stroke-width="1.4"/>
+    <path d="M6.1 13V6.2H62.5L68.5 12.2H93.9V138.3H6.1" stroke-width=".4"/>
+  </g>
+</svg>

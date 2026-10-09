@@ -1,0 +1,91 @@
+/* Full-art Rare: the approved anatomy remains in the shared HeroCardLayout. */
+.common-hero-body.rare-hero-body {
+  --rare-frame-color: #284a77;
+  border: 1px solid #c6d8e7;
+  background: #183047;
+}
+/* Remove the shared artwork box as a stacking context so its two images
+   can sit on opposite sides of the printed frame. The card body still clips them. */
+.common-art-field.rare-art-field {
+  position: static;
+  inset: 0;
+  overflow: visible;
+  clip-path: none;
+  background: transparent;
+}
+.rare-art-field img.hero-artwork-background {
+  z-index: 0;
+  object-fit: cover;
+  object-position: center 58%;
+}
+.rare-art-field img.hero-artwork-character {
+  z-index: 2;
+  object-fit: cover;
+  object-position: center;
+}
+.rare-hero-body .common-description-trim {
+  display: none;
+}
+.common-print-frame.rare-print-frame {
+  z-index: 1;
+}
+.rare-hero-body .common-stat-bar,
+.rare-hero-body .common-card-footer {
+  z-index: 5;
+}
+.rare-print-frame path:first-child {
+  stroke: var(--rare-frame-color);
+  stroke-width: 0.35;
+}
+.rare-print-frame path:nth-child(2) {
+  stroke: var(--rare-frame-color);
+  stroke-width: 0.15;
+}
+.common-description.rare-description {
+  z-index: 3;
+  background: transparent;
+  backdrop-filter: none;
+  border: 0;
+  overflow: hidden;
+}
+.common-description.rare-description p {
+  color: #fffdf4;
+  text-shadow:
+    0 1px 3px #07111be6,
+    0 2px 7px #07111bcc;
+}
+.common-identity.rare-nameplate {
+  z-index: 4;
+  left: 5%;
+  right: 5%;
+  bottom: 4.3%;
+  background: var(--rare-frame-color);
+}
+.rare-nameplate .common-category,
+.rare-nameplate h3,
+.rare-nameplate p,
+.rare-hero-body .common-power,
+.rare-hero-body .common-card-id {
+  color: #fffdf4;
+  text-shadow:
+    0 1px 3px #07111be6,
+    0 2px 7px #07111bcc;
+}
+.rare-hero-body .common-cost {
+  border-color: #dce8ea;
+  background: #122640;
+}
+.common-rarity.rare-badge {
+  color: #fffdf4;
+}
+.rare-badge .common-rarity-seal path:first-child {
+  fill: #c6d8e7;
+  stroke: #f2f6f4;
+}
+.rare-badge .common-rarity-seal path:nth-child(2) {
+  fill: #1b3a56;
+  stroke: #b8d7e8;
+}
+.rare-badge .common-rarity-seal path:nth-child(n + 3) {
+  stroke: #e5eff0;
+}

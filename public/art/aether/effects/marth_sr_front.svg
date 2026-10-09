@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 437.32">
+  <!-- Sparse front effect: sword edge and outer cape only. -->
+  <defs>
+    <linearGradient id="blade" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#82dfff" stop-opacity=".18"/><stop offset=".48" stop-color="#d8fcff" stop-opacity="1"/><stop offset="1" stop-color="#2797ee" stop-opacity=".08"/></linearGradient>
+    <linearGradient id="cape" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1c62c6" stop-opacity="0"/><stop offset=".48" stop-color="#51b9ff" stop-opacity=".82"/><stop offset="1" stop-color="#a4ebff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <path d="M-14 139C21 148 55 170 106 201" fill="none" stroke="#338fde" stroke-opacity=".48" stroke-width="10" stroke-linecap="round"/>
+  <path d="M-12 139C25 153 64 178 107 201" fill="none" stroke="url(#blade)" stroke-width="3.1" stroke-linecap="round"/>
+  <path d="M4 149c25 15 38 16 58 29-21-7-38-10-58-29Z" fill="#a8edff" opacity=".66"/>
+  <path d="M9 226c24-21 32-33 41-51-4 33-22 58-48 77 10-12 14-19 7-26Z" fill="url(#cape)" opacity=".92"/>
+  <path d="M12 232c18-16 26-31 31-45" fill="none" stroke="#b6efff" stroke-opacity=".78" stroke-width="1.8"/>
+  <path d="M63 199l5-11 4 8 11-3-10 8-2 9-4-7-10 1Z" fill="#c5f6ff" opacity=".8"/>
+  <path d="m89 188 3 5 5 3-5 3-3 5-3-5-5-3 5-3Z" fill="#e0fbff" opacity=".9"/>
+  <path d="m26 165 2.2 4 4 2-4 2-2.2 4-2-4-4-2 4-2Z" fill="#d3f8ff" opacity=".83"/>
+  <path d="M-13 135c47 12 85 40 119 64" fill="none" stroke="#a2ecff" stroke-opacity=".62" stroke-width=".9"/>
+  <path d="M2 257c14-9 22-17 34-31-9 26-23 40-36 46Z" fill="#3c9df3" opacity=".48"/>
+  <path d="m20 240 7-10 3 9-8 9Zm76-39 5-9 5 10-6 7Z" fill="#a5eaff" opacity=".76"/>
+  <g fill="#b8f1ff" opacity=".66"><circle cx="47" cy="184" r="1.1"/><circle cx="77" cy="210" r=".9"/><circle cx="12" cy="204" r=".8"/><circle cx="107" cy="215" r=".7"/></g>
+  <path d="m44 211 4-7 3 8-5 5Zm72-2 3-5 3 6-4 4Z" fill="#70c9ff" opacity=".42"/>
+</svg>

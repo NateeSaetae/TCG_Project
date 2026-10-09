@@ -10,6 +10,6 @@ export const marthPreview: HeroCardData = {
   power: 2000,
   characterType: 'Hero · Swordsman',
   description: 'The prince of Altea, destined to wield the legendary Falchion.',
-  image: '/art/aether/characters/marth_hero-king.png',
+  image: '/art/aether/characters/marth_hero-king_C.png',
   imagePosition: '50% 50%',
 };

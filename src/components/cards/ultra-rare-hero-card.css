@@ -1,0 +1,203 @@
+/* UR is a new presentation variant of the shared HeroCardLayout. */
+.common-hero-body.ultra-rare-hero-body {
+  border: 1px solid transparent;
+  /* The full Uncommon-style rim stays visible around the inset artwork. */
+  background: linear-gradient(
+    var(--foil-angle, 118deg),
+    #f7fcff 3%,
+    #a5d7ef 21%,
+    #e4c0ed 39%,
+    #fff9e7 53%,
+    #91d4ed 73%,
+    #f2c5e1 96%
+  );
+  background-size: 220% 220%;
+  background-position: var(--foil-x, 50%) var(--foil-y, 50%);
+  box-shadow:
+    inset 0 0 0 1px #ffffffb8,
+    inset 0 0 9px #34497466,
+    0 16px 35px #0006;
+  --ur-character-scale: 1.2;
+  --ur-magic-depth: 1.35;
+}
+.common-art-field.ultra-rare-art-field {
+  position: static;
+  overflow: visible;
+  clip-path: none;
+  background: transparent;
+}
+.ultra-rare-art-field img.hero-artwork-background {
+  z-index: 0;
+  inset: 3.5% 5% 4.3%;
+  width: 90%;
+  height: 92.2%;
+  border-radius: 3px;
+  clip-path: polygon(0 0, 64.5% 0, 71% 4.5%, 100% 4.5%, 100% 100%, 0 100%);
+  object-fit: cover;
+  object-position: center;
+  transform: translate3d(
+    calc(var(--background-x, 0px) * -1),
+    calc(var(--background-y, 0px) * -1),
+    0
+  );
+}
+.ultra-rare-hero-body::before {
+  content: '';
+  position: absolute;
+  inset: 3.5% 5% 4.3%;
+  z-index: 1;
+  pointer-events: none;
+  clip-path: polygon(0 0, 64.5% 0, 71% 4.5%, 100% 4.5%, 100% 100%, 0 100%);
+  background: linear-gradient(180deg, #09214818, #153a5d0b 42%, #071a39a3);
+}
+.ultra-rare-art-field img.hero-artwork-character {
+  z-index: 3;
+  object-fit: contain;
+  object-position: center 47%;
+  transform: translate3d(var(--character-x, 0px), var(--character-y, 0px), 0)
+    scale(var(--ur-character-scale));
+  transform-origin: center;
+}
+.ultra-rare-art-field img.hero-artwork-foreground {
+  z-index: 3;
+  object-fit: fill;
+  opacity: 0.84;
+  pointer-events: none;
+  transform: translate3d(
+    calc(var(--foreground-x, 0px) * var(--ur-magic-depth)),
+    calc(var(--foreground-y, 0px) * var(--ur-magic-depth)),
+    0
+  );
+}
+.ultra-rare-hero-body .common-description-trim {
+  display: none;
+}
+/* Shared Power-notch shape; Marth sits above the silver print and its foil. */
+.common-print-frame.ultra-rare-print-frame {
+  z-index: 2;
+  filter: drop-shadow(0 2px 2px #06172bbd) drop-shadow(0 0 4px #e3f5ff6e);
+}
+.ultra-rare-print-frame path:first-child {
+  stroke: #c5d1db;
+  stroke-width: 1.2;
+}
+.ultra-rare-print-frame path:nth-child(2) {
+  stroke: #f4f8fa;
+  stroke-width: 0.35;
+}
+.common-description.ultra-rare-description {
+  z-index: 4;
+  background: transparent;
+  backdrop-filter: none;
+  border: 0;
+  border-radius: 0;
+  height: 17.1%;
+  top: 65.1%;
+  overflow: auto;
+}
+.ultra-rare-description p {
+  color: #fff8e8;
+  text-shadow:
+    0 1px 2px #071425,
+    0 2px 5px #071425,
+    0 0 10px #071425;
+}
+.common-identity.ultra-rare-nameplate {
+  z-index: 5;
+  left: 4.85%;
+  right: 4.85%;
+  bottom: 4.2%;
+  background: transparent;
+  box-shadow: none;
+}
+.ultra-rare-nameplate .common-category,
+.ultra-rare-nameplate h3,
+.ultra-rare-nameplate p,
+.ultra-rare-hero-body .common-card-id {
+  color: #fff2cf;
+  text-shadow:
+    0 1px 2px #031325,
+    0 2px 5px #031325,
+    0 0 9px #031325;
+}
+.ultra-rare-hero-body .common-stat-bar,
+.ultra-rare-hero-body .common-card-footer {
+  z-index: 8;
+}
+.ultra-rare-hero-body .common-cost {
+  border-color: #f2d28b;
+  background: #0d326c;
+  opacity: 1;
+  box-shadow:
+    0 0 0 2px #9f783c,
+    0 2px 7px #06152a;
+}
+.ultra-rare-hero-body .common-cost span,
+.ultra-rare-hero-body .common-cost b {
+  text-shadow:
+    0 1px 2px #06162d,
+    0 0 5px #06162d;
+}
+.ultra-rare-hero-body .common-power {
+  color: #173557;
+  text-shadow:
+    0 1px 1px #ffffff,
+    0 0 5px #ffffffcc;
+}
+.common-rarity.ultra-rare-badge {
+  color: #fff5d3;
+  opacity: 1;
+  text-shadow:
+    0 1px 2px #06162d,
+    0 0 5px #06162d;
+}
+.ultra-rare-badge .common-rarity-seal {
+  background: #102f65;
+  clip-path: polygon(50% 3%, 91% 26.5%, 91% 73.5%, 50% 97%, 9% 73.5%, 9% 26.5%);
+}
+.ultra-rare-badge .common-rarity-seal path:first-child {
+  fill: #d5ac5d;
+  stroke: #fff0c1;
+}
+.ultra-rare-badge .common-rarity-seal path:nth-child(2) {
+  fill: #102f65;
+  stroke: #e0c27c;
+}
+.ultra-rare-badge .common-rarity-seal path:nth-child(n + 3) {
+  stroke: #f0d797;
+}
+.ultra-rare-foil {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    var(--foil-angle, 118deg),
+    #fff5d8 4%,
+    #6ccaff 20%,
+    #f6afe9 36%,
+    #faffff 51%,
+    #a299f1 66%,
+    #80e6ff 82%,
+    #ffe3a4 98%
+  );
+  background-size: 220% 220%;
+  background-position: var(--foil-x, 50%) var(--foil-y, 50%);
+  mask: url('/art/aether/frames/ur_foil_mask.svg') center / 100% 100% no-repeat;
+  -webkit-mask: url('/art/aether/frames/ur_foil_mask.svg') center / 100% 100%
+    no-repeat;
+  opacity: calc(0.72 + var(--presence, 0) * 0.18);
+  filter: drop-shadow(0 0 3px #a5e6ffd9);
+}
+.two-sided-card[data-effects='off'] .ultra-rare-foil {
+  visibility: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ultra-rare-art-field img.hero-artwork-background,
+  .ultra-rare-art-field img.hero-artwork-foreground {
+    transform: none;
+  }
+  .ultra-rare-art-field img.hero-artwork-character {
+    transform: scale(var(--ur-character-scale));
+  }
+}

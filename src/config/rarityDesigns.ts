@@ -1,6 +1,7 @@
 import type { ComponentType, CSSProperties } from 'react';
 import type { Rarity } from '../types';
 import { rarityLabels } from './rarityLabels';
+import { UltraRareFoil } from '../components/cards/UltraRareFoil';
 
 export type RarityCode = 'C' | 'U' | 'R' | 'SR' | 'UR' | 'SEC';
 export type RarityIdentifier = Rarity | RarityCode;
@@ -46,10 +47,55 @@ export interface RarityDesign {
 /** Common values remain in the approved CSS/SVG; no override is applied. */
 export const rarityDesigns: Record<RarityCode, RarityDesign> = {
   C: { implemented: true, layout: 'hero-common', design: {} },
-  U: { implemented: false, layout: 'hero-common', design: {} },
-  R: { implemented: false, layout: 'hero-common', design: {} },
-  SR: { implemented: false, layout: 'hero-common', design: {} },
-  UR: { implemented: false, layout: 'hero-common', design: {} },
+  U: {
+    implemented: true,
+    layout: 'hero-common',
+    design: {
+      background: { className: 'uncommon-hero-body' },
+      artwork: { layers: true, className: 'uncommon-art-field' },
+      frame: { className: 'uncommon-print-frame' },
+      description: { className: 'uncommon-description' },
+      nameplate: { className: 'uncommon-nameplate' },
+      badge: { className: 'uncommon-badge' },
+    },
+  },
+  R: {
+    implemented: true,
+    layout: 'hero-common',
+    design: {
+      background: { className: 'rare-hero-body' },
+      artwork: { layers: true, className: 'rare-art-field' },
+      frame: { className: 'rare-print-frame' },
+      description: { className: 'rare-description' },
+      nameplate: { className: 'rare-nameplate' },
+      badge: { className: 'rare-badge' },
+    },
+  },
+  SR: {
+    implemented: true,
+    layout: 'hero-common',
+    design: {
+      background: { className: 'super-rare-hero-body' },
+      artwork: { layers: true, className: 'super-rare-art-field' },
+      frame: { className: 'super-rare-print-frame' },
+      description: { className: 'super-rare-description' },
+      nameplate: { className: 'super-rare-nameplate' },
+      badge: { className: 'super-rare-badge' },
+    },
+  },
+  UR: {
+    implemented: true,
+    layout: 'hero-common',
+    design: {
+      background: { className: 'ultra-rare-hero-body' },
+      artwork: { layers: true, className: 'ultra-rare-art-field' },
+      frame: { className: 'ultra-rare-print-frame' },
+      description: { className: 'ultra-rare-description' },
+      nameplate: { className: 'ultra-rare-nameplate' },
+      badge: { className: 'ultra-rare-badge' },
+      Effects: UltraRareFoil,
+    },
+  },
   SEC: { implemented: false, layout: 'hero-common', design: {} },
 };
 

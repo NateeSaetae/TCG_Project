@@ -11,6 +11,10 @@ import {
   type PointerPosition,
 } from '../../hooks/useCardPointer';
 import './common-hero-card.css';
+import './uncommon-hero-card.css';
+import './rare-hero-card.css';
+import './super-rare-hero-card.css';
+import './ultra-rare-hero-card.css';
 
 /** The printed face only; Card/TwoSidedCard continue to own flipping. */
 export function HeroCardLayout({

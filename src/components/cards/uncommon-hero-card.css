@@ -1,0 +1,56 @@
+/* Uncommon reuses every printed slot of the Common layout. */
+.common-hero-body.uncommon-hero-body {
+  border-color: #779781;
+  background: #dbe8dc;
+}
+.uncommon-art-field img.hero-artwork-background {
+  object-fit: cover;
+  object-position: center 58%;
+}
+.uncommon-art-field img.hero-artwork-character {
+  object-fit: cover;
+  object-position: center;
+}
+.common-description.uncommon-description {
+  background: rgba(240, 229, 207, 0.82);
+  border-top-color: #6b947d;
+}
+.common-description.uncommon-description p {
+  color: #182a25;
+}
+.common-identity.uncommon-nameplate {
+  background: #254d58;
+}
+.common-rarity.uncommon-badge {
+  color: #f0e5cf;
+}
+.uncommon-badge .common-rarity-seal path:first-child {
+  fill: #91b49c;
+  stroke: #e2efdf;
+}
+.uncommon-badge .common-rarity-seal path:nth-child(2) {
+  fill: #1e4852;
+  stroke: #517e6b;
+}
+.uncommon-badge .common-rarity-seal path:nth-child(n + 3) {
+  stroke: #c7e1c9;
+}
+.uncommon-print-frame path:first-child {
+  stroke: #315c58;
+}
+.uncommon-print-frame path:nth-child(2) {
+  stroke: #8baf91;
+}
+
+.marth-preview-comparison {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: clamp(24px, 5vw, 56px);
+  max-width: 100%;
+}
+.marth-preview-comparison .marth-preview-size > .eyebrow {
+  min-height: 28px;
+  text-align: center;
+}

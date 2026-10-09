@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 437.32">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff2c6"/><stop offset=".25" stop-color="#b98940"/><stop offset=".55" stop-color="#f2d695"/><stop offset=".8" stop-color="#9b692d"/><stop offset="1" stop-color="#f7dda2"/></linearGradient>
+    <linearGradient id="gem" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f4ffff"/><stop offset=".35" stop-color="#72d5ff"/><stop offset="1" stop-color="#173fa2"/></linearGradient>
+  </defs>
+  <rect x="2.5" y="2.5" width="295" height="432.32" rx="11" fill="none" stroke="url(#gold)" stroke-width="2.5"/>
+  <rect x="7" y="7" width="286" height="423.32" rx="8" fill="none" stroke="#133568" stroke-width="3"/>
+  <rect x="9.5" y="9.5" width="281" height="418.32" rx="6" fill="none" stroke="url(#gold)" stroke-width=".9"/>
+  <path d="M17 48V21h28M255 21h28v27M17 390v26h28m210 0h28v-26" fill="none" stroke="url(#gold)" stroke-width="1.9"/>
+  <path d="M13 75h7m-7 94h7m-7 94h7m267-188h-7m7 94h-7m7 94h-7" stroke="#e1bf78" stroke-width="1.2" stroke-opacity=".8"/>
+  <g fill="none" stroke="url(#gold)" stroke-width="1.35" stroke-linejoin="round">
+    <path d="M11 49q12-4 12-19 5 8 13 7-8 7-8 18-8-7-17-6ZM289 49q-12-4-12-19-5 8-13 7 8 7 8 18 8-7 17-6Z"/>
+    <path d="M11 388q12 4 12 19 5-8 13-7-8-7-8-18-8 7-17 6ZM289 388q-12 4-12 19-5-8-13-7 8-7 8-18 8 7 17 6Z"/>
+    <path d="M58 10l12 6h56l9 8h30l9-8h56l12-6M58 427l12-6h56l9-8h30l9 8h56l12 6"/>
+  </g>
+  <path d="m150 7 10 10-10 11-10-11Zm0 402 10 10-10 11-10-11Z" fill="#153e77" stroke="url(#gold)" stroke-width="2"/>
+  <path d="m150 11 6 6-6 7-6-7Zm0 402 6 6-6 7-6-7Z" fill="url(#gem)"/>
+  <path d="m19 106 5 5-5 5-5-5Zm262 0 5 5-5 5-5-5Zm-262 215 5 5-5 5-5-5Zm262 0 5 5-5 5-5-5Z" fill="url(#gem)" stroke="#f3d58f" stroke-width="1"/>
+</svg>

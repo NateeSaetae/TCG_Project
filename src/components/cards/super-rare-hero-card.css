@@ -1,0 +1,147 @@
+/* SR extends the shared HeroCardLayout without changing C, U or R. */
+.common-hero-body.super-rare-hero-body {
+  border: 1px solid #dbe7e9;
+  background: #1b2227;
+  /* Effect parallax strength: 0 = still, larger absolute value = more depth. */
+  --sr-back-effect-depth: -0.5;
+  --sr-front-effect-depth: 1;
+  --sr-back-effect-opacity: 0.8;
+  --sr-front-effect-opacity: 0.55;
+}
+/* The artwork wrapper does not form a stacking context: each image can sit
+   independently around the printed frame while the rounded body clips both. */
+.common-art-field.super-rare-art-field {
+  position: static;
+  overflow: visible;
+  clip-path: none;
+  background: transparent;
+}
+.super-rare-art-field img.hero-artwork-background {
+  z-index: 0;
+  object-fit: cover;
+  object-position: center;
+  transform: translate3d(
+    calc(var(--background-x, 0px) * -1),
+    calc(var(--background-y, 0px) * -1),
+    0
+  );
+}
+.super-rare-hero-body::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(180deg, #0b172520, #0b172535 48%, #09142044);
+}
+/* Independent supplied PNG effects sit behind/in front of Marth. */
+.super-rare-art-field img.hero-artwork-midground {
+  z-index: 2;
+  object-fit: contain;
+  object-position: center;
+  opacity: var(--sr-back-effect-opacity);
+  transform: translate3d(
+    calc(var(--midground-x, 0px) * var(--sr-back-effect-depth)),
+    calc(var(--midground-y, 0px) * var(--sr-back-effect-depth)),
+    0
+  );
+  pointer-events: none;
+}
+.super-rare-art-field img.hero-artwork-foreground {
+  z-index: 3;
+  object-fit: contain;
+  object-position: center;
+  opacity: var(--sr-front-effect-opacity);
+  transform: translate3d(
+    calc(var(--foreground-x, 0px) * var(--sr-front-effect-depth)),
+    calc(var(--foreground-y, 0px) * var(--sr-front-effect-depth)),
+    0
+  );
+  pointer-events: none;
+}
+.super-rare-art-field img.hero-artwork-character {
+  --sr-character-scale: 1.15;
+  z-index: 3;
+  object-fit: contain;
+  object-position: center 48%;
+  transform: translate3d(var(--character-x, 0px), var(--character-y, 0px), 0)
+    scale(var(--sr-character-scale));
+  transform-origin: center;
+}
+.super-rare-hero-body .common-description-trim {
+  display: none;
+}
+.common-print-frame.super-rare-print-frame {
+  z-index: 2;
+}
+.super-rare-print-frame path:first-child {
+  stroke: #e1eceb;
+  stroke-width: 0.35;
+}
+.super-rare-print-frame path:nth-child(2) {
+  stroke: #abc9d6;
+  stroke-width: 0.15;
+}
+.common-description.super-rare-description {
+  z-index: 4;
+  background: transparent;
+  backdrop-filter: none;
+  border: 0;
+  overflow: hidden;
+}
+.super-rare-description p {
+  color: #fffaf0;
+  text-shadow:
+    0 1px 3px #050c12f2,
+    0 2px 8px #050c12d9;
+}
+.common-identity.super-rare-nameplate {
+  z-index: 5;
+  left: 5%;
+  right: 5%;
+  bottom: 4.3%;
+  background: rgba(12, 31, 48, 0.62);
+}
+.super-rare-nameplate .common-category,
+.super-rare-nameplate h3,
+.super-rare-nameplate p,
+.super-rare-hero-body .common-power,
+.super-rare-hero-body .common-card-id {
+  color: #fffaf0;
+  text-shadow:
+    0 1px 3px #050c12f2,
+    0 2px 8px #050c12d9;
+}
+.super-rare-hero-body .common-stat-bar,
+.super-rare-hero-body .common-card-footer {
+  z-index: 6;
+}
+.super-rare-hero-body .common-cost {
+  border-color: #dbe7e9;
+  background: #172b43;
+}
+.common-rarity.super-rare-badge {
+  color: #fffaf0;
+}
+.super-rare-badge .common-rarity-seal path:first-child {
+  fill: #d6e6e8;
+  stroke: #f7f4e8;
+}
+.super-rare-badge .common-rarity-seal path:nth-child(2) {
+  fill: #19374e;
+  stroke: #b2d1db;
+}
+.super-rare-badge .common-rarity-seal path:nth-child(n + 3) {
+  stroke: #e1eceb;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .super-rare-art-field img.hero-artwork-background,
+  .super-rare-art-field img.hero-artwork-midground,
+  .super-rare-art-field img.hero-artwork-foreground {
+    transform: none;
+  }
+  .super-rare-art-field img.hero-artwork-character {
+    transform: scale(var(--sr-character-scale));
+  }
+}

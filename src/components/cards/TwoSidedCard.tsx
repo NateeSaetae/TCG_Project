@@ -5,9 +5,11 @@ import {
   type PointerPosition,
 } from '../../hooks/useCardPointer';
 import { holographicProfile } from '../../config/cardEffects';
+import { CardBack } from './CardBack';
+import { cardBackImage } from '../../config/cardBack';
 import './two-sided-card.css';
 export type CardFace = 'front' | 'back';
-export const CARD_BACK_IMAGE = '/card/card-back-prod.png';
+export const CARD_BACK_IMAGE = cardBackImage;
 export const CARD_FLIP_MS = 600;
 export function TwoSidedCard({
   face,
@@ -50,12 +52,7 @@ export function TwoSidedCard({
             {children}
           </div>
           <div className="two-face two-back" aria-hidden={face !== 'back'}>
-            <img
-              src={CARD_BACK_IMAGE}
-              alt="Fire Emblem TCG card back"
-              draggable={false}
-            />
-            <div className="two-back-light" aria-hidden="true" />
+            <CardBack interactive={false} />
           </div>
         </div>
       </div>
