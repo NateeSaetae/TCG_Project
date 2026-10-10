@@ -1,3 +1,4 @@
+import { magicEffectVariables } from './MagicEffects';
 import { useId } from 'react';
 import type { HeroCardData } from '../../types/heroCard';
 import {
@@ -37,6 +38,8 @@ export function HeroCardLayout({
   const pointer = useCardPointer(preview);
   const code = rarityCode(card.rarity);
   const Effects = design.Effects;
+  const magic =
+    code === 'UR' && card.magicEffects?.enabled ? card.magicEffects : undefined;
   const identityClipId = useId().replace(/:/g, '');
   return (
     <div
@@ -52,9 +55,14 @@ export function HeroCardLayout({
           'common-hero-body' +
           (design.background?.className
             ? ' ' + design.background.className
-            : '')
+            : '') +
+          (magic ? ' ur-magic-enhanced' : '')
         }
-        style={design.background?.style}
+        style={
+          magic
+            ? { ...design.background?.style, ...magicEffectVariables(magic) }
+            : design.background?.style
+        }
       >
         <div
           className={
@@ -219,7 +227,7 @@ export function HeroCardLayout({
             strokeWidth=".35"
           />
         </svg>
-        {Effects && !hidden && <Effects active={effectsActive} />}
+        {Effects && !hidden && <Effects active={effectsActive} card={card} />}
       </div>
     </div>
   );

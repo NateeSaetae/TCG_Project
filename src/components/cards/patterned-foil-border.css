@@ -1,0 +1,38 @@
+/* The notch follows the existing Power frame; the middle stays fully clear. */
+.patterned-foil-border {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  border-radius: inherit;
+  pointer-events: none;
+  overflow: hidden;
+}
+.foil-rim-metal {
+  opacity: 0.78;
+}
+.foil-rim-engraving {
+  opacity: 0.9;
+  filter: drop-shadow(0 0.14px 0.08px #33476580);
+}
+.foil-rim-glint {
+  transform-origin: center;
+  transform: translate(calc(var(--px, 0) * 24%), calc(var(--py, 0) * 14%))
+    rotate(-24deg);
+  opacity: calc(0.24 + var(--presence, 0) * 0.5);
+  mix-blend-mode: screen;
+}
+.patterned-foil-border[data-active='off'] .foil-rim-glint,
+.two-sided-card[data-effects='off'] .foil-rim-glint {
+  visibility: hidden;
+}
+.marth-preview-comparison[data-foil-border='plain'] .patterned-foil-border {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .foil-rim-glint {
+    transform: rotate(-24deg);
+    opacity: 0.24;
+  }
+}

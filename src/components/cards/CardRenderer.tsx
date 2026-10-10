@@ -1,3 +1,4 @@
+import { SecretHeroCard } from './SecretHeroCard';
 import { HeroCardLayout } from './HeroCardLayout';
 import { resolveRarityDesign } from '../../config/rarityDesigns';
 import type { HeroCardData } from '../../types/heroCard';
@@ -43,10 +44,22 @@ export function CardRenderer({
       </TwoSidedCard>
     );
   if ('layout' in card) {
+    const variant = resolveRarityDesign(card.rarity);
+    if (variant.layout === 'secret-full-art')
+      return (
+        <SecretHeroCard
+          card={card}
+          small={small}
+          hidden={hidden}
+          managedPointer={managedPointer}
+          preview={preview}
+          effectsActive={effectsActive}
+        />
+      );
     return (
       <HeroCardLayout
         card={card}
-        design={resolveRarityDesign(card.rarity).design}
+        design={variant.design}
         effectsActive={effectsActive}
         small={small}
         hidden={hidden}

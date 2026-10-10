@@ -1,0 +1,106 @@
+/* Scope every change to an opted-in UR. Legacy mode keeps the approved styling. */
+.ultra-rare-hero-body.ur-magic-enhanced .hero-artwork-foreground {
+  /* Shift the existing composition slightly below the face, without editing pixels. */
+  transform: translate3d(
+    calc(var(--foreground-x, 0px) * var(--ur-front-effect-depth)),
+    calc(var(--foreground-y, 0px) * var(--ur-front-effect-depth) + 2cqw),
+    0
+  );
+}
+.ur-magic-aura {
+  position: absolute;
+  inset: 10% 9% 22%;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 16% 48%, #58d9ff30, transparent 35%),
+    radial-gradient(ellipse at 85% 58%, #79cfff26, transparent 33%);
+  transform: translate3d(
+    calc(var(--background-x, 0px) * var(--magic-background-depth)),
+    calc(var(--background-y, 0px) * var(--magic-background-depth)),
+    0
+  );
+}
+.ur-magic-aura img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.18;
+}
+.ur-magic-reflection {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  mask-size: contain;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-mode: alpha;
+  -webkit-mask-size: contain;
+  -webkit-mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  transform: translate3d(
+    calc(var(--foreground-x, 0px) * var(--ur-front-effect-depth)),
+    calc(var(--foreground-y, 0px) * var(--ur-front-effect-depth) + 2cqw),
+    0
+  );
+}
+.ur-magic-selective {
+  position: absolute;
+  inset: 0;
+  mask-size: contain;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-mode: alpha;
+  -webkit-mask-size: contain;
+  -webkit-mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+}
+.ur-magic-spectrum,
+.ur-magic-specular {
+  position: absolute;
+  inset: 0;
+}
+.ur-magic-spectrum {
+  background: linear-gradient(
+    var(--foil-angle, 118deg),
+    var(--magic-cyan),
+    var(--magic-ice) 28%,
+    var(--magic-lavender) 48%,
+    var(--magic-pink) 68%,
+    var(--magic-champagne)
+  );
+  background-size: 240% 240%;
+  background-position: var(--foil-x, 50%) var(--foil-y, 50%);
+  opacity: calc(var(--magic-foil-intensity) * (0.3 + var(--presence, 0) * 0.7));
+}
+.ur-magic-specular {
+  background: radial-gradient(
+    ellipse at var(--mx, 50%) var(--my, 50%),
+    #ffffff 0%,
+    #e7faff99 7%,
+    transparent 26%
+  );
+  opacity: calc(var(--magic-highlight-opacity) * var(--presence, 0));
+  mix-blend-mode: screen;
+}
+.two-sided-card[data-effects='off'] .ur-magic-aura,
+.two-sided-card[data-effects='off'] .ur-magic-reflection {
+  visibility: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ultra-rare-hero-body.ur-magic-enhanced .hero-artwork-foreground,
+  .ur-magic-reflection {
+    transform: translateY(2cqw);
+  }
+  .ur-magic-aura {
+    transform: none;
+  }
+  .ur-magic-spectrum {
+    background-position: 50% 50%;
+    opacity: calc(var(--magic-foil-intensity) * 0.3);
+  }
+  .ur-magic-specular {
+    opacity: 0;
+  }
+}

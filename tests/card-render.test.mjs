@@ -355,18 +355,22 @@ test('rarity names and codes select their implemented design without changing id
     assert.equal(rarityCode(name), code);
     assert.equal(
       resolveRarityDesign(code),
-      code === 'U' || code === 'R' || code === 'SR' || code === 'UR'
-        ? rarityDesigns[code]
-        : rarityDesigns.C,
+      rarityDesigns[code].implemented ? rarityDesigns[code] : rarityDesigns.C,
     );
     const card = { ...marthPreview, layout: 'hero', rarity: code };
     const byCode = render(CardRenderer, { card });
     const byName = render(CardRenderer, { card: { ...card, rarity: name } });
     assert.equal(byCode, byName);
-    assert.ok(byCode.includes('aria-label="' + name + '">' + code));
-    assert.ok(byCode.includes('common-print-frame'));
+    assert.ok(
+      byCode.includes(
+        'aria-label="' + name + '">' + (code === 'SEC' ? 'SCR' : code),
+      ),
+    );
+    assert.ok(
+      byCode.includes(code === 'SEC' ? 'scr-hero-card' : 'common-print-frame'),
+    );
     assert.ok(byCode.includes('FE-001'));
-    assert.ok(!byCode.includes('sr-rainbow'));
+    assert.equal(byCode.includes('sr-rainbow'), code === 'SEC');
     assert.equal(card.rarity, code);
   }
 });
@@ -729,4 +733,107 @@ test('FE-005 UR keeps independent art, selective foil, and prior rarities intact
     '/src/pages/MarthCommonPreview.tsx',
   );
   assert.ok(render(MarthCommonPreview, {}).includes('FE-005'));
+});
+
+test('UR enhanced magic is selective, configurable and reversible without changing approved artwork', async () => {
+  const { marthUltraRarePreview: ur } = await server.ssrLoadModule(
+    '/src/data/marthUltraRarePreview.ts',
+  );
+  assert.equal(ur.artwork.foreground, '/art/aether/effects/marth_sr_front.png');
+  assert.equal(ur.artwork.midground, undefined);
+  assert.equal(ur.magicEffects.foilArtwork, ur.artwork.foreground);
+  await access(
+    new URL('../public' + ur.magicEffects.foilMask, import.meta.url),
+  );
+  const enhanced = render(CardRenderer, { card: ur });
+  for (const value of [
+    'ur-magic-enhanced',
+    'ur-magic-aura',
+    'ur-magic-reflection',
+    'ur-magic-selective',
+    ur.magicEffects.foilArtwork,
+    ur.magicEffects.foilMask,
+  ])
+    assert.ok(enhanced.includes(value), value);
+  const original = render(CardRenderer, {
+    card: { ...ur, magicEffects: { ...ur.magicEffects, enabled: false } },
+  });
+  const withoutProfile = render(CardRenderer, {
+    card: { ...ur, magicEffects: undefined },
+  });
+  assert.equal(original, withoutProfile);
+  assert.ok(!original.includes('ur-magic-reflection'));
+  assert.ok(original.includes('patterned-foil-border'));
+  assert.ok(original.includes(ur.artwork.foreground));
+  const inactive = render(CardRenderer, { card: ur, effectsActive: false });
+  assert.ok(!inactive.includes('ur-magic-reflection'));
+  assert.ok(!inactive.includes('ur-magic-aura'));
+  const hidden = render(CardRenderer, { card: ur, hidden: true });
+  assert.ok(!hidden.includes(ur.magicEffects.foilMask));
+  assert.ok(!hidden.includes(ur.artwork.foreground));
+  assert.ok(ur.magicEffects.foregroundDepth * 10 > 7);
+  for (const value of [
+    ur.name,
+    ur.description,
+    ur.id,
+    ur.artwork.character,
+    ur.artwork.background,
+  ])
+    assert.ok(enhanced.includes(value));
+});
+
+test('FE-006 SCR reuses Aether full-art finishing with supplied art and independent hero stats', async () => {
+  const { marthSecretRarePreview: scr } = await server.ssrLoadModule(
+    '/src/data/marthSecretRarePreview.ts',
+  );
+  assert.equal(rarityCode('SCR'), 'SEC');
+  assert.equal(scr.id, 'FE-006');
+  assert.ok(!cards.some((card) => card.id === scr.id));
+  for (const path of Object.values(scr.artwork))
+    await access(new URL('../public' + path, import.meta.url));
+  const html = render(CardRenderer, { card: scr });
+  for (const value of [
+    'scr-hero-card',
+    'sr-background',
+    'sr-character',
+    'sr-rainbow',
+    'sr-specular',
+    'sr-etching',
+    'sr-frame',
+    'Cost 3',
+    '2000',
+    'FE-006',
+    'Secret Rare">SCR',
+    scr.name,
+    scr.description,
+    scr.artwork.background,
+    scr.artwork.character,
+  ])
+    assert.ok(html.includes(value), value);
+  assert.ok(!html.includes('common-description'));
+  assert.ok(!html.includes('ultra-rare-foil'));
+  assert.ok(!html.includes('undefined'));
+  assert.ok(html.indexOf('sr-background') < html.indexOf('sr-character'));
+  assert.equal(html, render(CardRenderer, { card: { ...scr, rarity: 'SEC' } }));
+  assert.equal(
+    html,
+    render(CardRenderer, { card: { ...scr, rarity: 'Secret Rare' } }),
+  );
+  const hidden = render(CardRenderer, { card: scr, hidden: true });
+  assert.ok(hidden.includes('Undiscovered'));
+  for (const asset of Object.values(scr.artwork))
+    assert.ok(!hidden.includes(asset));
+  assert.ok(!hidden.includes('sr-rainbow'));
+  assert.ok(!hidden.includes(scr.description));
+  const inactive = render(CardRenderer, { card: scr, effectsActive: false });
+  assert.ok(inactive.includes(scr.artwork.character));
+  assert.ok(!inactive.includes('sr-rainbow'));
+  const back = render(CardRenderer, { card: scr, face: 'back' });
+  assert.ok(back.includes('data-face="back"'));
+  assert.ok(back.includes('data-effects="off"'));
+  assert.ok(back.includes(CARD_BACK_IMAGE));
+  const { default: Preview } = await server.ssrLoadModule(
+    '/src/pages/MarthCommonPreview.tsx',
+  );
+  assert.ok(render(Preview, {}).includes('FE-006'));
 });

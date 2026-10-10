@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 732 1024">
+  <!-- Narrow facets of peripheral crystals in marth_sr_front.png. No face,
+       central body, broad glow, description, nameplate or large star masks. -->
+  <g fill="white">
+    <path d="M523 134 578 111 560 130 541 139Z"/>
+    <path d="M552 287 570 265 561 300 550 326Z"/>
+    <path d="M649 611 670 579 659 625 644 650Z"/>
+    <path d="M49 403 64 412 74 435 61 427Z"/>
+  </g>
+</svg>

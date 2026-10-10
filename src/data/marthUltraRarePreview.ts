@@ -9,9 +9,21 @@ export const marthUltraRarePreview: HeroCardData = {
   cost: 3,
   power: 2000,
   image: '/art/aether/characters/marth_of_beginnings_UR.png',
+  magicEffects: {
+    enabled: true,
+    foilArtwork: '/art/aether/effects/marth_sr_front.png',
+    foilMask: '/art/aether/effects/ur_magic_selective_mask.svg',
+    foregroundOpacity: 0.34,
+    foregroundDepth: 1.1,
+    backgroundDepth: 0.25,
+    foilIntensity: 0.28,
+    highlightOpacity: 0.42,
+    colors: ['#7eeaff', '#d4f5ff', '#c8c0f7', '#f4d5e9', '#fff0ce'],
+  },
   artwork: {
-    background: '/art/aether/backgrounds/ur_royal_court_placeholder.svg',
+    background: '/art/aether/backgrounds/marth-BG-UR.webp',
     character: '/art/aether/characters/marth_of_beginnings_UR.png',
-    foreground: '/art/aether/effects/marth_ur_magic.svg',
+    // Reuse only SR's front effect; no midground/back-effect layer.
+    foreground: '/art/aether/effects/marth_sr_front.png',
   },
 };

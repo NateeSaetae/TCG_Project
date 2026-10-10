@@ -1,3 +1,4 @@
+import type { MagicEffectProfile } from './magicEffects';
 import type { ArtworkLayers } from './index';
 import type { RarityIdentifier } from '../config/rarityDesigns';
 
@@ -16,4 +17,5 @@ export interface HeroCardData {
   imagePosition?: string;
   /** Optional layers are used only when the selected design opts in. */
   artwork?: ArtworkLayers;
+  magicEffects?: MagicEffectProfile;
 }

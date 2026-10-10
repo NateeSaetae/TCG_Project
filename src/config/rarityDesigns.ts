@@ -1,10 +1,12 @@
+import type { HeroCardData } from '../types/heroCard';
 import type { ComponentType, CSSProperties } from 'react';
 import type { Rarity } from '../types';
 import { rarityLabels } from './rarityLabels';
 import { UltraRareFoil } from '../components/cards/UltraRareFoil';
 
 export type RarityCode = 'C' | 'U' | 'R' | 'SR' | 'UR' | 'SEC';
-export type RarityIdentifier = Rarity | RarityCode;
+/** SCR is a presentation alias of the existing SEC tier. */
+export type RarityIdentifier = Rarity | RarityCode | 'SCR';
 
 export const rarityNames: Record<RarityCode, Rarity> = {
   C: 'Common',
@@ -17,6 +19,7 @@ export const rarityNames: Record<RarityCode, Rarity> = {
 
 /** Presentation-only normalization: never changes catalog or saved values. */
 export function rarityCode(rarity: RarityIdentifier): RarityCode {
+  if (rarity === 'SCR') return 'SEC';
   return rarity in rarityNames
     ? (rarity as RarityCode)
     : (rarityLabels[rarity as Rarity] as RarityCode);
@@ -35,12 +38,12 @@ export interface HeroCardDesign {
   background?: DesignSlot;
   nameplate?: DesignSlot;
   badge?: DesignSlot;
-  Effects?: ComponentType<{ active: boolean }>;
+  Effects?: ComponentType<{ active: boolean; card?: HeroCardData }>;
 }
 
 export interface RarityDesign {
   implemented: boolean;
-  layout: 'hero-common';
+  layout: 'hero-common' | 'secret-full-art';
   design: HeroCardDesign;
 }
 
@@ -96,7 +99,7 @@ export const rarityDesigns: Record<RarityCode, RarityDesign> = {
       Effects: UltraRareFoil,
     },
   },
-  SEC: { implemented: false, layout: 'hero-common', design: {} },
+  SEC: { implemented: true, layout: 'secret-full-art', design: {} },
 };
 
 export function resolveRarityDesign(rarity: RarityIdentifier): RarityDesign {

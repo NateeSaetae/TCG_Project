@@ -17,8 +17,20 @@
     inset 0 0 0 1px #ffffffb8,
     inset 0 0 9px #34497466,
     0 16px 35px #0006;
+  /* Same silver/pastel palette as PatternedFoilBorder. */
+  --ur-rim-foil: linear-gradient(
+    var(--foil-angle, 118deg),
+    #f9ffef 0%,
+    #b6dbe5 18%,
+    #e4bde5 36%,
+    #fffef5 49%,
+    #b6c4df 65%,
+    #b9eadc 82%,
+    #f7d6e7 100%
+  );
   --ur-character-scale: 1.2;
-  --ur-magic-depth: 1.35;
+  --ur-front-effect-depth: 1;
+  --ur-front-effect-opacity: 0.55;
 }
 .common-art-field.ultra-rare-art-field {
   position: static;
@@ -60,12 +72,13 @@
 }
 .ultra-rare-art-field img.hero-artwork-foreground {
   z-index: 3;
-  object-fit: fill;
-  opacity: 0.84;
+  object-fit: contain;
+  object-position: center;
+  opacity: var(--ur-front-effect-opacity);
   pointer-events: none;
   transform: translate3d(
-    calc(var(--foreground-x, 0px) * var(--ur-magic-depth)),
-    calc(var(--foreground-y, 0px) * var(--ur-magic-depth)),
+    calc(var(--foreground-x, 0px) * var(--ur-front-effect-depth)),
+    calc(var(--foreground-y, 0px) * var(--ur-front-effect-depth)),
     0
   );
 }
@@ -125,11 +138,17 @@
   z-index: 8;
 }
 .ultra-rare-hero-body .common-cost {
-  border-color: #f2d28b;
-  background: #0d326c;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(#0d326c, #0d326c) padding-box,
+    var(--ur-rim-foil) border-box;
+  background-size: 100% 100%, 220% 220%;
+  background-position:
+    center,
+    var(--foil-x, 50%) var(--foil-y, 50%);
   opacity: 1;
   box-shadow:
-    0 0 0 2px #9f783c,
+    0 0 0 1px #edf5ff,
     0 2px 7px #06152a;
 }
 .ultra-rare-hero-body .common-cost span,
@@ -152,19 +171,21 @@
     0 0 5px #06162d;
 }
 .ultra-rare-badge .common-rarity-seal {
-  background: #102f65;
+  background: var(--ur-rim-foil);
+  background-size: 220% 220%;
+  background-position: var(--foil-x, 50%) var(--foil-y, 50%);
   clip-path: polygon(50% 3%, 91% 26.5%, 91% 73.5%, 50% 97%, 9% 73.5%, 9% 26.5%);
 }
 .ultra-rare-badge .common-rarity-seal path:first-child {
-  fill: #d5ac5d;
-  stroke: #fff0c1;
+  fill: transparent;
+  stroke: #f7f2ff;
 }
 .ultra-rare-badge .common-rarity-seal path:nth-child(2) {
   fill: #102f65;
-  stroke: #e0c27c;
+  stroke: #dce8f4;
 }
 .ultra-rare-badge .common-rarity-seal path:nth-child(n + 3) {
-  stroke: #f0d797;
+  stroke: #dce8f4;
 }
 .ultra-rare-foil {
   position: absolute;
@@ -200,4 +221,9 @@
   .ultra-rare-art-field img.hero-artwork-character {
     transform: scale(var(--ur-character-scale));
   }
+}
+
+/* Small diamond accents share the silver finish rather than the old gold. */
+.ultra-rare-badge .common-rarity-seal path:nth-child(4) {
+  fill: #f7f2ff;
 }
