@@ -3,7 +3,7 @@ import { useReducedMotion } from 'framer-motion';
 import { Card } from '../cards/Card';
 import { secretRevealTiming } from '../../config/cardEffects';
 import { playTone } from '../../utils/sound';
-import type { CardData } from '../../types';
+import type { CollectibleCard } from '../../data/catalog';
 
 type Stage = 'idle' | 'charging' | 'flipping' | 'settling' | 'ready';
 
@@ -17,7 +17,7 @@ export function SecretRareReveal({
   continueLabel = 'Continue to next card',
   autoPlay = false,
 }: {
-  card: CardData;
+  card: CollectibleCard;
   revealed: boolean;
   onReveal: () => void;
   onContinue: () => void;

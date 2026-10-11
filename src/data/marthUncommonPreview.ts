@@ -3,7 +3,7 @@ import { marthPreview } from './marthPreview';
 
 const originalMarthArt = '/art/aether/characters/marth_hero-king.png';
 
-/** Development preview; not part of the booster catalog. */
+/** Uncommon variant shared by previews and the Marth booster catalog. */
 export const marthUncommonPreview: HeroCardData = {
   ...marthPreview,
   id: 'FE-002',

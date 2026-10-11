@@ -6,7 +6,8 @@ import { Collection } from './pages/Collection';
 import { PackOpening } from './pages/PackOpening';
 import { Card } from './components/cards/Card';
 import { useCollection } from './hooks/useCollection';
-import type { CardData } from './types';
+import type { CollectibleCard } from './data/catalog';
+
 const DevShowcase = import.meta.env.DEV
   ? lazy(() => import('./pages/CardShowcase'))
   : null;
@@ -35,7 +36,7 @@ function currentPage(): Page {
 }
 export default function App() {
   const [page, setPage] = useState<Page>(currentPage);
-  const [viewer, setViewer] = useState<CardData | null>(null);
+  const [viewer, setViewer] = useState<CollectibleCard | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const { save, error, addPack, finish, toggleSound } = useCollection();
@@ -202,14 +203,19 @@ export default function App() {
                 className="viewer-details focused-detail-panel"
                 aria-label="Card details"
               >
-                <div className="eyebrow">{viewer.set}</div>
+                <div className="eyebrow">
+                  {'set' in viewer ? viewer.set : 'The Hero Collection'}
+                </div>
                 <h2>
                   {save.owned[viewer.id]
                     ? viewer.name
                     : 'An undiscovered legend'}
                 </h2>
                 <p>
-                  {viewer.rarity} · {viewer.element} · {viewer.cardType}
+                  {viewer.rarity} ·{' '}
+                  {'element' in viewer
+                    ? viewer.element + ' · ' + viewer.cardType
+                    : viewer.characterType}
                 </p>
                 <p>
                   {save.owned[viewer.id]
@@ -227,16 +233,28 @@ export default function App() {
                     <dd>{save.owned[viewer.id] ? viewer.cost : '—'}</dd>
                   </div>
                   <div>
-                    <dt>Attack</dt>
-                    <dd>{save.owned[viewer.id] ? viewer.attack : '—'}</dd>
+                    <dt>{'power' in viewer ? 'Power' : 'Attack'}</dt>
+                    <dd>
+                      {save.owned[viewer.id]
+                        ? 'power' in viewer
+                          ? viewer.power
+                          : viewer.attack
+                        : '—'}
+                    </dd>
                   </div>
-                  <div>
-                    <dt>Defense</dt>
-                    <dd>{save.owned[viewer.id] ? viewer.defense : '—'}</dd>
-                  </div>
+                  {'defense' in viewer && (
+                    <div>
+                      <dt>Defense</dt>
+                      <dd>{save.owned[viewer.id] ? viewer.defense : '—'}</dd>
+                    </div>
+                  )}
                   <div>
                     <dt>Card number</dt>
-                    <dd>{String(viewer.cardNumber).padStart(3, '0')} / 030</dd>
+                    <dd>
+                      {'cardNumber' in viewer
+                        ? String(viewer.cardNumber).padStart(3, '0') + ' / 030'
+                        : viewer.id}
+                    </dd>
                   </div>
                 </dl>
               </aside>

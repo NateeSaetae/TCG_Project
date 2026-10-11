@@ -45,11 +45,24 @@ export function SecretHeroCard({
             </div>
           </div>
           <div className="card-copy scr-copy">
-            <div className="card-rarity">
-              <span aria-label="Secret Rare">SCR</span> · SECRET RARE ·
-              CHARACTER
+            <div className="scr-title-row">
+              <span className="scr-rarity-badge" aria-label="Secret Rare">
+                SER
+                <svg
+                  className="scr-rarity-seal"
+                  viewBox="0 0 100 100"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d="M50 3 91 26.5V73.5L50 97 9 73.5V26.5Z" />
+                  <path d="M50 11 84 30.5V69.5L50 89 16 69.5V30.5Z" />
+                  <path d="M50 18 78 34V66L50 82 22 66V34Z" />
+                  <path d="M50 17 54 22 50 27 46 22ZM50 73 54 78 50 83 46 78Z" />
+                  <path d="M24 41 28 50 24 59M76 41 72 50 76 59" />
+                </svg>
+              </span>
+              <h3>{hidden ? 'Undiscovered' : card.name}</h3>
             </div>
-            <h3>{hidden ? 'Undiscovered' : card.name}</h3>
             <p>
               {hidden
                 ? 'Summon this hero to discover their story.'
@@ -59,7 +72,6 @@ export function SecretHeroCard({
               {hidden ? 'Unknown hero' : card.characterType}
             </div>
             <footer>
-              <span>THE HERO COLLECTION · EN</span>
               <span>{card.id}</span>
             </footer>
           </div>

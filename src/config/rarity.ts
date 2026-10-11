@@ -1,4 +1,6 @@
 import type { Rarity } from '../types';
+import type { RarityIdentifier } from './rarityDesigns';
+import { rarityLabels } from './rarityLabels';
 export const rarities: Rarity[] = [
   'Common',
   'Uncommon',
@@ -24,4 +26,13 @@ export const rarityColors: Record<Rarity, string> = {
   'Secret Rare': '#fff1ac',
 };
 export const PACK_SIZE = 5;
-export const rank = (rarity: Rarity) => rarities.indexOf(rarity);
+export function rarityName(rarity: RarityIdentifier): Rarity {
+  if (rarity === 'SER') return 'Secret Rare';
+  const name = rarities.find(
+    (candidate) => candidate === rarity || rarityLabels[candidate] === rarity,
+  );
+  if (!name) throw new Error('Unknown rarity: ' + rarity);
+  return name;
+}
+export const rank = (rarity: RarityIdentifier) =>
+  rarities.indexOf(rarityName(rarity));

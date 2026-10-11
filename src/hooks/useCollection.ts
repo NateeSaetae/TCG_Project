@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { cards } from '../data/cards';
-import type { CardData, SaveData } from '../types';
+import { archiveCards, cardById, type CollectibleCard } from '../data/catalog';
+import { PACK_SIZE } from '../config/rarity';
+import type { SaveData } from '../types';
 const KEY = 'aetherveil-save-v1';
 const fresh = (): SaveData => ({
   version: 1,
@@ -14,7 +15,7 @@ function read(): SaveData {
     const data = JSON.parse(localStorage.getItem(KEY) || 'null');
     if (!data || data.version !== 1) return fresh();
     const owned: Record<string, number> = {};
-    for (const c of cards) {
+    for (const c of archiveCards) {
       const n = data.owned?.[c.id];
       if (Number.isSafeInteger(n) && n > 0) owned[c.id] = n;
     }
@@ -25,8 +26,11 @@ function read(): SaveData {
         Number.isSafeInteger(data.packs) && data.packs >= 0 ? data.packs : 0,
       pending: Array.isArray(data.pending)
         ? data.pending
-            .filter((id: unknown) => cards.some((c) => c.id === id))
-            .slice(0, 5)
+            .filter(
+              (id: unknown): id is string =>
+                typeof id === 'string' && cardById.has(id),
+            )
+            .slice(0, PACK_SIZE)
         : [],
       sound: data.sound === true,
     };
@@ -51,7 +55,7 @@ export function useCollection() {
   return {
     save,
     error,
-    addPack: (pack: CardData[]) => {
+    addPack: (pack: CollectibleCard[]) => {
       const owned = { ...save.owned };
       for (const c of pack) owned[c.id] = (owned[c.id] || 0) + 1;
       commit({

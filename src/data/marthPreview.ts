@@ -1,6 +1,6 @@
 import type { HeroCardData } from '../types/heroCard';
 
-// Development fixture only. Do not add to the pack catalog without a migration plan.
+// Shared by the development preview, Marth booster pool, and archive.
 export const marthPreview: HeroCardData = {
   layout: 'hero-common',
   id: 'FE-001',

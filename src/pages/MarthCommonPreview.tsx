@@ -24,7 +24,7 @@ export default function MarthCommonPreview() {
       <div className="eyebrow">DEVELOPMENT PREVIEW · MARTH CARD COMPARISON</div>
       <h1>Marth · Hero of Altea</h1>
       <p>
-        Compare Common, Uncommon, Rare, Super Rare, Ultra Rare, and SCR prints.
+        Compare Common, Uncommon, Rare, Super Rare, Ultra Rare, and SER prints.
         Move the pointer to inspect each card.
       </p>
       <div className="marth-preview-stage">
@@ -54,7 +54,7 @@ export default function MarthCommonPreview() {
             <Card card={urCard} face={face} small />
           </div>
           <div className="marth-preview-size">
-            <div className="eyebrow">FE-006 · SCR / Secret Rare</div>
+            <div className="eyebrow">FE-006 · SER / Secret Rare</div>
             <Card card={marthSecretRarePreview} face={face} small />
           </div>
         </div>

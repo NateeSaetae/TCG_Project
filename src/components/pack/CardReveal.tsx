@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { Card } from '../cards/Card';
 import { CARD_FLIP_MS } from '../cards/TwoSidedCard';
-import type { CardData } from '../../types';
+import type { CollectibleCard } from '../../data/catalog';
 import { rank } from '../../config/rarity';
 import { playTone } from '../../utils/sound';
 export function CardReveal({
@@ -11,7 +11,7 @@ export function CardReveal({
   onContinue,
   sound,
 }: {
-  card: CardData;
+  card: CollectibleCard;
   onReveal: () => void;
   onContinue: () => void;
   sound: boolean;

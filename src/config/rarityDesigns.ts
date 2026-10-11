@@ -5,8 +5,8 @@ import { rarityLabels } from './rarityLabels';
 import { UltraRareFoil } from '../components/cards/UltraRareFoil';
 
 export type RarityCode = 'C' | 'U' | 'R' | 'SR' | 'UR' | 'SEC';
-/** SCR is a presentation alias of the existing SEC tier. */
-export type RarityIdentifier = Rarity | RarityCode | 'SCR';
+/** SER is a presentation alias of the existing SEC tier. */
+export type RarityIdentifier = Rarity | RarityCode | 'SER';
 
 export const rarityNames: Record<RarityCode, Rarity> = {
   C: 'Common',
@@ -19,7 +19,7 @@ export const rarityNames: Record<RarityCode, Rarity> = {
 
 /** Presentation-only normalization: never changes catalog or saved values. */
 export function rarityCode(rarity: RarityIdentifier): RarityCode {
-  if (rarity === 'SCR') return 'SEC';
+  if (rarity === 'SER') return 'SEC';
   return rarity in rarityNames
     ? (rarity as RarityCode)
     : (rarityLabels[rarity as Rarity] as RarityCode);

@@ -1,7 +1,7 @@
 import type { HeroCardData } from '../types/heroCard';
 import { marthUncommonPreview } from './marthUncommonPreview';
 
-/** Full-art development preview; not part of the booster catalog. */
+/** Full-art Rare variant shared by previews and the Marth booster catalog. */
 export const marthRarePreview: HeroCardData = {
   ...marthUncommonPreview,
   id: 'FE-003',

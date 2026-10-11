@@ -1,7 +1,7 @@
 import type { HeroCardData } from '../types/heroCard';
 import { marthSuperRarePreview } from './marthSuperRarePreview';
 
-/** Visual prototype only; FE-005 is not part of booster packs or saved collection. */
+/** UR variant shared by previews and the Marth booster catalog. */
 export const marthUltraRarePreview: HeroCardData = {
   ...marthSuperRarePreview,
   id: 'FE-005',

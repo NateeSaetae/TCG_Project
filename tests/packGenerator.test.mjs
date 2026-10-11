@@ -1,0 +1,82 @@
+import { after, test } from 'node:test';
+import assert from 'node:assert/strict';
+import { createServer } from 'vite';
+
+const server = await createServer({
+  server: { middlewareMode: true },
+  appType: 'custom',
+});
+after(() => server.close());
+
+const { generatePack, selectWeightedRarity } = await server.ssrLoadModule(
+  '/src/utils/packGenerator.ts',
+);
+const { archiveCards, marthCards } = await server.ssrLoadModule(
+  '/src/data/catalog.ts',
+);
+const { PACK_SIZE, rank, rarityName, rarityWeights } =
+  await server.ssrLoadModule('/src/config/rarity.ts');
+
+function seededRandom(seed = 9137) {
+  return () => {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    return seed / 4294967296;
+  };
+}
+
+test('packs draw only the six fixed Marth entries and keep the Rare+ guarantee', () => {
+  const random = seededRandom();
+  const seen = new Set();
+  for (let i = 0; i < 10000; i++) {
+    const pack = generatePack(random);
+    assert.equal(pack.length, PACK_SIZE);
+    assert.ok(pack.some((card) => rank(card.rarity) >= 2));
+    for (const card of pack) {
+      assert.ok(marthCards.includes(card));
+      assert.equal(card.cost, 3);
+      assert.equal(card.power, 2000);
+      seen.add(card.id);
+    }
+  }
+  assert.equal(seen.size, 6);
+});
+
+test('weighted rarity selection follows the existing configured weights', () => {
+  const random = seededRandom(119);
+  const counts = new Map();
+  const samples = 100000;
+  for (let i = 0; i < samples; i++) {
+    const rarity = selectWeightedRarity(marthCards, random);
+    counts.set(rarity, (counts.get(rarity) ?? 0) + 1);
+  }
+  for (const [rarity, weight] of Object.entries(rarityWeights)) {
+    const observed = ((counts.get(rarity) ?? 0) / samples) * 100;
+    assert.ok(Math.abs(observed - weight) < 0.5, rarity);
+  }
+});
+
+test('forced development pulls do not change the normal generator', () => {
+  for (const card of marthCards) {
+    const pack = generatePack(() => 0, { forceCardId: card.id });
+    assert.ok(pack.includes(card));
+    const rarity = rarityName(card.rarity);
+    assert.ok(
+      generatePack(() => 0, { forceRarity: rarity }).some(
+        (pulled) => rarityName(pulled.rarity) === rarity,
+      ),
+    );
+  }
+  assert.throws(() => generatePack(() => 0, { forceCardId: 'missing' }));
+  assert.equal(generatePack(() => 0).length, PACK_SIZE);
+});
+
+test('duplicates stay distinct pulls and old archive identities remain available', () => {
+  const pack = generatePack(() => 0);
+  assert.ok(new Set(pack.map((card) => card.id)).size < PACK_SIZE);
+  assert.equal(new Set(marthCards.map((card) => card.id)).size, 6);
+  assert.equal(new Set(archiveCards.map((card) => card.id)).size, 36);
+  assert.equal(
+    Object.values(rarityWeights).reduce((sum, weight) => sum + weight, 0),
+    100,
+  );
+});

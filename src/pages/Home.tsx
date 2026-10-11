@@ -1,6 +1,7 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { Card } from '../components/cards/Card';
 import { cards } from '../data/cards';
+import { archiveCards } from '../data/catalog';
 export function Home({
   open,
   collect,
@@ -83,7 +84,8 @@ export function Home({
           <div className="eyebrow">INSCRIBED IN THE ARCHIVES</div>
           <h2>A legacy worth collecting.</h2>
           <p>
-            Thirty cards await. Discover each story, one summoning at a time.
+            Marth joins the archive. Discover each story, one summoning at a
+            time.
           </p>
           <div className="element-list">
             ☀ Fire &nbsp; ≈ Water &nbsp; ❧ Nature &nbsp; ✧ Light &nbsp; ☾ Dark
@@ -95,22 +97,24 @@ export function Home({
           <div>
             <b>
               {owned}
-              <small> / 30</small>
+              <small> / {archiveCards.length}</small>
             </b>
             <span>↗</span>
           </div>
           <div className="progress-track">
-            <i style={{ width: (owned / 30) * 100 + '%' }} />
+            <i style={{ width: (owned / archiveCards.length) * 100 + '%' }} />
           </div>
           <footer>
             {packs} boosters opened{' '}
-            <span>{Math.round((owned / 30) * 100)}% complete</span>
+            <span>
+              {Math.round((owned / archiveCards.length) * 100)}% complete
+            </span>
           </footer>
         </button>
       </section>
       <div className="page-foot">
         <span>THE HERO COLLECTION · PROTOTYPE EDITION</span>
-        <span>CHAPTER I — 030 CARDS</span>
+        <span>CHAPTER I — {archiveCards.length} CARDS</span>
       </div>
     </>
   );

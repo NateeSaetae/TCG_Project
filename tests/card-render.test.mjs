@@ -244,11 +244,86 @@ test('legacy collection survives the rebrand, adding a pack and finishing its re
   }
 });
 
-test('Marth Common has independent text anatomy and does not enter the pack catalog', async () => {
+test('Marth packs add duplicates by ID and survive an archive reload', async () => {
+  const { useCollection } = await server.ssrLoadModule(
+    '/src/hooks/useCollection.ts',
+  );
+  const { generatePack } = await server.ssrLoadModule(
+    '/src/utils/packGenerator.ts',
+  );
+  const { Collection } = await server.ssrLoadModule(
+    '/src/pages/Collection.tsx',
+  );
+  const previous = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
+  const store = new Map();
+  Object.defineProperty(globalThis, 'localStorage', {
+    configurable: true,
+    value: {
+      getItem: (key) => store.get(key) ?? null,
+      setItem: (key, value) => store.set(key, value),
+    },
+  });
+  let collection;
+  function Probe() {
+    collection = useCollection();
+    return null;
+  }
+  try {
+    const first = generatePack(() => 0, { forceCardId: 'FE-006' });
+    const second = generatePack(() => 0, { forceCardId: 'FE-006' });
+    render(Probe, {});
+    collection.addPack(first);
+    render(Probe, {});
+    assert.deepEqual(
+      collection.save.pending,
+      first.map((card) => card.id),
+    );
+    collection.finish();
+    render(Probe, {});
+    collection.addPack(second);
+    render(Probe, {});
+    assert.equal(collection.save.packs, 2);
+    assert.equal(collection.save.owned['FE-006'], 2);
+    assert.equal(
+      collection.save.owned['FE-001'],
+      [...first, ...second].filter((card) => card.id === 'FE-001').length,
+    );
+    assert.ok(
+      render(Collection, { owned: collection.save.owned, view() {} }).includes(
+        'FE-006',
+      ),
+    );
+    render(Probe, {});
+    assert.equal(collection.save.owned['FE-006'], 2);
+    assert.equal(store.size, 1);
+  } finally {
+    if (previous) Object.defineProperty(globalThis, 'localStorage', previous);
+    else delete globalThis.localStorage;
+  }
+});
+
+test('a pending Marth SER pull resumes with the Secret Rare reveal', async () => {
+  const { PackOpening } = await server.ssrLoadModule(
+    '/src/pages/PackOpening.tsx',
+  );
+  const html = render(PackOpening, {
+    pending: ['FE-006'],
+    addPack() {},
+    finish() {},
+    sound: false,
+    collect() {},
+  });
+  assert.ok(html.includes('secret-reveal'));
+  assert.ok(html.includes('data-face="back"'));
+});
+
+test('Marth Common keeps its text anatomy and enters the new pack catalog', async () => {
   const { marthPreview } = await server.ssrLoadModule(
     '/src/data/marthPreview.ts',
   );
+  const { marthCards } = await server.ssrLoadModule('/src/data/catalog.ts');
   assert.ok(!cards.some((card) => card.id === marthPreview.id));
+  assert.ok(marthCards.includes(marthPreview));
   await access(
     fileURLToPath(new URL('../public' + marthPreview.image, import.meta.url)),
   );
@@ -363,7 +438,7 @@ test('rarity names and codes select their implemented design without changing id
     assert.equal(byCode, byName);
     assert.ok(
       byCode.includes(
-        'aria-label="' + name + '">' + (code === 'SEC' ? 'SCR' : code),
+        'aria-label="' + name + '">' + (code === 'SEC' ? 'SER' : code),
       ),
     );
     assert.ok(
@@ -782,11 +857,11 @@ test('UR enhanced magic is selective, configurable and reversible without changi
     assert.ok(enhanced.includes(value));
 });
 
-test('FE-006 SCR reuses Aether full-art finishing with supplied art and independent hero stats', async () => {
+test('FE-006 SER reuses Aether full-art finishing with supplied art and independent hero stats', async () => {
   const { marthSecretRarePreview: scr } = await server.ssrLoadModule(
     '/src/data/marthSecretRarePreview.ts',
   );
-  assert.equal(rarityCode('SCR'), 'SEC');
+  assert.equal(rarityCode('SER'), 'SEC');
   assert.equal(scr.id, 'FE-006');
   assert.ok(!cards.some((card) => card.id === scr.id));
   for (const path of Object.values(scr.artwork))
@@ -795,6 +870,7 @@ test('FE-006 SCR reuses Aether full-art finishing with supplied art and independ
   for (const value of [
     'scr-hero-card',
     'sr-background',
+    'sr-midground',
     'sr-character',
     'sr-rainbow',
     'sr-specular',
@@ -803,7 +879,7 @@ test('FE-006 SCR reuses Aether full-art finishing with supplied art and independ
     'Cost 3',
     '2000',
     'FE-006',
-    'Secret Rare">SCR',
+    'Secret Rare">SER',
     scr.name,
     scr.description,
     scr.artwork.background,
@@ -814,6 +890,7 @@ test('FE-006 SCR reuses Aether full-art finishing with supplied art and independ
   assert.ok(!html.includes('ultra-rare-foil'));
   assert.ok(!html.includes('undefined'));
   assert.ok(html.indexOf('sr-background') < html.indexOf('sr-character'));
+  assert.ok(html.indexOf('sr-midground') < html.indexOf('sr-character'));
   assert.equal(html, render(CardRenderer, { card: { ...scr, rarity: 'SEC' } }));
   assert.equal(
     html,

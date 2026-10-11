@@ -5,11 +5,10 @@ import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Card } from '../components/cards/Card';
 import { BoosterPack } from '../components/pack/BoosterPack';
-import { cards } from '../data/cards';
+import { cardById, marthCards, type CollectibleCard } from '../data/catalog';
 import { generatePack } from '../utils/packGenerator';
 import { playTone } from '../utils/sound';
-import { rank, rarities, rarityWeights } from '../config/rarity';
-import type { CardData } from '../types';
+import { PACK_SIZE, rank, rarities, rarityWeights } from '../config/rarity';
 export function PackOpening({
   pending,
   addPack,
@@ -18,7 +17,7 @@ export function PackOpening({
   collect,
 }: {
   pending: string[];
-  addPack: (c: CardData[]) => void;
+  addPack: (c: CollectibleCard[]) => void;
   finish: () => void;
   sound: boolean;
   collect: () => void;
@@ -26,12 +25,13 @@ export function PackOpening({
   const [phase, setPhase] = useState<
     'sealed' | 'tearing' | 'reveal' | 'results'
   >(pending.length ? 'reveal' : 'sealed');
-  const [pack, setPack] = useState<CardData[]>(() =>
-    pending.map((id) => cards.find((c) => c.id === id)!),
+  const [pack, setPack] = useState<CollectibleCard[]>(() =>
+    pending.map((id) => cardById.get(id)!).filter(Boolean),
   );
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [odds, setOdds] = useState(false);
+  const [forcedPull, setForcedPull] = useState('');
   const lock = useRef(false);
   const reduced = useReducedMotion();
   useEffect(() => {
@@ -48,7 +48,14 @@ export function PackOpening({
   function open() {
     if (lock.current) return;
     lock.current = true;
-    const next = generatePack();
+    const next = generatePack(Math.random, {
+      forceCardId: forcedPull.startsWith('card:')
+        ? forcedPull.slice(5)
+        : undefined,
+      forceRarity: forcedPull.startsWith('rarity:')
+        ? rarities.find((rarity) => rarity === forcedPull.slice(7))
+        : undefined,
+    });
     setPack(next);
     addPack(next);
     playTone(sound, 2);
@@ -154,9 +161,9 @@ export function PackOpening({
                 ))}
               </div>
             )}
-            {isShowcaseCard(pack[index]) ? (
+            {isShowcaseCard(pack[index]) || rank(pack[index].rarity) === 5 ? (
               <SecretRareReveal
-                key={pack[index].id}
+                key={index + '-' + pack[index].id}
                 card={pack[index]}
                 revealed={flipped}
                 onReveal={() => setFlipped(true)}
@@ -165,7 +172,7 @@ export function PackOpening({
               />
             ) : (
               <CardReveal
-                key={pack[index].id}
+                key={index + '-' + pack[index].id}
                 card={pack[index]}
                 onReveal={() => setFlipped(true)}
                 onContinue={reveal}
@@ -178,7 +185,7 @@ export function PackOpening({
                 : 'THE UNKNOWN AWAITS'}
               <small>
                 {flipped
-                  ? index === 4
+                  ? index === pack.length - 1
                     ? 'Click to see your discoveries'
                     : 'Click to continue'
                   : 'Click the card to reveal'}
@@ -209,7 +216,7 @@ export function PackOpening({
             <div className="results-grid">
               {pack.map((c, i) => (
                 <motion.div
-                  key={c.id}
+                  key={c.id + '-' + i}
                   initial={{ y: reduced ? 0 : 30, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: reduced ? 0 : i * 0.12 }}
@@ -234,7 +241,7 @@ export function PackOpening({
         <>
           <div className="pack-meta">
             <span>✧ &nbsp; Rare+ guaranteed</span>
-            <span>5 unique cards</span>
+            <span>{PACK_SIZE} cards</span>
             <span>Free to discover</span>
           </div>
           <button
@@ -255,10 +262,32 @@ export function PackOpening({
               <p>
                 Base rarity weights. If the first four cards have no Rare+, the
                 final slot draws only from Rare and above. Weights are
-                normalized over eligible rarities; cards never repeat within a
+                normalized over eligible rarities; copies can repeat within a
                 pack.
               </p>
             </div>
+          )}
+          {import.meta.env.DEV && (
+            <label className="pack-debug-control">
+              Test pull
+              <select
+                aria-label="Force a card or rarity in the next pack"
+                value={forcedPull}
+                onChange={(event) => setForcedPull(event.target.value)}
+              >
+                <option value="">Normal odds</option>
+                {rarities.map((rarity) => (
+                  <option key={rarity} value={'rarity:' + rarity}>
+                    Force {rarity}
+                  </option>
+                ))}
+                {marthCards.map((card) => (
+                  <option key={card.id} value={'card:' + card.id}>
+                    Force {card.id}
+                  </option>
+                ))}
+              </select>
+            </label>
           )}
         </>
       )}

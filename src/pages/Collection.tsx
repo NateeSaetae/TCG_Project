@@ -1,15 +1,14 @@
 import { rarityLabels } from '../config/rarityLabels';
 import { useState } from 'react';
-import { cards } from '../data/cards';
-import { rarities, rank } from '../config/rarity';
+import { archiveCards, type CollectibleCard } from '../data/catalog';
+import { rarities, rank, rarityName } from '../config/rarity';
 import { Card } from '../components/cards/Card';
-import type { CardData } from '../types';
 export function Collection({
   owned,
   view,
 }: {
   owned: Record<string, number>;
-  view: (c: CardData) => void;
+  view: (c: CollectibleCard) => void;
 }) {
   const [search, setSearch] = useState('');
   const [rarity, setRarity] = useState('');
@@ -17,19 +16,20 @@ export function Collection({
   const [type, setType] = useState('');
   const [sort, setSort] = useState('number');
   const [only, setOnly] = useState(false);
-  const filtered = cards
+  const filtered = archiveCards
     .filter(
       (c) =>
         (!only || owned[c.id]) &&
         c.name.toLowerCase().includes(search.toLowerCase()) &&
-        (!rarity || c.rarity === rarity) &&
-        (!element || c.element === element) &&
-        (!type || c.cardType === type),
+        (!rarity || rarityName(c.rarity) === rarity) &&
+        (!element || ('element' in c && c.element === element)) &&
+        (!type || ('cardType' in c && c.cardType === type)),
     )
     .sort((a, b) =>
       sort === 'rarity'
-        ? rank(b.rarity) - rank(a.rarity) || a.cardNumber - b.cardNumber
-        : a.cardNumber - b.cardNumber,
+        ? rank(b.rarity) - rank(a.rarity) ||
+          archiveCards.indexOf(a) - archiveCards.indexOf(b)
+        : archiveCards.indexOf(a) - archiveCards.indexOf(b),
     );
   return (
     <section className="collection-page">
@@ -40,7 +40,8 @@ export function Collection({
           <p>A record of every hero called to your side.</p>
         </div>
         <div className="count">
-          <b>{Object.keys(owned).length}</b> / 30 <span>HEROES DISCOVERED</span>
+          <b>{Object.keys(owned).length}</b> / {archiveCards.length}{' '}
+          <span>HEROES DISCOVERED</span>
         </div>
       </div>
       <div
@@ -48,12 +49,13 @@ export function Collection({
         role="progressbar"
         aria-label="Hero archive completion"
         aria-valuemin={0}
-        aria-valuemax={cards.length}
+        aria-valuemax={archiveCards.length}
         aria-valuenow={Object.keys(owned).length}
       >
         <span
           style={{
-            width: (Object.keys(owned).length / cards.length) * 100 + '%',
+            width:
+              (Object.keys(owned).length / archiveCards.length) * 100 + '%',
           }}
         />
       </div>
@@ -125,7 +127,7 @@ export function Collection({
             onClick={() => view(c)}
             aria-label={'View ' + c.name}
           >
-            <Card card={c} small hidden={!owned[c.id]} />
+            <Card card={c} small hidden={!owned[c.id]} effectsActive={false} />
             <div className="ownership">
               {owned[c.id] ? (
                 <>

@@ -2,7 +2,8 @@ import type { CardData } from '../types';
 
 // Opt in one card, without changing the finish of other rarities.
 export const SHOWCASE_CARD_ID = 'AW-030';
-export const isShowcaseCard = (card: CardData) => card.id === SHOWCASE_CARD_ID;
+export const isShowcaseCard = (card: Pick<CardData, 'id'>) =>
+  card.id === SHOWCASE_CARD_ID;
 export const holographicProfile = {
   rotateX: 7,
   rotateY: 9,
