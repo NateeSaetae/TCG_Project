@@ -2,7 +2,7 @@ import type { MagicEffectProfile } from './magicEffects';
 import type { ArtworkLayers } from './index';
 import type { RarityIdentifier } from '../config/rarityDesigns';
 
-/** New presentation model; deliberately separate from the legacy pack catalog. */
+/** Hero presentation data, distinct from the legacy CardData shape. */
 export interface HeroCardData {
   /** hero-common remains supported for existing fixtures. */
   layout: 'hero-common' | 'hero';

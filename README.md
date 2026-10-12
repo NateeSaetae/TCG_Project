@@ -29,10 +29,10 @@ Collection ค้นหาชื่อ กรองระดับความ�
 
 - `src/App.tsx` เมนูและ hash routing แบบเบา รองรับ back/forward โดยไม่ต้องติดตั้ง router
 - `src/pages/` Home, PackOpening และ Collection
-- `src/components/cards/Card.tsx` กรอบการ์ด สถิติ tilt และ foil
+- `src/components/cards/Card.tsx` จุดเรียกใช้ renderer; `src/components/cards/` จัดกรอบการ์ด การพลิก tilt และ foil
 - `src/components/pack/BoosterPack.tsx` ซองการ์ด
 - `src/types/index.ts` โมเดล CardData และ SaveData
-- `src/data/catalog.ts` รวม Marth FE-001–FE-006 สำหรับซอง และการ์ดเดิม 30 ใบสำหรับคลัง
+- `src/data/characters/` เก็บข้อมูลการ์ดแยกตามตัวละคร; `src/data/catalog.ts` รวมการ์ดที่ลงทะเบียนสำหรับซองและคลัง
 - `src/config/rarity.ts` rarity, น้ำหนัก, สี และจำนวนการ์ดต่อซอง
 - `src/utils/packGenerator.ts` ระบบสุ่ม แยกจาก UI และใส่ RNG สำหรับทดสอบได้
 - `src/hooks/useCollection.ts` โหลด ตรวจสอบ และบันทึก localStorage
@@ -54,9 +54,9 @@ Collection ค้นหาชื่อ กรองระดับความ�
 
 ## เพิ่มการ์ด / เปลี่ยนภาพ
 
-การ์ด Marth ทั้งหกใช้ข้อมูลเดิมใน `src/data/marth*Preview.ts` และถูกรวมใน `src/data/catalog.ts` โดยไม่คัดลอกค่าสถิติ หากเพิ่มใบใหม่ในซอง ให้เพิ่มเข้ากับ pool นี้โดยใช้ ID ไม่ซ้ำ
+การ์ด Marth ทั้งหกอยู่ใน `src/data/characters/marth.ts` และลงทะเบียนผ่าน `src/data/characters/index.ts` หากเพิ่มตัวละครใหม่ ให้สร้างไฟล์ข้อมูลหนึ่งไฟล์ต่อตัวละครและเพิ่ม array ของการ์ดใน `characterSets` โดยใช้ ID ไม่ซ้ำ ดู [วิธีเพิ่มตัวละคร](docs/adding-character.md)
 
-ภาพอยู่ใน `public/art/` และแต่ละระดับของ Marth ใช้ renderer กับเลเยอร์ภาพที่กำหนดไว้แล้ว คลังแสดง Marth 6 ใบพร้อมการ์ดเดิม 30 ใบ ส่วนซองใหม่สุ่มเฉพาะ Marth
+ภาพ Marth อยู่ใน `public/art/aether/heroes/marth/` แยกเป็น `characters/`, `backgrounds/` และ `effects/` ส่วนกรอบและภาพที่ใช้ร่วมกันยังอยู่ใน `public/art/aether/` คลังแสดง Marth 6 ใบพร้อมการ์ดเดิม 30 ใบ และซองสุ่มจากชุดการ์ดตัวละครที่ลงทะเบียน
 
 ## งานภาพและประสิทธิภาพ
 

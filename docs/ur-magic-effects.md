@@ -4,11 +4,11 @@ FE-005 keeps its approved character, castle WebP, printed frame, cost/power, rar
 
 ## Compare and revert
 
-Open /dev/marth-common and toggle **UR magic: Enhanced / Original**. Original disables the profile and renders the previous PNG at its original opacity (.55), depth (1) and position. To make this permanent, set magicEffects.enabled to false in src/data/marthUltraRarePreview.ts. Frame foil is independent and remains unchanged in both modes.
+Open /dev/marth-common and toggle **UR magic: Enhanced / Original**. Original disables the profile and renders the previous PNG at its original opacity (.55), depth (1) and position. To make this permanent, set magicEffects.enabled to false in src/data/characters/marth.ts. Frame foil is independent and remains unchanged in both modes.
 
 ## Artwork and reflection
 
-The existing /art/aether/effects/marth_sr_front.png remains the foreground artwork. Enhanced mode lowers its opacity to .34, shifts the composition down 2cqw and gives it 1.1 times the foreground pointer displacement. No SR back PNG is added. A very soft cyan aura sits behind the character; a future clean background PNG can be supplied through backgroundArtwork.
+The existing /art/aether/heroes/marth/effects/marth_sr_front.png remains the foreground artwork. Enhanced mode lowers its opacity to .34, shifts the composition down 2cqw and gives it 1.1 times the foreground pointer displacement. No SR back PNG is added. A very soft cyan aura sits behind the character; a future clean background PNG can be supplied through backgroundArtwork.
 
 MagicEffects renders a separate reflection: an outer alpha mask uses the same foreground PNG, and an inner selective SVG mask permits only four small peripheral crystal facets. This intersection prevents diffuse glow or the broad diagonal streak from becoming a rainbow overlay. The masks use the same contain sizing, centering and translation as the PNG. The overlay sits above artwork but below description/name/cost/badge.
 

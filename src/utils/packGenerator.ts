@@ -1,4 +1,4 @@
-import { marthCards } from '../data/catalog';
+import { heroCards } from '../data/catalog';
 import { PACK_SIZE, rank, rarityName, rarityWeights } from '../config/rarity';
 import type { HeroCardData } from '../types/heroCard';
 import type { Rarity } from '../types';
@@ -31,7 +31,7 @@ export function generatePack(
 ): HeroCardData[] {
   const selected: HeroCardData[] = [];
   for (let slot = 0; slot < PACK_SIZE; slot++) {
-    const available = marthCards.filter(
+    const available = heroCards.filter(
       (card) =>
         slot !== PACK_SIZE - 1 ||
         selected.some((chosen) => rank(chosen.rarity) >= 2) ||

@@ -12,9 +12,11 @@ const DevShowcase = import.meta.env.DEV
   ? lazy(() => import('./pages/CardShowcase'))
   : null;
 const DevMarth = import.meta.env.DEV
-  ? lazy(() => import('./pages/MarthCommonPreview'))
+  ? lazy(() => import('./pages/dev/MarthPreview'))
   : null;
+
 type Page = 'home' | 'packs' | 'collection' | 'showcase' | 'marth';
+
 function currentPage(): Page {
   if (
     import.meta.env.DEV &&
@@ -34,27 +36,32 @@ function currentPage(): Page {
       ? 'collection'
       : 'home';
 }
+
 export default function App() {
   const [page, setPage] = useState<Page>(currentPage);
   const [viewer, setViewer] = useState<CollectibleCard | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const { save, error, addPack, finish, toggleSound } = useCollection();
+
   useEffect(() => {
     const listener = () => setPage(currentPage());
     window.addEventListener('hashchange', listener);
     return () => window.removeEventListener('hashchange', listener);
   }, []);
+
   useEffect(() => {
     setDetailsOpen(false);
     if (viewer) dialog.current?.showModal();
     else dialog.current?.close();
   }, [viewer]);
+
   function go(next: Page) {
     location.hash = next;
     setPage(next);
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
+
   return (
     <div
       className="app-shell royal-theme"

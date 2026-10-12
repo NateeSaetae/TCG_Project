@@ -319,11 +319,11 @@ test('a pending Marth SER pull resumes with the Secret Rare reveal', async () =>
 
 test('Marth Common keeps its text anatomy and enters the new pack catalog', async () => {
   const { marthPreview } = await server.ssrLoadModule(
-    '/src/data/marthPreview.ts',
+    '/src/data/characters/marth.ts',
   );
-  const { marthCards } = await server.ssrLoadModule('/src/data/catalog.ts');
+  const { heroCards } = await server.ssrLoadModule('/src/data/catalog.ts');
   assert.ok(!cards.some((card) => card.id === marthPreview.id));
-  assert.ok(marthCards.includes(marthPreview));
+  assert.ok(heroCards.includes(marthPreview));
   await access(
     fileURLToPath(new URL('../public' + marthPreview.image, import.meta.url)),
   );
@@ -356,10 +356,10 @@ test('Marth Common keeps its text anatomy and enters the new pack catalog', asyn
 
 test('Marth preview supports shared flip faces and existing card-back artwork', async () => {
   const { marthPreview } = await server.ssrLoadModule(
-    '/src/data/marthPreview.ts',
+    '/src/data/characters/marth.ts',
   );
-  const { default: MarthCommonPreview } = await server.ssrLoadModule(
-    '/src/pages/MarthCommonPreview.tsx',
+  const { default: MarthPreview } = await server.ssrLoadModule(
+    '/src/pages/dev/MarthPreview.tsx',
   );
   for (const face of ['front', 'back']) {
     const html = render(Card, { card: marthPreview, face });
@@ -367,7 +367,7 @@ test('Marth preview supports shared flip faces and existing card-back artwork', 
     assert.ok(html.includes(CARD_BACK_IMAGE));
     assert.ok(html.includes('common-hero-card'));
   }
-  const preview = render(MarthCommonPreview, {});
+  const preview = render(MarthPreview, {});
   for (const label of ['Show Front', 'Show Back', 'Flip Card', 'Preview size'])
     assert.ok(preview.includes(label));
 });
@@ -375,7 +375,7 @@ test('Marth preview supports shared flip faces and existing card-back artwork', 
 const { readFile } = await import('node:fs/promises');
 const { createHash } = await import('node:crypto');
 const { marthPreview } = await server.ssrLoadModule(
-  '/src/data/marthPreview.ts',
+  '/src/data/characters/marth.ts',
 );
 const { CardRenderer } = await server.ssrLoadModule(
   '/src/components/cards/CardRenderer.tsx',
@@ -520,17 +520,17 @@ test('card back renders one approved image without legacy stack classes or foil 
 
 test('Marth Uncommon has independent grassland and character art without changing Common data', async () => {
   const { marthUncommonPreview } = await server.ssrLoadModule(
-    '/src/data/marthUncommonPreview.ts',
+    '/src/data/characters/marth.ts',
   );
   assert.equal(marthPreview.id, 'FE-001');
   assert.equal(
     marthPreview.image,
-    '/art/aether/characters/marth_hero-king_C.png',
+    '/art/aether/heroes/marth/characters/marth_hero-king_C.png',
   );
   assert.equal(marthUncommonPreview.id, 'FE-002');
   assert.equal(
     marthUncommonPreview.image,
-    '/art/aether/characters/marth_hero-king.png',
+    '/art/aether/heroes/marth/characters/marth_hero-king.png',
   );
   assert.equal(
     marthUncommonPreview.artwork.character,
@@ -570,20 +570,20 @@ test('Marth Uncommon has independent grassland and character art without changin
   const hidden = render(Card, { card: marthUncommonPreview, hidden: true });
   assert.ok(!hidden.includes(marthUncommonPreview.artwork.background));
   assert.ok(!hidden.includes(marthUncommonPreview.artwork.character));
-  const { default: MarthCommonPreview } = await server.ssrLoadModule(
-    '/src/pages/MarthCommonPreview.tsx',
+  const { default: MarthPreview } = await server.ssrLoadModule(
+    '/src/pages/dev/MarthPreview.tsx',
   );
-  const preview = render(MarthCommonPreview, {});
+  const preview = render(MarthPreview, {});
   assert.ok(preview.includes('FE-001'));
   assert.ok(preview.includes('FE-002'));
 });
 
 test('FE-003 reuses Uncommon assets and data in a full-art Rare design', async () => {
   const { marthUncommonPreview } = await server.ssrLoadModule(
-    '/src/data/marthUncommonPreview.ts',
+    '/src/data/characters/marth.ts',
   );
   const { marthRarePreview } = await server.ssrLoadModule(
-    '/src/data/marthRarePreview.ts',
+    '/src/data/characters/marth.ts',
   );
   assert.equal(marthRarePreview.id, 'FE-003');
   assert.equal(marthRarePreview.rarity, 'R');
@@ -628,20 +628,20 @@ test('FE-003 reuses Uncommon assets and data in a full-art Rare design', async (
   const hidden = render(Card, { card: marthRarePreview, hidden: true });
   assert.ok(!hidden.includes(marthRarePreview.artwork.background));
   assert.ok(!hidden.includes(marthRarePreview.artwork.character));
-  const { default: MarthCommonPreview } = await server.ssrLoadModule(
-    '/src/pages/MarthCommonPreview.tsx',
+  const { default: MarthPreview } = await server.ssrLoadModule(
+    '/src/pages/dev/MarthPreview.tsx',
   );
-  const preview = render(MarthCommonPreview, {});
+  const preview = render(MarthPreview, {});
   for (const id of ['FE-001', 'FE-002', 'FE-003'])
     assert.ok(preview.includes(id));
 });
 
 test('FE-004 uses its alternate transparent Marth art over the battlefield with fixed stats', async () => {
   const { marthRarePreview } = await server.ssrLoadModule(
-    '/src/data/marthRarePreview.ts',
+    '/src/data/characters/marth.ts',
   );
   const { marthSuperRarePreview } = await server.ssrLoadModule(
-    '/src/data/marthSuperRarePreview.ts',
+    '/src/data/characters/marth.ts',
   );
   assert.equal(marthSuperRarePreview.id, 'FE-004');
   assert.equal(marthSuperRarePreview.rarity, 'SR');
@@ -709,17 +709,17 @@ test('FE-004 uses its alternate transparent Marth art over the battlefield with 
     css,
     /\.common-description\.super-rare-description\s*\{[^}]*background:\s*transparent;/,
   );
-  const { default: MarthCommonPreview } = await server.ssrLoadModule(
-    '/src/pages/MarthCommonPreview.tsx',
+  const { default: MarthPreview } = await server.ssrLoadModule(
+    '/src/pages/dev/MarthPreview.tsx',
   );
-  const preview = render(MarthCommonPreview, {});
+  const preview = render(MarthPreview, {});
   for (const id of ['FE-001', 'FE-002', 'FE-003', 'FE-004'])
     assert.ok(preview.includes(id));
 });
 
 test('FE-004 keeps two independent effect assets around the character', async () => {
   const { marthSuperRarePreview } = await server.ssrLoadModule(
-    '/src/data/marthSuperRarePreview.ts',
+    '/src/data/characters/marth.ts',
   );
   const art = marthSuperRarePreview.artwork;
   for (const path of [art.midground, art.foreground])
@@ -734,10 +734,10 @@ test('FE-004 keeps two independent effect assets around the character', async ()
       html.indexOf('hero-artwork-foreground'),
   );
   const { marthUncommonPreview } = await server.ssrLoadModule(
-    '/src/data/marthUncommonPreview.ts',
+    '/src/data/characters/marth.ts',
   );
   const { marthRarePreview } = await server.ssrLoadModule(
-    '/src/data/marthRarePreview.ts',
+    '/src/data/characters/marth.ts',
   );
   for (const card of [marthPreview, marthUncommonPreview, marthRarePreview]) {
     const variant = render(CardRenderer, { card });
@@ -748,10 +748,10 @@ test('FE-004 keeps two independent effect assets around the character', async ()
 
 test('FE-005 UR keeps independent art, selective foil, and prior rarities intact', async () => {
   const { marthUltraRarePreview } = await server.ssrLoadModule(
-    '/src/data/marthUltraRarePreview.ts',
+    '/src/data/characters/marth.ts',
   );
   const { marthSuperRarePreview } = await server.ssrLoadModule(
-    '/src/data/marthSuperRarePreview.ts',
+    '/src/data/characters/marth.ts',
   );
   assert.equal(marthUltraRarePreview.id, 'FE-005');
   assert.equal(marthUltraRarePreview.rarity, 'UR');
@@ -804,17 +804,20 @@ test('FE-005 UR keeps independent art, selective foil, and prior rarities intact
   assert.ok(!hidden.includes(marthUltraRarePreview.artwork.character));
   for (const card of [marthPreview, marthSuperRarePreview])
     assert.ok(!render(CardRenderer, { card }).includes('ultra-rare-foil'));
-  const { default: MarthCommonPreview } = await server.ssrLoadModule(
-    '/src/pages/MarthCommonPreview.tsx',
+  const { default: MarthPreview } = await server.ssrLoadModule(
+    '/src/pages/dev/MarthPreview.tsx',
   );
-  assert.ok(render(MarthCommonPreview, {}).includes('FE-005'));
+  assert.ok(render(MarthPreview, {}).includes('FE-005'));
 });
 
 test('UR enhanced magic is selective, configurable and reversible without changing approved artwork', async () => {
   const { marthUltraRarePreview: ur } = await server.ssrLoadModule(
-    '/src/data/marthUltraRarePreview.ts',
+    '/src/data/characters/marth.ts',
   );
-  assert.equal(ur.artwork.foreground, '/art/aether/effects/marth_sr_front.png');
+  assert.equal(
+    ur.artwork.foreground,
+    '/art/aether/heroes/marth/effects/marth_sr_front.png',
+  );
   assert.equal(ur.artwork.midground, undefined);
   assert.equal(ur.magicEffects.foilArtwork, ur.artwork.foreground);
   await access(
@@ -859,7 +862,7 @@ test('UR enhanced magic is selective, configurable and reversible without changi
 
 test('FE-006 SER reuses Aether full-art finishing with supplied art and independent hero stats', async () => {
   const { marthSecretRarePreview: scr } = await server.ssrLoadModule(
-    '/src/data/marthSecretRarePreview.ts',
+    '/src/data/characters/marth.ts',
   );
   assert.equal(rarityCode('SER'), 'SEC');
   assert.equal(scr.id, 'FE-006');
@@ -910,7 +913,7 @@ test('FE-006 SER reuses Aether full-art finishing with supplied art and independ
   assert.ok(back.includes('data-effects="off"'));
   assert.ok(back.includes(CARD_BACK_IMAGE));
   const { default: Preview } = await server.ssrLoadModule(
-    '/src/pages/MarthCommonPreview.tsx',
+    '/src/pages/dev/MarthPreview.tsx',
   );
   assert.ok(render(Preview, {}).includes('FE-006'));
 });

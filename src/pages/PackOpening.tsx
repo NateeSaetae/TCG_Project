@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Card } from '../components/cards/Card';
 import { BoosterPack } from '../components/pack/BoosterPack';
-import { cardById, marthCards, type CollectibleCard } from '../data/catalog';
+import { cardById, heroCards, type CollectibleCard } from '../data/catalog';
 import { generatePack } from '../utils/packGenerator';
 import { playTone } from '../utils/sound';
 import { PACK_SIZE, rank, rarities, rarityWeights } from '../config/rarity';
@@ -281,7 +281,7 @@ export function PackOpening({
                     Force {rarity}
                   </option>
                 ))}
-                {marthCards.map((card) => (
+                {heroCards.map((card) => (
                   <option key={card.id} value={'card:' + card.id}>
                     Force {card.id}
                   </option>

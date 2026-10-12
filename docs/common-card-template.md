@@ -4,19 +4,19 @@ Open `http://127.0.0.1:5173/dev/marth-common` with the dev server running. Hash 
 
 ## Asset
 
-The existing artwork was found at `public/art/aether/characters/marth_hero-king.png`. No missing asset or placeholder was needed. Change `image` and optional `imagePosition` in `src/data/marthPreview.ts` to replace it. Artwork now fills the entire card using cover, preserving image proportions while cropping the sides as needed. The opaque description panel and dark identity panel overlay the artwork. Adjust imagePosition in the preview data to move the focal point. No text is baked into the PNG.
+The approved Common artwork is at `public/art/aether/heroes/marth/characters/marth_hero-king_C.png`. Change `image` and optional `imagePosition` in `src/data/characters/marth.ts` to replace it. Artwork fills the card using cover, preserving image proportions while cropping the sides as needed. The opaque description panel and dark identity panel overlay the artwork. No text is baked into the PNG.
 
 ## Components and files
 
 - `src/types/heroCard.ts`: separate presentation data model with layout discriminant, power and characterType; avoids inventing legacy attack/defense fields.
-- `src/data/marthPreview.ts`: FE-001 fixture only, with Common internally and C displayed via existing rarityLabels. It is not imported by the catalog/randomizer.
+- `src/data/characters/marth.ts`: FE-001 and all other Marth prints, registered for packs and the archive through `src/data/characters/index.ts`.
 - `src/components/cards/CommonHeroCard.tsx`: compatibility export of `HeroCardLayout`; the shared printed face retains cost and power, artwork, opaque description panel, centered identity and bottom corner rarity/ID.
 - `src/components/cards/common-hero-card.css`: independent navy/parchment frame. Container-relative typography, proportional regions and full-card artwork scale together. The description wraps and permits scrolling for unusually long future rules text instead of truncation. Future exceptionally long names/types should be visually checked at the smallest supported size.
 - `src/components/cards/Card.tsx`: compatibility export of the shared `CardRenderer`. All existing CardData records retain the old renderer.
-- `src/pages/MarthCommonPreview.tsx`: front/back, flip and 200–400px size controls, with mobile width limits.
+- `src/pages/dev/MarthPreview.tsx`: front/back, flip and 200–400px size controls, with mobile width limits.
 - `src/App.tsx`: dev-only lazy route.
 - `src/pages/CardShowcase.tsx`: adds a link to the Common preview; keeps existing controls and effects.
-- `tests/card-render.test.mjs`: checks the new anatomy, asset, hidden state, shared two-sided composition and absence from the pack catalog.
+- `tests/card-render.test.mjs`: checks the new anatomy, asset, hidden state, shared two-sided composition and inclusion in the pack catalog.
 
 Common uses a quiet satin reflection, without Secret Rare foil. Shared TwoSidedCard still owns flip and the outer pointer tilt. When rendered inside it, the Common face disables its independent pointer handler and inherits the shared variables. Standalone faces reuse useCardPointer. Reduced motion remains supported.
 
