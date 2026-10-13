@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from 'framer-motion';
-import { Card } from '../cards/Card';
+import { CardRenderer } from '../cards/CardRenderer';
 import { secretRevealTiming } from '../../config/cardEffects';
 import { playTone } from '../../utils/sound';
-import type { CollectibleCard } from '../../data/catalog';
+import type { HeroCardData } from '../../types/heroCard';
 
 type Stage = 'idle' | 'charging' | 'flipping' | 'settling' | 'ready';
 
-/** Shared by real packs and the dev showcase; it never mutates the collection. */
+/** Pack reveal animation; it never mutates the collection. */
 export function SecretRareReveal({
   card,
   revealed,
@@ -17,7 +17,7 @@ export function SecretRareReveal({
   continueLabel = 'Continue to next card',
   autoPlay = false,
 }: {
-  card: CollectibleCard;
+  card: HeroCardData;
   revealed: boolean;
   onReveal: () => void;
   onContinue: () => void;
@@ -102,7 +102,7 @@ export function SecretRareReveal({
                 : 'Reveal Secret Rare card'
           }
         >
-          <Card
+          <CardRenderer
             card={card}
             face={stage === 'idle' || stage === 'charging' ? 'back' : 'front'}
             effectsActive={stage === 'settling' || stage === 'ready'}

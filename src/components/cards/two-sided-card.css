@@ -41,12 +41,12 @@
     0 18px 40px #0007;
 }
 .two-front > .sr-card,
-.two-front > .tcg-card {
+.two-front > .common-hero-card {
   width: 100% !important;
   height: 100%;
 }
 /* One shared outer tilt; front layers only keep their local depth and light. */
-.two-front > .tcg-card,
+.two-front > .common-hero-card,
 .two-front .sr-body {
   transform: none;
 }
@@ -69,8 +69,7 @@
 .two-sided-card[data-effects='off'] .sr-finish,
 .two-sided-card[data-effects='off'] .sr-particles,
 .two-sided-card[data-effects='off'] .sr-glass,
-.two-sided-card[data-effects='off'] .sr-atmosphere,
-.two-sided-card[data-effects='off'] .card-foil {
+.two-sided-card[data-effects='off'] .sr-atmosphere {
   visibility: hidden;
 }
 .two-sided-card[data-face='back'] .two-front {

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { archiveCards, cardById, type CollectibleCard } from '../data/catalog';
+import { archiveCards, cardById } from '../data/catalog';
+import type { HeroCardData } from '../types/heroCard';
 import { PACK_SIZE } from '../config/rarity';
 import type { SaveData } from '../types';
 const KEY = 'aetherveil-save-v1';
@@ -55,7 +56,7 @@ export function useCollection() {
   return {
     save,
     error,
-    addPack: (pack: CollectibleCard[]) => {
+    addPack: (pack: HeroCardData[]) => {
       const owned = { ...save.owned };
       for (const c of pack) owned[c.id] = (owned[c.id] || 0) + 1;
       commit({

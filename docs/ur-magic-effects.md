@@ -4,7 +4,7 @@ FE-005 keeps its approved character, castle WebP, printed frame, cost/power, rar
 
 ## Compare and revert
 
-Open /dev/marth-common and toggle **UR magic: Enhanced / Original**. Original disables the profile and renders the previous PNG at its original opacity (.55), depth (1) and position. To make this permanent, set magicEffects.enabled to false in src/data/characters/marth.ts. Frame foil is independent and remains unchanged in both modes.
+Open /dev/heroes and toggle **Magic effects: Enhanced / Original**. Original disables the profile and renders the previous PNG at its original opacity (.55), depth (1) and position. To make this permanent, set magicEffects.enabled to false in src/data/characters/marth.ts. Frame foil is independent and remains unchanged in both modes.
 
 ## Artwork and reflection
 

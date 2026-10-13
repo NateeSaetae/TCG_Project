@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from 'framer-motion';
-import { Card } from '../cards/Card';
+import { CardRenderer } from '../cards/CardRenderer';
 import { CARD_FLIP_MS } from '../cards/TwoSidedCard';
-import type { CollectibleCard } from '../../data/catalog';
+import type { HeroCardData } from '../../types/heroCard';
 import { rank } from '../../config/rarity';
 import { playTone } from '../../utils/sound';
 export function CardReveal({
@@ -11,7 +11,7 @@ export function CardReveal({
   onContinue,
   sound,
 }: {
-  card: CollectibleCard;
+  card: HeroCardData;
   onReveal: () => void;
   onContinue: () => void;
   sound: boolean;
@@ -57,7 +57,7 @@ export function CardReveal({
         onClick={activate}
         aria-label={stage === 'ready' ? 'Continue to next card' : 'Reveal card'}
       >
-        <Card
+        <CardRenderer
           card={card}
           face={stage === 'idle' || stage === 'charging' ? 'back' : 'front'}
           effectsActive={stage === 'ready'}

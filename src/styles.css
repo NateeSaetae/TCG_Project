@@ -267,7 +267,7 @@ main {
   position: absolute;
   width: 235px;
 }
-.hero-card .tcg-card {
+.hero-card .common-hero-card {
   width: 100%;
 }
 .side-left {
@@ -283,7 +283,7 @@ main {
   z-index: 2;
   filter: drop-shadow(0 14px 35px #050610);
 }
-.center-card .tcg-card {
+.center-card .common-hero-card {
   width: 252px;
 }
 .orbit {
@@ -398,191 +398,6 @@ main {
   font-size: 8px;
   letter-spacing: 2px;
   color: #4f5b6c;
-}
-.tcg-card {
-  width: 290px;
-  aspect-ratio: 0.686;
-  position: relative;
-  border: 1px solid var(--rarity);
-  border-radius: 12px;
-  padding: 10px;
-  overflow: hidden;
-  background: #111a28;
-  isolation: isolate;
-  transform: perspective(900px) rotateX(var(--rx, 0deg))
-    rotateY(var(--ry, 0deg));
-  transition: transform 0.15s ease-out;
-  box-shadow:
-    0 0 0 3px #141a23,
-    0 0 0 4px color-mix(in srgb, var(--rarity) 30%, transparent),
-    0 18px 40px #0007;
-  text-align: left;
-}
-.tcg-card:before {
-  content: '';
-  position: absolute;
-  inset: 6px;
-  border: 1px solid color-mix(in srgb, var(--rarity) 45%, transparent);
-  border-radius: 7px;
-  z-index: 3;
-  pointer-events: none;
-}
-.card-art {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  inset: 0;
-  object-fit: cover;
-  z-index: -3;
-}
-.card-shade {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    #060b1040,
-    transparent 33%,
-    #07101b80 55%,
-    #080f1bee 78%
-  );
-  z-index: -2;
-}
-.card-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 9px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  padding: 3px;
-  color: #e0e3e9;
-}
-.card-top > span:first-child {
-  border: 1px solid var(--rarity);
-  border-radius: 50%;
-  width: 25px;
-  height: 25px;
-  display: grid;
-  place-items: center;
-  background: #101624a0;
-  font: 15px Georgia;
-}
-.card-copy {
-  position: absolute;
-  bottom: 14px;
-  left: 18px;
-  right: 18px;
-}
-.card-rarity {
-  font-size: 8px;
-  color: var(--rarity);
-  text-transform: uppercase;
-  letter-spacing: 1.3px;
-}
-.card-copy h3 {
-  font:
-    20px/1.15 Georgia,
-    serif;
-  margin: 8px 0;
-  color: #f0ece3;
-}
-.card-copy p {
-  font-size: 9px;
-  line-height: 1.6;
-  color: #a8aeb9;
-  min-height: 29px;
-}
-.card-stats {
-  display: flex;
-  gap: 25px;
-  font-size: 11px;
-  margin: 12px 0 9px;
-  color: #e3d8bc;
-}
-.card-copy footer {
-  display: flex;
-  justify-content: space-between;
-  border-top: 1px solid #ffffff1c;
-  padding-top: 8px;
-  font-size: 6px;
-  letter-spacing: 1px;
-  color: #a0a0a1;
-}
-.card-gloss {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    circle at var(--mx, 50%) var(--my, 30%),
-    #ffffff24,
-    transparent 50%
-  );
-  pointer-events: none;
-  mix-blend-mode: screen;
-}
-.card-foil {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(
-    115deg,
-    transparent 15%,
-    #93e5c815,
-    #c991ee22,
-    #fbd2861c,
-    transparent 80%
-  );
-  background-size: 250% 250%;
-  mix-blend-mode: color-dodge;
-  animation: foil 9s ease-in-out infinite;
-  opacity: 0.7;
-}
-.secret {
-  border-width: 2px;
-}
-.secret .card-foil {
-  opacity: 1;
-  background-image: repeating-linear-gradient(
-    115deg,
-    #79ead80e 0%,
-    #aba7ff35 20%,
-    #ffc79729 40%,
-    transparent 60%
-  );
-}
-.small {
-  width: 100%;
-}
-.small .card-copy h3 {
-  font-size: 17px;
-}
-.small .card-copy {
-  left: 14px;
-  right: 14px;
-}
-.unowned .card-art {
-  filter: grayscale(1) brightness(0.17);
-}
-.unowned {
-  border-color: #34414e;
-  box-shadow: 0 0 0 3px #141a23;
-  opacity: 0.7;
-}
-.unowned .card-foil {
-  display: none;
-}
-.unowned .card-rarity {
-  color: #778393;
-}
-.unowned .card-gloss {
-  opacity: 0.2;
-}
-@keyframes foil {
-  0%,
-  100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
 }
 .collection-page {
   padding: 48px 0 70px;
@@ -700,34 +515,6 @@ main {
   background: #03060ddb;
   backdrop-filter: blur(14px);
 }
-.viewer-content {
-  display: flex;
-  align-items: center;
-  gap: 50px;
-  padding: 45px;
-  position: relative;
-}
-.viewer-content > .tcg-card {
-  flex-shrink: 0;
-}
-.viewer-details h2 {
-  font-size: 35px;
-  line-height: 1.15;
-  margin: 16px 0;
-}
-.viewer-details p {
-  font-size: 12px;
-  margin: 12px 0;
-}
-.viewer-owned {
-  font-size: 12px;
-  color: #d5bf8e;
-}
-.viewer-details .muted {
-  font-size: 10px;
-  color: #677687;
-  margin-top: 28px;
-}
 .close-viewer {
   position: absolute;
   right: 12px;
@@ -827,7 +614,7 @@ main {
   inset: 20px 10px;
   background:
     linear-gradient(#0c132233, #16172d22, #131a2f),
-    url('/art/30.svg') center 40% / cover;
+    var(--booster-art) center 40% / cover;
   border: 1px solid #c4ae7966;
   display: flex;
   align-items: center;
@@ -1026,47 +813,6 @@ main {
     transform: rotate(360deg);
   }
 }
-.card-back {
-  width: 290px;
-  aspect-ratio: 0.686;
-  background:
-    repeating-linear-gradient(45deg, #25263d 0 1px, transparent 1px 18px),
-    radial-gradient(#283047, #0c1421);
-  border: 2px solid #ad9871;
-  border-radius: 12px;
-  box-shadow:
-    0 0 0 5px #151c29,
-    8px 8px 0 #313442,
-    13px 13px 0 #141d2b;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 35px;
-  position: relative;
-}
-.card-back:after {
-  content: '';
-  position: absolute;
-  inset: 12px;
-  border: 1px solid #a58d674d;
-  border-radius: 7px;
-}
-.card-back span {
-  font: 12px Georgia;
-  letter-spacing: 3px;
-  color: #c2ac81;
-}
-.card-back span:last-child {
-  font: 7px Segoe UI;
-  letter-spacing: 2px;
-}
-.card-back strong {
-  font-size: 115px;
-  color: #dcc28c;
-  font-weight: 400;
-  text-shadow: 0 0 25px #b19af944;
-}
 .reveal-label {
   margin-top: 25px;
   font-size: 10px;
@@ -1243,7 +989,7 @@ main {
   .hero-card {
     width: 218px;
   }
-  .center-card .tcg-card {
+  .center-card .common-hero-card {
     width: 235px;
   }
   .side-left {
@@ -1282,16 +1028,6 @@ main {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     row-gap: 30px;
     margin-top: 40px;
-  }
-  .viewer-content {
-    gap: 25px;
-    padding: 30px;
-  }
-  .viewer-content > .tcg-card {
-    width: 240px;
-  }
-  .viewer-details h2 {
-    font-size: 27px;
   }
   .page-foot {
     font-size: 6px;
@@ -1392,42 +1128,6 @@ main {
   .filters label {
     padding: 8px 0;
   }
-  .small .card-copy h3 {
-    font-size: 14px;
-    margin: 5px 0;
-  }
-  .small .card-copy {
-    left: 11px;
-    right: 11px;
-    bottom: 12px;
-  }
-  .small .card-rarity {
-    font-size: 6px;
-    letter-spacing: 0.7px;
-  }
-  .small .card-copy p {
-    font-size: 7px;
-    min-height: 23px;
-  }
-  .small .card-stats {
-    margin: 6px 0;
-    font-size: 8px;
-    gap: 18px;
-  }
-  .small .card-copy footer {
-    font-size: 4px;
-    letter-spacing: 0.5px;
-    padding-top: 5px;
-  }
-  .small .card-top {
-    font-size: 6px;
-    padding: 0;
-  }
-  .small .card-top > span:first-child {
-    width: 19px;
-    height: 19px;
-    font-size: 12px;
-  }
   .opening-page {
     padding-top: 30px;
   }
@@ -1463,10 +1163,6 @@ main {
   .result-actions {
     flex-direction: column;
   }
-  .reveal-button .tcg-card,
-  .card-back {
-    width: 250px;
-  }
   .reveal-aura {
     width: 350px;
     height: 400px;
@@ -1474,31 +1170,9 @@ main {
   .spark-burst {
     top: 170px;
   }
-  .viewer-content {
-    flex-direction: column;
-    gap: 24px;
-    padding: 30px 20px 22px;
-  }
-  .viewer-content > .tcg-card {
-    width: 225px;
-  }
   .card-dialog {
     max-height: 92vh;
     overflow: auto;
-  }
-  .viewer-details {
-    text-align: center;
-  }
-  .viewer-details h2 {
-    font-size: 24px;
-    margin: 10px 0;
-  }
-  .viewer-details p {
-    font-size: 10px;
-    margin: 6px 0;
-  }
-  .viewer-details .muted {
-    margin-top: 13px;
   }
   .close-viewer {
     background: #131a26;
@@ -1518,9 +1192,6 @@ main {
     animation: none !important;
     transition: none !important;
     scroll-behavior: auto !important;
-  }
-  .tcg-card {
-    transform: none !important;
   }
 }
 
@@ -1560,7 +1231,6 @@ main {
   width: var(--viewer-card-width);
   position: relative;
 }
-.focused-card-stage > .tcg-card,
 .focused-card-stage > .sr-card {
   width: 100%;
 }
@@ -1584,113 +1254,9 @@ main {
   border-radius: 50%;
   background: #111925;
 }
-.viewer-detail-toggle {
-  position: absolute;
-  left: calc(50% + var(--viewer-card-width) / 2 + 26px);
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 12px 15px;
-  border: 1px solid #d6bd8044;
-  border-radius: 6px;
-  background: #141c28e8;
-  color: #ddc795;
-  font-size: 11px;
-  white-space: nowrap;
-  z-index: 4;
-}
-.viewer-detail-toggle:hover {
-  border-color: #ddc795;
-  background: #202735;
-}
-.viewer-detail-toggle > span {
-  font-size: 19px;
-}
-.focused-viewer[data-details-open='true'] .viewer-detail-toggle {
-  position: fixed;
-  left: auto;
-  right: 80px;
-  top: 20px;
-  transform: none;
-  height: 40px;
-}
-.focused-detail-panel {
-  position: absolute;
-  right: 24px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: min(320px, calc((100vw - var(--viewer-card-width)) / 2 - 48px));
-  max-height: calc(100dvh - 170px);
-  overflow-y: auto;
-  padding: 26px;
-  text-align: left;
-  border: 1px solid #c9b67b30;
-  border-radius: 12px;
-  background: #111925f5;
-  box-shadow: 0 15px 45px #0005;
-  z-index: 3;
-}
-.focused-detail-panel h2 {
-  font-size: 28px;
-}
-.viewer-card-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
-  margin: 24px 0 0;
-  border-top: 1px solid #ffffff12;
-  padding-top: 20px;
-}
-.viewer-card-stats dt {
-  font-size: 10px;
-  color: #8d98a7;
-}
-.viewer-card-stats dd {
-  margin: 6px 0 0;
-  font-size: 14px;
-  color: #e3d6b9;
-}
-@media (max-width: 900px) {
-  .viewer-detail-toggle {
-    left: auto;
-    right: 16px;
-    padding: 10px;
-    flex-direction: column;
-    gap: 4px;
-    font-size: 9px;
-  }
-  .focused-viewer[data-details-open='true'] .viewer-detail-toggle {
-    flex-direction: row;
-    right: 74px;
-  }
-  .focused-detail-panel {
-    position: fixed;
-    left: 16px;
-    right: 16px;
-    top: auto;
-    bottom: 16px;
-    transform: none;
-    width: auto;
-    max-height: 42dvh;
-    padding: 22px;
-  }
-  .focused-detail-panel h2 {
-    font-size: 25px;
-  }
-}
 @media (max-width: 520px) {
   .focused-viewer {
     padding: 72px 12px;
-  }
-  .viewer-detail-toggle {
-    right: 6px;
-    max-width: 54px;
-    white-space: normal;
-  }
-  .focused-viewer[data-details-open='true'] .viewer-detail-toggle {
-    max-width: none;
   }
   .focused-viewer .close-viewer {
     right: 20px;

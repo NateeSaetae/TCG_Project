@@ -1,19 +1,18 @@
 import { rarityLabels } from '../config/rarityLabels';
 import { useState } from 'react';
-import { archiveCards, type CollectibleCard } from '../data/catalog';
+import { archiveCards } from '../data/catalog';
+import type { HeroCardData } from '../types/heroCard';
 import { rarities, rank, rarityName } from '../config/rarity';
-import { Card } from '../components/cards/Card';
+import { CardRenderer } from '../components/cards/CardRenderer';
 export function Collection({
   owned,
   view,
 }: {
   owned: Record<string, number>;
-  view: (c: CollectibleCard) => void;
+  view: (c: HeroCardData) => void;
 }) {
   const [search, setSearch] = useState('');
   const [rarity, setRarity] = useState('');
-  const [element, setElement] = useState('');
-  const [type, setType] = useState('');
   const [sort, setSort] = useState('number');
   const [only, setOnly] = useState(false);
   const filtered = archiveCards
@@ -21,9 +20,7 @@ export function Collection({
       (c) =>
         (!only || owned[c.id]) &&
         c.name.toLowerCase().includes(search.toLowerCase()) &&
-        (!rarity || rarityName(c.rarity) === rarity) &&
-        (!element || ('element' in c && c.element === element)) &&
-        (!type || ('cardType' in c && c.cardType === type)),
+        (!rarity || rarityName(c.rarity) === rarity),
     )
     .sort((a, b) =>
       sort === 'rarity'
@@ -79,26 +76,6 @@ export function Collection({
           ))}
         </select>
         <select
-          aria-label="Element"
-          value={element}
-          onChange={(e) => setElement(e.target.value)}
-        >
-          <option value="">All elements</option>
-          {['Fire', 'Water', 'Nature', 'Light', 'Dark', 'Arcane'].map((r) => (
-            <option key={r}>{r}</option>
-          ))}
-        </select>
-        <select
-          aria-label="Card type"
-          value={type}
-          onChange={(e) => setType(e.target.value)}
-        >
-          <option value="">All types</option>
-          {['Guardian', 'Spirit', 'Relic'].map((r) => (
-            <option key={r}>{r}</option>
-          ))}
-        </select>
-        <select
           aria-label="Sort"
           value={sort}
           onChange={(e) => setSort(e.target.value)}
@@ -127,7 +104,12 @@ export function Collection({
             onClick={() => view(c)}
             aria-label={'View ' + c.name}
           >
-            <Card card={c} small hidden={!owned[c.id]} effectsActive={false} />
+            <CardRenderer
+              card={c}
+              small
+              hidden={!owned[c.id]}
+              effectsActive={false}
+            />
             <div className="ownership">
               {owned[c.id] ? (
                 <>
@@ -151,8 +133,6 @@ export function Collection({
             onClick={() => {
               setSearch('');
               setRarity('');
-              setElement('');
-              setType('');
               setOnly(false);
             }}
           >

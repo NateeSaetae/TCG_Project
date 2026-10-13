@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react';
-import type { CardData } from '../../types';
+import type { HeroCardData } from '../../types/heroCard';
 import {
   useCardPointer,
   type PointerPosition,
@@ -19,7 +19,7 @@ export function SecretRareSurface({
   hidden = false,
   effectsActive = true,
 }: {
-  card: Pick<CardData, 'image' | 'imagePosition' | 'artwork'>;
+  card: Pick<HeroCardData, 'image' | 'imagePosition' | 'artwork'>;
   information: ReactNode;
   label: string;
   className?: string;

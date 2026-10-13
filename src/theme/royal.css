@@ -517,10 +517,6 @@ body {
 .royal-theme .showcase-controls input {
   accent-color: var(--fe-gold);
 }
-.royal-theme .focused-detail-panel {
-  background: var(--fe-panel);
-  border-color: var(--fe-line);
-}
 @media (max-width: 1100px) {
   .royal-theme .site-header {
     gap: 20px;

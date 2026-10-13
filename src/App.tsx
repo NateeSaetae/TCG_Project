@@ -4,32 +4,25 @@ import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Home } from './pages/Home';
 import { Collection } from './pages/Collection';
 import { PackOpening } from './pages/PackOpening';
-import { Card } from './components/cards/Card';
+import { CardRenderer } from './components/cards/CardRenderer';
 import { useCollection } from './hooks/useCollection';
-import type { CollectibleCard } from './data/catalog';
+import type { HeroCardData } from './types/heroCard';
 
-const DevShowcase = import.meta.env.DEV
-  ? lazy(() => import('./pages/CardShowcase'))
-  : null;
-const DevMarth = import.meta.env.DEV
-  ? lazy(() => import('./pages/dev/MarthPreview'))
+const DevHeroes = import.meta.env.DEV
+  ? lazy(() => import('./pages/dev/HeroPreview'))
   : null;
 
-type Page = 'home' | 'packs' | 'collection' | 'showcase' | 'marth';
+type Page = 'home' | 'packs' | 'collection' | 'heroes';
 
 function currentPage(): Page {
   if (
     import.meta.env.DEV &&
-    (location.hash === '#/dev/marth-common' ||
-      (location.pathname === '/dev/marth-common' && !location.hash))
+    (location.hash === '#/dev/heroes' ||
+      location.hash === '#/dev/marth-common' ||
+      (['/dev/heroes', '/dev/marth-common'].includes(location.pathname) &&
+        !location.hash))
   )
-    return 'marth';
-  if (
-    import.meta.env.DEV &&
-    (location.hash === '#/dev/card-showcase' ||
-      (location.pathname === '/dev/card-showcase' && !location.hash))
-  )
-    return 'showcase';
+    return 'heroes';
   return location.hash === '#packs'
     ? 'packs'
     : location.hash === '#collection'
@@ -39,8 +32,7 @@ function currentPage(): Page {
 
 export default function App() {
   const [page, setPage] = useState<Page>(currentPage);
-  const [viewer, setViewer] = useState<CollectibleCard | null>(null);
-  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [viewer, setViewer] = useState<HeroCardData | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
   const { save, error, addPack, finish, toggleSound } = useCollection();
 
@@ -51,7 +43,6 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    setDetailsOpen(false);
     if (viewer) dialog.current?.showModal();
     else dialog.current?.close();
   }, [viewer]);
@@ -131,13 +122,9 @@ export default function App() {
         </div>
       )}
       <main id="main-content" tabIndex={-1}>
-        {page === 'marth' && DevMarth ? (
-          <Suspense fallback={<p>Loading Common preview…</p>}>
-            <DevMarth />
-          </Suspense>
-        ) : page === 'showcase' && DevShowcase ? (
-          <Suspense fallback={<p>Loading showcase…</p>}>
-            <DevShowcase sound={save.sound} />
+        {page === 'heroes' && DevHeroes ? (
+          <Suspense fallback={<p>Loading hero preview…</p>}>
+            <DevHeroes />
           </Suspense>
         ) : page === 'home' ? (
           <Home
@@ -177,7 +164,6 @@ export default function App() {
         {viewer && (
           <div
             className="focused-viewer"
-            data-details-open={detailsOpen}
             onClick={(event) => {
               if (event.target === event.currentTarget) setViewer(null);
             }}
@@ -190,82 +176,11 @@ export default function App() {
               ×
             </button>
             <div className="focused-card-stage">
-              <Card card={viewer} hidden={!save.owned[viewer.id]} />
+              <CardRenderer card={viewer} hidden={!save.owned[viewer.id]} />
               <p className="focused-card-hint">
                 Move your cursor to explore the card
               </p>
             </div>
-            {/* <button
-              className="viewer-detail-toggle"
-              aria-expanded={detailsOpen}
-              aria-controls="card-detail-panel"
-              onClick={() => setDetailsOpen((value) => !value)}
-            >
-              <span aria-hidden="true">{detailsOpen ? '×' : 'ⓘ'}</span>
-              {detailsOpen ? 'Hide details' : 'Card details'}
-            </button> */}
-            {detailsOpen && (
-              <aside
-                id="card-detail-panel"
-                className="viewer-details focused-detail-panel"
-                aria-label="Card details"
-              >
-                <div className="eyebrow">
-                  {'set' in viewer ? viewer.set : 'The Hero Collection'}
-                </div>
-                <h2>
-                  {save.owned[viewer.id]
-                    ? viewer.name
-                    : 'An undiscovered legend'}
-                </h2>
-                <p>
-                  {viewer.rarity} ·{' '}
-                  {'element' in viewer
-                    ? viewer.element + ' · ' + viewer.cardType
-                    : viewer.characterType}
-                </p>
-                <p>
-                  {save.owned[viewer.id]
-                    ? viewer.description
-                    : 'Open boosters to discover this card and reveal its story.'}
-                </p>
-                <span className="viewer-owned">
-                  {save.owned[viewer.id]
-                    ? 'Owned ×' + save.owned[viewer.id]
-                    : 'Not collected yet'}
-                </span>
-                <dl className="viewer-card-stats">
-                  <div>
-                    <dt>Cost</dt>
-                    <dd>{save.owned[viewer.id] ? viewer.cost : '—'}</dd>
-                  </div>
-                  <div>
-                    <dt>{'power' in viewer ? 'Power' : 'Attack'}</dt>
-                    <dd>
-                      {save.owned[viewer.id]
-                        ? 'power' in viewer
-                          ? viewer.power
-                          : viewer.attack
-                        : '—'}
-                    </dd>
-                  </div>
-                  {'defense' in viewer && (
-                    <div>
-                      <dt>Defense</dt>
-                      <dd>{save.owned[viewer.id] ? viewer.defense : '—'}</dd>
-                    </div>
-                  )}
-                  <div>
-                    <dt>Card number</dt>
-                    <dd>
-                      {'cardNumber' in viewer
-                        ? String(viewer.cardNumber).padStart(3, '0') + ' / 030'
-                        : viewer.id}
-                    </dd>
-                  </div>
-                </dl>
-              </aside>
-            )}
           </div>
         )}
       </dialog>

@@ -239,12 +239,12 @@
 .two-front .common-hero-body {
   transform: none;
 }
-.marth-preview-stage {
+.hero-preview-stage {
   display: grid;
   place-items: center;
   padding: 38px 0;
 }
-.marth-preview-size {
+.hero-preview-size {
   width: min(var(--preview-width, 320px), calc(100vw - 72px));
 }
 .common-preview-note {

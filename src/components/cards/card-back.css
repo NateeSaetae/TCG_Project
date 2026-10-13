@@ -1,4 +1,4 @@
-/* Use a dedicated namespace: .card-back belongs to the legacy pack stack. */
+/* Dedicated card-back namespace, separate from the hero card front. */
 .fe-card-back {
   position: relative;
   width: 100%;

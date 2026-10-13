@@ -1,11 +1,11 @@
 import { CardReveal } from '../components/pack/CardReveal';
 import { SecretRareReveal } from '../components/pack/SecretRareReveal';
-import { isShowcaseCard } from '../config/cardEffects';
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { Card } from '../components/cards/Card';
+import { CardRenderer } from '../components/cards/CardRenderer';
 import { BoosterPack } from '../components/pack/BoosterPack';
-import { cardById, heroCards, type CollectibleCard } from '../data/catalog';
+import { cardById, heroCards } from '../data/catalog';
+import type { HeroCardData } from '../types/heroCard';
 import { generatePack } from '../utils/packGenerator';
 import { playTone } from '../utils/sound';
 import { PACK_SIZE, rank, rarities, rarityWeights } from '../config/rarity';
@@ -17,7 +17,7 @@ export function PackOpening({
   collect,
 }: {
   pending: string[];
-  addPack: (c: CollectibleCard[]) => void;
+  addPack: (c: HeroCardData[]) => void;
   finish: () => void;
   sound: boolean;
   collect: () => void;
@@ -25,7 +25,7 @@ export function PackOpening({
   const [phase, setPhase] = useState<
     'sealed' | 'tearing' | 'reveal' | 'results'
   >(pending.length ? 'reveal' : 'sealed');
-  const [pack, setPack] = useState<CollectibleCard[]>(() =>
+  const [pack, setPack] = useState<HeroCardData[]>(() =>
     pending.map((id) => cardById.get(id)!).filter(Boolean),
   );
   const [index, setIndex] = useState(0);
@@ -161,7 +161,7 @@ export function PackOpening({
                 ))}
               </div>
             )}
-            {isShowcaseCard(pack[index]) || rank(pack[index].rarity) === 5 ? (
+            {rank(pack[index].rarity) === 5 ? (
               <SecretRareReveal
                 key={index + '-' + pack[index].id}
                 card={pack[index]}
@@ -221,7 +221,7 @@ export function PackOpening({
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: reduced ? 0 : i * 0.12 }}
                 >
-                  <Card card={c} small />
+                  <CardRenderer card={c} small />
                   <span className="result-rarity">{c.rarity}</span>
                 </motion.div>
               ))}

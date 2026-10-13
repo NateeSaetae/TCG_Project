@@ -1,7 +1,9 @@
 import { motion, useReducedMotion } from 'framer-motion';
-import { Card } from '../components/cards/Card';
-import { cards } from '../data/cards';
+import { CardRenderer } from '../components/cards/CardRenderer';
 import { archiveCards } from '../data/catalog';
+import { marthCards } from '../data/characters/marth';
+import { royCards } from '../data/characters/roy';
+
 export function Home({
   open,
   collect,
@@ -56,7 +58,7 @@ export function Home({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1 }}
           >
-            <Card card={cards[24]} />
+            <CardRenderer card={royCards[1]} small />
           </motion.div>
           <motion.div
             className="hero-card side-right"
@@ -64,7 +66,7 @@ export function Home({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.15 }}
           >
-            <Card card={cards[28]} />
+            <CardRenderer card={marthCards[2]} small />
           </motion.div>
           <motion.div
             className="hero-card center-card"
@@ -72,7 +74,7 @@ export function Home({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.3 }}
           >
-            <Card card={cards[29]} />
+            <CardRenderer card={marthCards[3]} small />
           </motion.div>
           <div className="display-caption">
             ✧ &nbsp; HEROES OF THE FIRST CHAPTER

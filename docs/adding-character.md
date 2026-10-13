@@ -22,4 +22,4 @@ public/art/aether/heroes/
 4. ใช้ ID ที่ไม่ซ้ำและอย่าเปลี่ยน ID ของการ์ดที่เผยแพร่แล้ว เพราะคลังที่บันทึกใน browser อ้างอิงการ์ดด้วย ID
 5. รัน `npm.cmd test` และ `npm.cmd run build` เพื่อตรวจข้อมูล การแสดงการ์ด และ path ภาพ
 
-`src/pages/dev/MarthPreview.tsx` เป็นหน้าเปรียบเทียบการ์ด Marth ระหว่างพัฒนาเท่านั้น ตัวละครใหม่ไม่จำเป็นต้องมีหน้า preview ของตัวเอง ส่วน `src/components/cards/` และ CSS เป็น renderer ที่ใช้ร่วมกัน
+During development, use /dev/heroes to preview every card registered in src/data/characters/index.ts. No character-specific preview page is required.

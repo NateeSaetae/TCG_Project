@@ -92,7 +92,7 @@ test('forced development pulls do not change the normal generator', () => {
   assert.equal(generatePack(() => 0).length, PACK_SIZE);
 });
 
-test('duplicates stay distinct pulls and old archive identities remain available', () => {
+test('duplicates stay distinct pulls and the archive contains only registered heroes', () => {
   const pack = generatePack(() => 0);
   assert.ok(new Set(pack.map((card) => card.id)).size < PACK_SIZE);
   assert.equal(new Set(marthCards.map((card) => card.id)).size, 6);
@@ -100,7 +100,7 @@ test('duplicates stay distinct pulls and old archive identities remain available
   assert.ok(marthCards.every((card) => heroCards.includes(card)));
   assert.equal(
     new Set(archiveCards.map((card) => card.id)).size,
-    30 + heroCards.length,
+    heroCards.length,
   );
   assert.equal(
     Object.values(rarityWeights).reduce((sum, weight) => sum + weight, 0),

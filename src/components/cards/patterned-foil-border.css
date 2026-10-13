@@ -27,7 +27,7 @@
 .two-sided-card[data-effects='off'] .foil-rim-glint {
   visibility: hidden;
 }
-.marth-preview-comparison[data-foil-border='plain'] .patterned-foil-border {
+.hero-preview-comparison[data-foil-border='plain'] .patterned-foil-border {
   display: none;
 }
 @media (prefers-reduced-motion: reduce) {

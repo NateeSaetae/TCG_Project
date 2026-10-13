@@ -42,7 +42,7 @@
   stroke: #8baf91;
 }
 
-.marth-preview-comparison {
+.hero-preview-comparison {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
@@ -50,7 +50,7 @@
   gap: clamp(24px, 5vw, 56px);
   max-width: 100%;
 }
-.marth-preview-comparison .marth-preview-size > .eyebrow {
+.hero-preview-comparison .hero-preview-size > .eyebrow {
   min-height: 28px;
   text-align: center;
 }
