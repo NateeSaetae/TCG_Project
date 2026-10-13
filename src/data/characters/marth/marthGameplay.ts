@@ -1,4 +1,4 @@
-import type { CharacterGameplayData } from '../../types/combat';
+import type { CharacterGameplayData } from '../../../types/combat';
 
 /** Provisional balance values, independent of card rarity and artwork. */
 export const marthGameplay: CharacterGameplayData = {
@@ -18,7 +18,7 @@ export const marthGameplay: CharacterGameplayData = {
     {
       id: 'heroes-resolve',
       name: "Hero's Resolve",
-      description: 'Sword attack: +200 ATK for that attack.',
+      description: 'Sword/Lance/Aex attack: +200 ATK for that attack.',
       type: 'Passive',
       trigger: 'on-attack',
       condition: { kind: 'weapon-is', weapon: 'Sword' },

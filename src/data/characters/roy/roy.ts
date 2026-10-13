@@ -1,4 +1,4 @@
-import type { HeroCardData } from '../../types/heroCard';
+import type { HeroCardData } from '../../../types/heroCard';
 
 const art = '/art/aether/heroes/Roy';
 const commonCharacter = `${art}/characters/roy_blazing_lion_C.png`;

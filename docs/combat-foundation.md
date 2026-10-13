@@ -1,6 +1,6 @@
 # PvE combat foundation
 
-`src/data/characters/marthGameplay.ts` is Marth's canonical gameplay record. All six Marth card prints reference the same object through `HeroCardData.gameplay`. Rarity, artwork, Cost and Power remain card presentation data; Power is not used as ATK.
+`src/data/characters/marth/marthGameplay.ts` is Marth's canonical gameplay record. All six Marth card prints reference the same object through `HeroCardData.gameplay`. Rarity, artwork, Cost and Power remain card presentation data; Power is not used as ATK.
 
 `src/types/combat.ts` defines base stats, compatible weapons, skills, temporary modifiers, teams, turns, actions and events. `src/types/items.ts` keeps future item rarity and upgrade fields separate from character rarity. Characters without complete gameplay data can omit `gameplay` and still render.
 

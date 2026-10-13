@@ -10,10 +10,10 @@ after(() => server.close());
 
 const engine = await server.ssrLoadModule('/src/combat/engine.ts');
 const { marthGameplay } = await server.ssrLoadModule(
-  '/src/data/characters/marthGameplay.ts',
+  '/src/data/characters/marth/marthGameplay.ts',
 );
 const { marthCards } = await server.ssrLoadModule(
-  '/src/data/characters/marth.ts',
+  '/src/data/characters/marth/marth.ts',
 );
 
 const enemy = {

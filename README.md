@@ -18,7 +18,8 @@ npm test
 
 ## โครงสร้างหลัก
 
-- `src/data/characters/<name>.ts` — ข้อมูลการ์ดและ path รูปของตัวละคร
+- `src/data/characters/<name>/<name>.ts` — ข้อมูลการ์ดและ path รูปของตัวละคร
+- `src/data/characters/<name>/<name>Gameplay.ts` — ข้อมูลต่อสู้ของตัวละคร (เมื่อพร้อมใช้งาน)
 - `src/data/characters/index.ts` — ลงทะเบียนชุดตัวละครที่พร้อมใช้งาน
 - `src/data/catalog.ts` — รายการการ์ดสำหรับคลังและค้นด้วย ID
 - `src/types/heroCard.ts` — รูปแบบข้อมูล HeroCard
@@ -30,7 +31,7 @@ npm test
 - `src/combat/engine.ts` — ฐานคำนวณการต่อสู้แบบไม่พึ่ง React; ดู [docs/combat-foundation.md](docs/combat-foundation.md)
 - `public/art/aether/heroes/<name>/` — รูปตัวละคร พื้นหลัง และ effect แยกโฟลเดอร์
 
-ตอนนี้ลงทะเบียน Marth 6 ใบ (`FE-001`–`FE-006`) และ Roy C/U (`FE-007`–`FE-008`) แล้ว ส่วนข้อมูล Roy rarity สูงกว่าอยู่ใน `roy.ts` ในสถานะร่าง ยังไม่เข้าซองหรือคลัง เพราะรูปยังไม่ครบและ ID ยังซ้ำกับ Marth
+ตอนนี้ลงทะเบียน Marth 6 ใบ (`FE-001`–`FE-006`) และ Roy C/U/R/SR (`FE-007`–`FE-010`) แล้ว ส่วนข้อมูล Roy ระดับ UR/SER อยู่ใน `src/data/characters/roy/roy.ts` ในสถานะร่าง ยังไม่เข้าซองหรือคลัง เพราะรูปยังไม่ครบและ ID ยังซ้ำกับ Marth
 
 ดูขั้นตอนเพิ่มตัวละครใน [docs/adding-character.md](docs/adding-character.md)
 

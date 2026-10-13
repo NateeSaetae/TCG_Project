@@ -17,7 +17,7 @@ const { archiveCards, heroCards } = await server.ssrLoadModule(
   '/src/data/catalog.ts',
 );
 const { marthCards } = await server.ssrLoadModule(
-  '/src/data/characters/marth.ts',
+  '/src/data/characters/marth/marth.ts',
 );
 const { PACK_SIZE, rank, rarityName, rarityWeights } =
   await server.ssrLoadModule('/src/config/rarity.ts');

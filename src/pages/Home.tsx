@@ -1,8 +1,8 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { CardRenderer } from '../components/cards/CardRenderer';
 import { archiveCards } from '../data/catalog';
-import { marthCards } from '../data/characters/marth';
-import { royCards } from '../data/characters/roy';
+import { marthCards } from '../data/characters/marth/marth';
+import { royCards } from '../data/characters/roy/roy';
 
 export function Home({
   open,

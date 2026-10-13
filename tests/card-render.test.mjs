@@ -17,9 +17,11 @@ const { archiveCards, cardById, heroCards } = await server.ssrLoadModule(
   '/src/data/catalog.ts',
 );
 const { marthCards } = await server.ssrLoadModule(
-  '/src/data/characters/marth.ts',
+  '/src/data/characters/marth/marth.ts',
 );
-const { royCards } = await server.ssrLoadModule('/src/data/characters/roy.ts');
+const { royCards } = await server.ssrLoadModule(
+  '/src/data/characters/roy/roy.ts',
+);
 const { CARD_BACK_IMAGE } = await server.ssrLoadModule(
   '/src/components/cards/TwoSidedCard.tsx',
 );

@@ -10,4 +10,4 @@ secret-hero-card.css scopes the character composition, restrained finishing, low
 
 The rarity registry selects secret-full-art for canonical SEC. SER is accepted as a presentation alias of SEC, and the face displays SER. FE-006 is registered for pack rolls and the collection.
 
-Tune src/data/characters/marth.ts for assets and content, and secret-hero-card.css for crop/character scale/foil strength. Swap the SEC registry layout back to hero-common to test the standard layout if desired.
+Tune src/data/characters/marth/marth.ts for assets and content, and secret-hero-card.css for crop/character scale/foil strength. Swap the SEC registry layout back to hero-common to test the standard layout if desired.

@@ -1,4 +1,4 @@
-import type { HeroCardData } from '../../types/heroCard';
+import type { HeroCardData } from '../../../types/heroCard';
 import { marthGameplay } from './marthGameplay';
 
 const art = '/art/aether/heroes/marth';
