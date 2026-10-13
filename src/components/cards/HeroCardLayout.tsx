@@ -1,12 +1,14 @@
 import { magicEffectVariables } from './MagicEffects';
 import { useId } from 'react';
 import type { HeroCardData } from '../../types/heroCard';
+import type { WeaponType } from '../../types/combat';
 import {
   rarityCode,
   rarityNames,
   type HeroCardDesign,
 } from '../../config/rarityDesigns';
 import { HeroArtwork } from './HeroArtwork';
+import { HeroStatusPanel, HeroWeaponIcons } from './HeroCombatDetails';
 import {
   useCardPointer,
   type PointerPosition,
@@ -16,6 +18,7 @@ import './uncommon-hero-card.css';
 import './rare-hero-card.css';
 import './super-rare-hero-card.css';
 import './ultra-rare-hero-card.css';
+import './hero-combat-details.css';
 
 /** The printed face only; Card/TwoSidedCard continue to own flipping. */
 export function HeroCardLayout({
@@ -26,6 +29,7 @@ export function HeroCardLayout({
   preview,
   design = {},
   effectsActive = true,
+  activeWeapon,
 }: {
   card: HeroCardData;
   small?: boolean;
@@ -34,6 +38,7 @@ export function HeroCardLayout({
   preview?: PointerPosition | null;
   design?: HeroCardDesign;
   effectsActive?: boolean;
+  activeWeapon?: WeaponType;
 }) {
   const pointer = useCardPointer(preview);
   const code = rarityCode(card.rarity);
@@ -41,6 +46,14 @@ export function HeroCardLayout({
   const magic =
     code === 'UR' && card.magicEffects?.enabled ? card.magicEffects : undefined;
   const identityClipId = useId().replace(/:/g, '');
+  const showCombat =
+    (code === 'C' ||
+      code === 'U' ||
+      code === 'R' ||
+      code === 'SR' ||
+      code === 'UR') &&
+    Boolean(card.gameplay) &&
+    !hidden;
   return (
     <div
       {...(managedPointer ? {} : pointer)}
@@ -53,6 +66,7 @@ export function HeroCardLayout({
       <div
         className={
           'common-hero-body' +
+          (showCombat ? ' common-combat-body' : '') +
           (design.background?.className
             ? ' ' + design.background.className
             : '') +
@@ -81,18 +95,30 @@ export function HeroCardLayout({
           )}
         </div>
         <div className="common-stat-bar">
-          <div
-            className="common-cost"
-            aria-label={'Cost ' + (hidden ? 'unknown' : card.cost)}
-          >
-            <span>COST</span>
-            <b>{hidden ? '?' : card.cost}</b>
-          </div>
-          <div className="common-power">
-            <span>POWER</span>
-            <b>{hidden ? '—' : card.power}</b>
-          </div>
+          {showCombat ? (
+            <HeroWeaponIcons
+              weapons={card.gameplay!.allowedWeapons}
+              activeWeapon={activeWeapon}
+            />
+          ) : (
+            <div
+              className="common-cost"
+              aria-label={'Cost ' + (hidden ? 'unknown' : card.cost)}
+            >
+              <span>COST</span>
+              <b>{hidden ? '?' : card.cost}</b>
+            </div>
+          )}
+          {card.heroTitle && !hidden ? (
+            <div className="common-hero-title">{card.heroTitle}</div>
+          ) : (
+            <div className="common-power">
+              <span>POWER</span>
+              <b>{hidden ? '—' : card.power}</b>
+            </div>
+          )}
         </div>
+        {showCombat && <HeroStatusPanel gameplay={card.gameplay!} />}
         <svg
           className="common-description-trim"
           viewBox="0 0 300 14"
@@ -114,17 +140,29 @@ export function HeroCardLayout({
         <div
           className={
             'common-description' +
+            (showCombat ? ' combat-skill-description' : '') +
             (design.description?.className
               ? ' ' + design.description.className
               : '')
           }
           style={design.description?.style}
         >
-          <p>
-            {hidden
-              ? 'Summon this hero to discover their story.'
-              : card.description}
-          </p>
+          {showCombat ? (
+            <ul className="hero-skill-list">
+              {card.gameplay!.skills.map((skill) => (
+                <li className="hero-skill" key={skill.id}>
+                  <strong>{skill.name}</strong>
+                  <span>{skill.description}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>
+              {hidden
+                ? 'Summon this hero to discover their story.'
+                : card.description}
+            </p>
+          )}
         </div>
         <svg
           className="common-shape-definitions"

@@ -1,0 +1,476 @@
+﻿/* Common hero combat overlay; the card frame and artwork remain shared. */
+.hero-weapon-icons {
+  position: absolute;
+  z-index: 5;
+  top: 0.2cqw;
+  left: 0.8cqw;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.2cqw;
+}
+
+.hero-weapon-icons::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 4.25cqw;
+  left: 8cqw;
+  right: 3cqw;
+  height: 0.35cqw;
+  background: #cfaa65;
+  box-shadow: 0 1px 2px #071b31;
+}
+
+.common-combat-body .common-power {
+  margin-left: auto;
+}
+
+.hero-weapon-icon {
+  box-sizing: border-box;
+  width: 8.7cqw;
+  height: 8.7cqw;
+  display: grid;
+  place-items: center;
+  border: 0.48cqw solid #cda460;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 30%, #1d4569, #0b2948 75%);
+  color: #f7e7c4;
+  box-shadow:
+    0 2px 5px #071522ad,
+    inset 0 0 0 0.2cqw #f0d39570;
+}
+
+.hero-weapon-icon.is-featured {
+  width: 14cqw;
+  height: 14cqw;
+  border-width: 0.75cqw;
+}
+
+.hero-weapon-icon svg,
+.hero-weapon-icon img {
+  width: 65%;
+  height: 65%;
+  filter: drop-shadow(0 1px 1px #071a2f);
+}
+
+.hero-weapon-icon img {
+  object-fit: contain;
+}
+
+.hero-weapon-icon svg {
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hero-weapon-icon[data-equipped='true'] {
+  box-shadow:
+    0 0 0 0.4cqw #f5d28c,
+    0 2px 8px #071522bc;
+}
+
+.hero-status-panel {
+  position: absolute;
+  z-index: 5;
+  top: 13.2%;
+  left: 2%;
+  width: 5.2cqw;
+  height: 26cqw;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    width 320ms ease,
+    height 320ms ease;
+}
+
+.hero-status-panel.expanded {
+  width: 22cqw;
+  height: 67cqw;
+}
+
+.hero-status-panel:focus-visible {
+  outline: 2px solid #f5d28c;
+  outline-offset: 2px;
+}
+
+.hero-status-tab {
+  position: absolute;
+  z-index: 2;
+  inset: 0.8cqw auto auto 0;
+  width: 5.2cqw;
+  height: 26cqw;
+  clip-path: polygon(50% 0, 100% 9%, 100% 91%, 50% 100%, 0 91%, 0 9%);
+  background: linear-gradient(135deg, #f2cf89, #a97b35 55%, #e4bd76);
+  filter: drop-shadow(0 2px 3px #071522bb);
+  transition:
+    height 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    clip-path 320ms ease;
+}
+
+.hero-status-tab::before {
+  content: '';
+  position: absolute;
+  inset: 0.45cqw;
+  clip-path: polygon(50% 0, 100% 9%, 100% 91%, 50% 100%, 0 91%, 0 9%);
+  background: linear-gradient(110deg, #153a5c, #0b2744);
+  transition: clip-path 320ms ease;
+}
+
+.hero-status-tab-bars {
+  position: absolute;
+  z-index: 1;
+  top: 6cqw;
+  left: 1.2cqw;
+  height: 5cqw;
+  display: flex;
+  align-items: end;
+  gap: 0.3cqw;
+}
+
+.hero-status-tab-bars i {
+  width: 0.7cqw;
+  height: 2.1cqw;
+  background: #dfb664;
+}
+
+.hero-status-tab-bars i:nth-child(2) {
+  height: 3.3cqw;
+}
+
+.hero-status-tab-bars i:nth-child(3) {
+  height: 4.6cqw;
+}
+
+.hero-status-tab-chevron {
+  position: absolute;
+  z-index: 1;
+  top: 16cqw;
+  left: 1.55cqw;
+  width: 1.4cqw;
+  height: 1.4cqw;
+  border-top: 0.45cqw solid #dfb664;
+  border-right: 0.45cqw solid #dfb664;
+  transform: rotate(45deg);
+  transition:
+    top 320ms ease,
+    transform 320ms ease;
+}
+
+.hero-status-panel.expanded .hero-status-tab {
+  height: 66cqw;
+  clip-path: polygon(50% 0, 100% 4%, 100% 96%, 50% 100%, 0 96%, 0 4%);
+}
+
+.hero-status-panel.expanded .hero-status-tab::before {
+  clip-path: polygon(50% 0, 100% 4%, 100% 96%, 50% 100%, 0 96%, 0 4%);
+}
+
+.hero-status-panel.expanded .hero-status-tab-chevron {
+  top: 20cqw;
+  transform: rotate(-135deg);
+}
+
+.hero-status-rows {
+  position: absolute;
+  top: 0.8cqw;
+  left: 2cqw;
+  width: 17.5cqw;
+  height: 66cqw;
+  clip-path: polygon(0 0, 84% 0, 100% 5%, 100% 95%, 84% 100%, 0 100%);
+  background: #d6ac67;
+  animation: hero-status-reveal 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes hero-status-reveal {
+  from {
+    opacity: 0;
+    clip-path: polygon(0 0, 0 0, 0 5%, 0 95%, 0 100%, 0 100%);
+    transform: translateX(-1cqw);
+  }
+
+  to {
+    opacity: 1;
+    clip-path: polygon(0 0, 84% 0, 100% 5%, 100% 95%, 84% 100%, 0 100%);
+    transform: translateX(0);
+  }
+}
+
+.hero-status-rows::before {
+  content: '';
+  position: absolute;
+  inset: 0.36cqw;
+  clip-path: polygon(0 0, 84% 0, 100% 5%, 100% 95%, 84% 100%, 0 100%);
+  background: linear-gradient(90deg, #0b2745, #112f4d);
+}
+
+.uncommon-hero-body.common-combat-body .hero-status-tab::before,
+.uncommon-hero-body.common-combat-body .hero-status-rows::before {
+  background: #315c58;
+}
+
+.rare-hero-body.common-combat-body .hero-status-tab::before,
+.rare-hero-body.common-combat-body .hero-status-rows::before {
+  background: var(--rare-frame-color);
+}
+
+.super-rare-hero-body.common-combat-body .hero-status-tab,
+.scr-hero-card .hero-status-tab {
+  background: linear-gradient(
+    135deg,
+    rgba(242, 207, 137, 0.48),
+    rgba(169, 123, 53, 0.38) 55%,
+    rgba(228, 189, 118, 0.48)
+  );
+}
+
+.super-rare-hero-body.common-combat-body .hero-status-rows,
+.scr-hero-card .hero-status-rows {
+  background: rgba(214, 172, 103, 0.48);
+}
+
+.super-rare-hero-body.common-combat-body .hero-status-tab::before,
+.super-rare-hero-body.common-combat-body .hero-status-rows::before,
+.scr-hero-card .hero-status-tab::before,
+.scr-hero-card .hero-status-rows::before {
+  background: rgba(12, 31, 48, 0.58);
+}
+
+.ultra-rare-hero-body.common-combat-body .hero-status-tab,
+.ultra-rare-hero-body.common-combat-body .hero-status-rows {
+  /* SR's two translucent fills combine to about this visible opacity. */
+  background: rgba(12, 31, 48, 0.78);
+}
+
+.ultra-rare-hero-body.common-combat-body .hero-status-tab::before,
+.ultra-rare-hero-body.common-combat-body .hero-status-rows::before {
+  inset: 0;
+  background: var(--ur-rim-foil);
+  background-size: 220% 220%;
+  background-position: var(--foil-x, 50%) var(--foil-y, 50%);
+}
+
+.ultra-rare-hero-body.common-combat-body .hero-status-tab::before {
+  clip-path: polygon(
+    evenodd,
+    50% 0,
+    100% 9%,
+    100% 91%,
+    50% 100%,
+    0 91%,
+    0 9%,
+    50% 0,
+    50% 1.7%,
+    8.5% 9.7%,
+    8.5% 90.3%,
+    50% 98.3%,
+    91.5% 90.3%,
+    91.5% 9.7%,
+    50% 1.7%
+  );
+}
+
+.ultra-rare-hero-body.common-combat-body
+  .hero-status-panel.expanded
+  .hero-status-tab::before {
+  clip-path: polygon(
+    evenodd,
+    50% 0,
+    100% 4%,
+    100% 96%,
+    50% 100%,
+    0 96%,
+    0 4%,
+    50% 0,
+    50% 0.7%,
+    8.5% 4.7%,
+    8.5% 95.3%,
+    50% 99.3%,
+    91.5% 95.3%,
+    91.5% 4.7%,
+    50% 0.7%
+  );
+}
+
+.ultra-rare-hero-body.common-combat-body .hero-status-rows::before {
+  clip-path: polygon(
+    evenodd,
+    0 0,
+    84% 0,
+    100% 5%,
+    100% 95%,
+    84% 100%,
+    0 100%,
+    0 0,
+    2% 0.55%,
+    2% 99.45%,
+    83% 99.45%,
+    98% 94.45%,
+    98% 5.55%,
+    83% 0.55%,
+    2% 0.55%
+  );
+}
+
+.ultra-rare-hero-body.common-combat-body .hero-weapon-icon {
+  border-color: transparent;
+  background:
+    linear-gradient(#0d326c, #0d326c) padding-box,
+    var(--ur-rim-foil) border-box;
+  background-size:
+    100% 100%,
+    220% 220%;
+  background-position:
+    center,
+    var(--foil-x, 50%) var(--foil-y, 50%);
+  color: #f4f8fa;
+}
+
+.ultra-rare-hero-body.common-combat-body
+  .hero-weapon-icon[data-equipped='true'] {
+  box-shadow:
+    0 0 0 0.4cqw #e8f5ff,
+    0 2px 8px #071522bc;
+}
+
+.ultra-rare-hero-body.common-combat-body .hero-status-panel:focus-visible {
+  outline-color: #e8f5ff;
+}
+
+.ultra-rare-hero-body.common-combat-body .hero-weapon-icons::before,
+.ultra-rare-hero-body.common-combat-body
+  .hero-status-row:not(:last-child)::before {
+  background: var(--ur-rim-foil);
+  background-size: 220% 220%;
+  background-position: var(--foil-x, 50%) var(--foil-y, 50%);
+}
+
+.ultra-rare-hero-body.common-combat-body .hero-status-tab-bars i {
+  background: #dce8f4;
+}
+
+.ultra-rare-hero-body.common-combat-body .hero-status-tab-chevron,
+.ultra-rare-hero-body.common-combat-body .hero-status-row::after {
+  border-color: #dce8f4;
+}
+
+.ultra-rare-hero-body.common-combat-body .hero-status-label {
+  color: #dce8f4;
+}
+
+.ultra-rare-hero-body.common-combat-body .hero-status-value {
+  color: #f4f8fa;
+}
+
+.hero-status-row {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  height: 11cqw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0.7cqw 1cqw 0.7cqw 4.7cqw;
+  color: #f8edd7;
+}
+
+.hero-status-row:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  bottom: 0;
+  left: 4.5cqw;
+  right: 2.8cqw;
+  height: 0.25cqw;
+  background: #d6ac67;
+}
+
+.hero-status-row::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  top: 48%;
+  left: 0.25cqw;
+  width: 1.3cqw;
+  height: 1.3cqw;
+  border: 0.3cqw solid #d6ac67;
+  transform: rotate(45deg);
+}
+
+.hero-status-label {
+  position: relative;
+  z-index: 1;
+  color: #dfb664;
+  font:
+    700 2.3cqw/1.1 'Trebuchet MS',
+    Arial,
+    sans-serif;
+}
+
+.hero-status-value {
+  position: relative;
+  z-index: 1;
+  color: #f8edd7;
+  font:
+    700 4cqw/1 Georgia,
+    serif;
+  text-shadow: 0 1px 2px #071522;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-status-panel,
+  .hero-status-tab,
+  .hero-status-tab::before,
+  .hero-status-tab-chevron {
+    transition: none;
+  }
+
+  .hero-status-rows {
+    animation: none;
+  }
+}
+
+.common-description.combat-skill-description {
+  padding: 2.3cqw 2.7cqw;
+}
+
+.combat-skill-description .hero-skill-list {
+  margin: 0;
+  padding: 0;
+  color: #10151c;
+  list-style: none;
+}
+
+.combat-skill-description .hero-skill {
+  margin: 0 0 1.15cqw;
+  font:
+    400 2.7cqw/1.22 'Trebuchet MS',
+    Arial,
+    sans-serif;
+}
+
+.combat-skill-description .hero-skill strong {
+  display: inline-block;
+  margin-right: 0.8cqw;
+  padding: 0.3cqw 0.7cqw;
+  border-radius: 0.6cqw;
+  background: #154c6a;
+  color: #fff;
+  font:
+    700 2.55cqw/1.1 'Trebuchet MS',
+    Arial,
+    sans-serif;
+}
+
+.combat-skill-description .hero-skill span {
+  display: inline;
+}
+
+.rare-hero-body.common-combat-body .hero-skill-list,
+.super-rare-hero-body.common-combat-body .hero-skill-list,
+.ultra-rare-hero-body.common-combat-body .hero-skill-list {
+  color: #fffdf4;
+  text-shadow:
+    0 1px 3px #07111be6,
+    0 2px 7px #07111bcc;
+}

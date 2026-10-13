@@ -98,6 +98,20 @@
     700 8cqw/1.1 Georgia,
     serif;
 }
+.common-hero-title {
+  width: 30cqw;
+  margin: 1.2cqw 0 0 auto;
+  transform: translate(4cqw, 2cqw);
+  color: #142541;
+  font:
+    italic 700 3.6cqw/1 'Palatino Linotype',
+    'Book Antiqua',
+    Georgia,
+    serif;
+  text-align: center;
+  white-space: nowrap;
+  text-shadow: 0 1px 2px #fff9e7;
+}
 /* Slim royal trim sits above the panel, separate from its scrolling text. */
 .common-description-trim {
   position: absolute;

@@ -142,7 +142,9 @@
   background:
     linear-gradient(#0d326c, #0d326c) padding-box,
     var(--ur-rim-foil) border-box;
-  background-size: 100% 100%, 220% 220%;
+  background-size:
+    100% 100%,
+    220% 220%;
   background-position:
     center,
     var(--foil-x, 50%) var(--foil-y, 50%);
@@ -158,6 +160,12 @@
     0 0 5px #06162d;
 }
 .ultra-rare-hero-body .common-power {
+  color: #173557;
+  text-shadow:
+    0 1px 1px #ffffff,
+    0 0 5px #ffffffcc;
+}
+.ultra-rare-hero-body .common-hero-title {
   color: #173557;
   text-shadow:
     0 1px 1px #ffffff,

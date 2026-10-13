@@ -4,6 +4,7 @@ import { resolveRarityDesign } from '../../config/rarityDesigns';
 import type { HeroCardData } from '../../types/heroCard';
 import { TwoSidedCard, type CardFace } from './TwoSidedCard';
 import type { PointerPosition } from '../../hooks/useCardPointer';
+import type { WeaponType } from '../../types/combat';
 
 export function CardRenderer({
   card,
@@ -13,6 +14,7 @@ export function CardRenderer({
   preview,
   effectsActive = true,
   managedPointer = false,
+  activeWeapon,
 }: {
   card: HeroCardData;
   small?: boolean;
@@ -21,6 +23,7 @@ export function CardRenderer({
   preview?: PointerPosition | null;
   effectsActive?: boolean;
   managedPointer?: boolean;
+  activeWeapon?: WeaponType;
 }) {
   if (face)
     return (
@@ -36,6 +39,7 @@ export function CardRenderer({
           hidden={hidden}
           managedPointer
           effectsActive={effectsActive}
+          activeWeapon={activeWeapon}
         />
       </TwoSidedCard>
     );
@@ -50,6 +54,7 @@ export function CardRenderer({
         managedPointer={managedPointer}
         preview={preview}
         effectsActive={effectsActive}
+        activeWeapon={activeWeapon}
       />
     );
 
@@ -62,6 +67,7 @@ export function CardRenderer({
       hidden={hidden}
       managedPointer={managedPointer}
       preview={preview}
+      activeWeapon={activeWeapon}
     />
   );
 }

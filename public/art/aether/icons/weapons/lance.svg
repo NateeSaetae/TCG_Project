@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Lance weapon icon">
+ <defs><linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff8e8"/><stop offset=".5" stop-color="#d9e7ee"/><stop offset="1" stop-color="#789ab5"/></linearGradient><linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff0b8"/><stop offset=".55" stop-color="#d4a44a"/><stop offset="1" stop-color="#946527"/></linearGradient></defs>
+ <g transform="rotate(42 128 128)" stroke-linejoin="round" stroke-linecap="round">
+  <path d="M122 110H134V233H122Z" fill="#284861" stroke="#e5bd69" stroke-width="4"/>
+  <path d="M128 12 150 61 142 104 128 121 114 104 106 61Z" fill="url(#steel)" stroke="#d6a34d" stroke-width="5"/>
+  <path d="M128 23V110" stroke="#57748b" stroke-width="4"/>
+  <path d="M106 68 88 94 106 106 119 100M150 68 168 94 150 106 137 100" fill="url(#gold)" stroke="#ffe5a5" stroke-width="3"/>
+  <path d="M113 118Q128 126 143 118L147 132Q128 143 109 132Z" fill="url(#gold)" stroke="#fff0c5" stroke-width="3"/>
+  <path d="M122 147H134M122 166H134M122 185H134M122 204H134" stroke="#e6bd68" stroke-width="4"/>
+  <path d="M116 230H140L136 241H120Z" fill="url(#gold)" stroke="#fff0c5" stroke-width="3"/>
+ </g>
+</svg>

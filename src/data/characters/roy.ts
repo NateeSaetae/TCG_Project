@@ -6,7 +6,7 @@ const sharedCharacter = `${art}/characters/roy_blazing_lion_U-R.png`;
 const srCharacter = `${art}/characters/roy_blazing_lion_SR.png`;
 const urCharacter = `${art}/characters/roy_of_beginnings_UR.png`;
 const serCharacter = `${art}/characters/roy_of_beginnings_SCR.png`;
-const srFrontEffect = `${art}/effects/roy_sr_front.png`;
+const srFrontEffect = `${art}/effects/marth_sr_front.png`;
 
 export const royPreview: HeroCardData = {
   layout: 'hero-common',
@@ -93,4 +93,9 @@ export const roySecretRarePreview: HeroCardData = {
 };
 
 /** Only completed Roy cards enter packs and the archive; later rarities are drafts. */
-export const royCards: HeroCardData[] = [royPreview, royUncommonPreview, royRarePreview, roySuperRarePreview];
+export const royCards: HeroCardData[] = [
+  royPreview,
+  royUncommonPreview,
+  royRarePreview,
+  roySuperRarePreview,
+];

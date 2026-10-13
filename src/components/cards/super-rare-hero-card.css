@@ -120,6 +120,12 @@
   border-color: #dbe7e9;
   background: #172b43;
 }
+.super-rare-hero-body .common-hero-title {
+  color: #fffaf0;
+  text-shadow:
+    0 1px 3px #050c12f2,
+    0 2px 8px #050c12d9;
+}
 .common-rarity.super-rare-badge {
   color: #fffaf0;
 }

@@ -1,4 +1,5 @@
 import type { HeroCardData } from '../../types/heroCard';
+import { marthGameplay } from './marthGameplay';
 
 const art = '/art/aether/heroes/marth';
 const commonCharacter = `${art}/characters/marth_hero-king_C.png`;
@@ -15,10 +16,12 @@ export const marthPreview: HeroCardData = {
   rarity: 'Common',
   cost: 3,
   power: 2000,
+  heroTitle: 'Legendary Hero',
   characterType: 'Hero · Swordsman',
   description: 'The prince of Altea, destined to wield the legendary Falchion.',
   image: commonCharacter,
   imagePosition: '50% 50%',
+  gameplay: marthGameplay,
 };
 
 export const marthUncommonPreview: HeroCardData = {
@@ -59,6 +62,7 @@ export const marthUltraRarePreview: HeroCardData = {
   rarity: 'UR',
   cost: 3,
   power: 2000,
+  heroTitle: 'Emblem Hero',
   image: urCharacter,
   magicEffects: {
     enabled: true,
@@ -84,6 +88,7 @@ export const marthSecretRarePreview: HeroCardData = {
   layout: 'hero',
   id: 'FE-006',
   rarity: 'SER',
+  heroTitle: 'Emblem Hero',
   image: serCharacter,
   artwork: {
     background: `${art}/backgrounds/marth-BG-SCR.png`,

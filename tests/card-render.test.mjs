@@ -35,10 +35,7 @@ test('catalog contains only registered HeroCard data with unique IDs', () => {
   );
   assert.ok(heroCards.every((card) => cardById.get(card.id) === card));
   assert.ok(heroCards.every((card) => !card.id.startsWith('AW-')));
-  assert.deepEqual(
-    royCards.map((card) => card.id),
-    ['FE-007', 'FE-008'],
-  );
+  assert.ok(royCards.every((card) => cardById.get(card.id) === card));
 });
 
 test('development preview includes every registered hero card', async () => {
@@ -53,7 +50,7 @@ test('development preview includes every registered hero card', async () => {
   for (const card of heroCards) assert.ok(html.includes(card.id), card.id);
   assert.ok(html.includes('<h2>Marth</h2>'));
   assert.ok(html.includes('<h2>Roy</h2>'));
-  assert.ok(!html.includes('roy_hero-king_SR.png'));
+  assert.ok(html.includes('FE-010'));
 });
 
 test('all active hero cards render their identity, stats, and art', () => {
@@ -61,10 +58,99 @@ test('all active hero cards render their identity, stats, and art', () => {
     const html = render(CardRenderer, { card });
     assert.ok(html.includes(card.name), card.id);
     assert.ok(html.includes(String(card.cost)), card.id);
-    assert.ok(html.includes(String(card.power)), card.id);
+    assert.ok(html.includes(card.heroTitle ?? String(card.power)), card.id);
     assert.ok(html.includes(card.id), card.id);
     assert.ok(html.includes(card.image), card.id);
   }
+});
+
+test('all Marth rarities show combat details', () => {
+  const common = render(CardRenderer, { card: marthCards[0] });
+  for (const text of [
+    'Sword',
+    'Lance',
+    'Axe',
+    'Hero&#x27;s Resolve',
+    'Altean Legacy',
+  ])
+    assert.ok(common.includes(text), text);
+  for (const weapon of ['sword', 'lance', 'axe'])
+    assert.ok(
+      common.includes(`/art/aether/icons/weapons/${weapon}.svg`),
+      weapon,
+    );
+  assert.ok(common.includes('hero-status-panel'));
+  assert.ok(common.includes('hero-status-tab'));
+  assert.ok(common.includes('aria-expanded="false"'));
+  assert.ok(common.includes('class="hero-skill-list"'));
+  assert.ok(!common.includes('3500'));
+  assert.ok(!common.includes('class="common-cost"'));
+  assert.ok(!common.includes('Cost 3'));
+  assert.ok(common.includes('aria-label="Sword"'));
+  assert.ok(!common.includes('aria-label="Sword equipped"'));
+  const equipped = render(CardRenderer, {
+    card: marthCards[0],
+    activeWeapon: 'Lance',
+  });
+  assert.match(
+    equipped,
+    /hero-weapon-icon is-featured[^>]*aria-label="Lance equipped"/,
+  );
+  const uncommon = render(CardRenderer, { card: marthCards[1] });
+  assert.ok(uncommon.includes('uncommon-hero-body'));
+  assert.ok(uncommon.includes('hero-status-panel'));
+  assert.ok(uncommon.includes('class="hero-skill-list"'));
+  assert.ok(!uncommon.includes('Cost 3'));
+  const rare = render(CardRenderer, { card: marthCards[2] });
+  assert.ok(rare.includes('rare-hero-body'));
+  assert.ok(rare.includes('hero-status-panel'));
+  assert.ok(rare.includes('class="hero-skill-list"'));
+  assert.ok(!rare.includes('Cost 3'));
+  const superRare = render(CardRenderer, { card: marthCards[3] });
+  assert.ok(superRare.includes('super-rare-hero-body'));
+  assert.ok(superRare.includes('hero-status-panel'));
+  assert.ok(superRare.includes('class="hero-skill-list"'));
+  assert.ok(!superRare.includes('Cost 3'));
+  const ultraRare = render(CardRenderer, { card: marthCards[4] });
+  assert.ok(ultraRare.includes('ultra-rare-hero-body'));
+  assert.ok(ultraRare.includes('hero-status-panel'));
+  assert.ok(ultraRare.includes('class="hero-skill-list"'));
+  assert.ok(!ultraRare.includes('Cost 3'));
+  const secretRare = render(CardRenderer, { card: marthCards[5] });
+  assert.ok(secretRare.includes('scr-hero-card'));
+  assert.ok(secretRare.includes('hero-status-panel'));
+  assert.ok(secretRare.includes('class="hero-skill-list"'));
+  assert.ok(!secretRare.includes('Cost 3'));
+  const equippedSecretRare = render(CardRenderer, {
+    card: marthCards[5],
+    activeWeapon: 'Lance',
+  });
+  assert.match(
+    equippedSecretRare,
+    /hero-weapon-icon is-featured[^>]*aria-label="Lance equipped"/,
+  );
+  const hidden = render(CardRenderer, { card: marthCards[0], hidden: true });
+  assert.ok(!hidden.includes('Hero&#x27;s Resolve'));
+  assert.ok(!hidden.includes('3500'));
+  const hiddenSecretRare = render(CardRenderer, {
+    card: marthCards[5],
+    hidden: true,
+  });
+  assert.ok(!hiddenSecretRare.includes('hero-status-panel'));
+  assert.ok(!hiddenSecretRare.includes('Hero&#x27;s Resolve'));
+});
+
+test('Marth hero titles replace the printed Power label by rarity', () => {
+  for (const [index, card] of marthCards.entries()) {
+    const html = render(CardRenderer, { card });
+    const title = index < 4 ? 'Legendary Hero' : 'Emblem Hero';
+    assert.equal(card.heroTitle, title);
+    assert.ok(html.includes(title), card.id);
+    assert.ok(!html.includes('POWER'), card.id);
+  }
+  const roy = render(CardRenderer, { card: royCards[0] });
+  assert.ok(roy.includes('POWER'));
+  assert.ok(roy.includes(String(royCards[0].power)));
 });
 
 test('undiscovered cards hide identity and artwork', () => {

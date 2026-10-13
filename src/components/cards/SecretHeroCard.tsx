@@ -1,5 +1,7 @@
 import type { HeroCardData } from '../../types/heroCard';
 import type { PointerPosition } from '../../hooks/useCardPointer';
+import type { WeaponType } from '../../types/combat';
+import { HeroStatusPanel, HeroWeaponIcons } from './HeroCombatDetails';
 import { SecretRareSurface } from './SecretRareSurface';
 import './secret-hero-card.css';
 
@@ -11,6 +13,7 @@ export function SecretHeroCard({
   preview,
   managedPointer = false,
   effectsActive = true,
+  activeWeapon,
 }: {
   card: HeroCardData;
   small?: boolean;
@@ -18,7 +21,9 @@ export function SecretHeroCard({
   preview?: PointerPosition | null;
   managedPointer?: boolean;
   effectsActive?: boolean;
+  activeWeapon?: WeaponType;
 }) {
+  const showCombat = Boolean(card.gameplay) && !hidden;
   return (
     <SecretRareSurface
       card={card}
@@ -32,19 +37,35 @@ export function SecretHeroCard({
       information={
         <>
           <div className="scr-stats">
-            <div
-              className="scr-cost"
-              aria-label={'Cost ' + (hidden ? 'unknown' : card.cost)}
-            >
-              <span>COST</span>
-              <b>{hidden ? '?' : card.cost}</b>
-            </div>
-            <div className="scr-power">
-              <b>{hidden ? '—' : card.power}</b>
-              <span>POWER</span>
-            </div>
+            {showCombat ? (
+              <HeroWeaponIcons
+                weapons={card.gameplay!.allowedWeapons}
+                activeWeapon={activeWeapon}
+              />
+            ) : (
+              <div
+                className="scr-cost"
+                aria-label={'Cost ' + (hidden ? 'unknown' : card.cost)}
+              >
+                <span>COST</span>
+                <b>{hidden ? '?' : card.cost}</b>
+              </div>
+            )}
+            {card.heroTitle && !hidden ? (
+              <div className="scr-hero-title">{card.heroTitle}</div>
+            ) : (
+              <div className="scr-power">
+                <b>{hidden ? '—' : card.power}</b>
+                <span>POWER</span>
+              </div>
+            )}
           </div>
-          <div className="card-copy scr-copy">
+          {showCombat && <HeroStatusPanel gameplay={card.gameplay!} />}
+          <div
+            className={
+              'card-copy scr-copy' + (showCombat ? ' scr-combat-copy' : '')
+            }
+          >
             <div className="scr-title-row">
               <span className="scr-rarity-badge" aria-label="Secret Rare">
                 SER
@@ -63,11 +84,22 @@ export function SecretHeroCard({
               </span>
               <h3>{hidden ? 'Undiscovered' : card.name}</h3>
             </div>
-            <p>
-              {hidden
-                ? 'Summon this hero to discover their story.'
-                : card.description}
-            </p>
+            {showCombat ? (
+              <ul className="hero-skill-list">
+                {card.gameplay!.skills.map((skill) => (
+                  <li className="hero-skill" key={skill.id}>
+                    <strong>{skill.name}</strong>
+                    <span>{skill.description}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>
+                {hidden
+                  ? 'Summon this hero to discover their story.'
+                  : card.description}
+              </p>
+            )}
             <div className="scr-character-type">
               {hidden ? 'Unknown hero' : card.characterType}
             </div>

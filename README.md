@@ -27,6 +27,7 @@ npm test
 - `src/utils/packGenerator.ts` — สุ่มการ์ด 5 ใบต่อซอง โดยมี Rare ขึ้นไปอย่างน้อยหนึ่งใบ
 - `src/hooks/useCollection.ts` — บันทึกคลังไว้ใน localStorage
 - `src/pages/` — Home, PackOpening และ Collection
+- `src/combat/engine.ts` — ฐานคำนวณการต่อสู้แบบไม่พึ่ง React; ดู [docs/combat-foundation.md](docs/combat-foundation.md)
 - `public/art/aether/heroes/<name>/` — รูปตัวละคร พื้นหลัง และ effect แยกโฟลเดอร์
 
 ตอนนี้ลงทะเบียน Marth 6 ใบ (`FE-001`–`FE-006`) และ Roy C/U (`FE-007`–`FE-008`) แล้ว ส่วนข้อมูล Roy rarity สูงกว่าอยู่ใน `roy.ts` ในสถานะร่าง ยังไม่เข้าซองหรือคลัง เพราะรูปยังไม่ครบและ ID ยังซ้ำกับ Marth

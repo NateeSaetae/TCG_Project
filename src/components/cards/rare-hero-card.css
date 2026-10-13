@@ -75,6 +75,12 @@
   border-color: #dce8ea;
   background: #122640;
 }
+.rare-hero-body .common-hero-title {
+  color: #fffdf4;
+  text-shadow:
+    0 1px 3px #07111be6,
+    0 2px 7px #07111bcc;
+}
 .common-rarity.rare-badge {
   color: #fffdf4;
 }
