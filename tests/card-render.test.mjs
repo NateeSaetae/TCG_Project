@@ -1,5 +1,6 @@
 import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
+import { access } from 'node:fs/promises';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { createServer } from 'vite';
@@ -22,6 +23,18 @@ const { marthCards } = await server.ssrLoadModule(
 const { royCards } = await server.ssrLoadModule(
   '/src/data/characters/roy/roy.ts',
 );
+const { hectorCards } = await server.ssrLoadModule(
+  '/src/data/characters/hector/hector.ts',
+);
+const { ephraimCards } = await server.ssrLoadModule(
+  '/src/data/characters/ephraim/ephraim.ts',
+);
+const { lilinaCards } = await server.ssrLoadModule(
+  '/src/data/characters/lilina/lilina.ts',
+);
+const { lynCards } = await server.ssrLoadModule(
+  '/src/data/characters/lyn/lyn.ts',
+);
 const { CARD_BACK_IMAGE } = await server.ssrLoadModule(
   '/src/components/cards/TwoSidedCard.tsx',
 );
@@ -30,7 +43,15 @@ const render = (component, props) =>
 
 test('catalog contains only registered HeroCard data with unique IDs', () => {
   assert.equal(archiveCards, heroCards);
-  assert.equal(heroCards.length, marthCards.length + royCards.length);
+  assert.equal(
+    heroCards.length,
+    marthCards.length +
+      royCards.length +
+      hectorCards.length +
+      ephraimCards.length +
+      lilinaCards.length +
+      lynCards.length,
+  );
   assert.equal(
     new Set(heroCards.map((card) => card.id)).size,
     heroCards.length,
@@ -52,7 +73,11 @@ test('development preview includes every registered hero card', async () => {
   for (const card of heroCards) assert.ok(html.includes(card.id), card.id);
   assert.ok(html.includes('<h2>Marth</h2>'));
   assert.ok(html.includes('<h2>Roy</h2>'));
-  assert.ok(html.includes('FE-010'));
+  assert.ok(html.includes('<h2>Hector</h2>'));
+  assert.ok(html.includes('<h2>Ephraim</h2>'));
+  assert.ok(html.includes('<h2>Lilina</h2>'));
+  assert.ok(html.includes('<h2>Lyn</h2>'));
+  assert.ok(html.includes('FE-011'));
 });
 
 test('all active hero cards render their identity, stats, and art', () => {
@@ -153,6 +178,122 @@ test('Marth hero titles replace the printed Power label by rarity', () => {
   const roy = render(CardRenderer, { card: royCards[0] });
   assert.ok(roy.includes('POWER'));
   assert.ok(roy.includes(String(royCards[0].power)));
+});
+
+test('registered Roy cards render their new combat skills', () => {
+  for (const card of royCards) {
+    const html = render(CardRenderer, { card });
+    assert.ok(html.includes('Blazing Resolve'), card.id);
+    assert.ok(html.includes('Binding Flame'), card.id);
+    assert.ok(html.includes('hero-status-panel'), card.id);
+    assert.ok(html.includes('/art/aether/icons/weapons/sword.svg'), card.id);
+  }
+  const hidden = render(CardRenderer, { card: royCards[0], hidden: true });
+  assert.ok(!hidden.includes('Blazing Resolve'));
+  assert.ok(!hidden.includes('Binding Flame'));
+});
+
+test('Hector and Ephraim C–UR reuse rarity layouts and render shared gameplay', () => {
+  for (const [cards, name, skills, weapons] of [
+    [
+      hectorCards,
+      'Hector',
+      ['Ostian Guard', 'Armads Retribution'],
+      ['axe', 'sword'],
+    ],
+    [
+      ephraimCards,
+      'Ephraim',
+      ["Siegmund's Edge", 'Renais Assault'],
+      ['lance', 'axe'],
+    ],
+  ]) {
+    assert.deepEqual(
+      cards.map((card) => card.rarity),
+      ['Common', 'U', 'R', 'SR', 'UR'],
+    );
+    assert.ok(cards.every((card) => card.gameplay === cards[0].gameplay));
+    for (const card of cards) {
+      const html = render(CardRenderer, { card });
+      assert.ok(html.includes(name), card.id);
+      assert.ok(html.includes('hero-status-panel'), card.id);
+      for (const skill of skills)
+        assert.ok(html.includes(skill.replaceAll("'", '&#x27;')), card.id);
+      for (const weapon of weapons)
+        assert.ok(
+          html.includes(`/art/aether/icons/weapons/${weapon}.svg`),
+          card.id,
+        );
+    }
+  }
+});
+
+test('every weapon displays its supplied SVG icon', async () => {
+  for (const weapon of [
+    'Sword',
+    'Lance',
+    'Axe',
+    'Bow',
+    'Magic',
+    'Staff',
+    'Dagger',
+  ]) {
+    const card = {
+      ...royCards[0],
+      gameplay: { ...royCards[0].gameplay, allowedWeapons: [weapon] },
+    };
+    const icon = `/art/aether/icons/weapons/${weapon.toLowerCase()}.svg`;
+    const html = render(CardRenderer, { card });
+    assert.ok(html.includes(`aria-label="${weapon}"`), weapon);
+    assert.ok(html.includes(icon), weapon);
+    await access(new URL(`../public${icon}`, import.meta.url));
+  }
+});
+
+test('Lilina and Lyn C–UR use available artwork and shared gameplay displays', () => {
+  for (const [cards, name, skills, weapons] of [
+    [
+      lilinaCards,
+      'Lilina',
+      ['Arcane Flame', 'Gentle Heart'],
+      ['Magic', 'Staff'],
+    ],
+    [lynCards, 'Lyn', ['Swift Strike', 'Sacaen Precision'], ['Sword', 'Bow']],
+  ]) {
+    assert.deepEqual(
+      cards.map((card) => card.rarity),
+      ['Common', 'U', 'R', 'SR', 'UR'],
+    );
+    assert.ok(cards.every((card) => card.gameplay === cards[0].gameplay));
+    for (const card of cards) {
+      const html = render(CardRenderer, { card });
+      assert.ok(html.includes(name), card.id);
+      assert.ok(html.includes('hero-status-panel'), card.id);
+      for (const skill of skills) assert.ok(html.includes(skill), card.id);
+      for (const weapon of weapons)
+        assert.ok(html.includes(`aria-label="${weapon}"`), card.id);
+    }
+  }
+  assert.ok(
+    render(CardRenderer, { card: lynCards[0] }).includes(
+      '/art/aether/icons/weapons/bow.svg',
+    ),
+  );
+});
+
+test('Roy UR uses its own artwork and the shared foil frame', () => {
+  const card = royCards.find((entry) => entry.rarity === 'UR');
+  assert.ok(card);
+  assert.equal(card.id, 'FE-011');
+  assert.equal(card.heroTitle, 'Emblem Hero');
+  assert.equal(card.artwork.foreground, royCards[3].artwork.foreground);
+  const html = render(CardRenderer, { card });
+  assert.ok(html.includes('roy_of_binding_UR.png'));
+  assert.ok(html.includes('roy-BG-UR.webp'));
+  assert.ok(html.includes('ultra-rare-hero-body'));
+  assert.ok(html.includes('patterned-foil-border'));
+  assert.ok(html.includes('Blazing Resolve'));
+  assert.ok(html.includes('/art/aether/heroes/Roy/effects/marth_sr_front.png'));
 });
 
 test('undiscovered cards hide identity and artwork', () => {

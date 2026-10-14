@@ -89,7 +89,8 @@ export function effectiveStats(
 
 export function effectiveCombatRole(character: BattleCharacterState) {
   return (
-    character.equippedItem?.combatRole ?? {
+    character.equippedItem?.combatRole ??
+    character.character.combatRole ?? {
       id: character.character.baseClass,
       displayName: character.character.baseClass,
     }
@@ -189,32 +190,104 @@ export function equipItem(
 
 function conditionMatches(
   condition: SkillCondition,
+  actor: BattleCharacterState,
+  target?: BattleCharacterState,
   weapon?: WeaponType,
 ): boolean {
-  return condition.kind === 'always' || condition.weapon === weapon;
+  switch (condition.kind) {
+    case 'always':
+      return true;
+    case 'weapon-is':
+      return condition.weapon === weapon;
+    case 'hp-at-most-percent':
+      return (
+        actor.currentHp * 100 <=
+        actor.character.baseStats.HP! * condition.percent
+      );
+    case 'target-hp-greater':
+      return Boolean(target && target.currentHp > actor.currentHp);
+    case 'target-spd-lower': {
+      if (!target) return false;
+      const actorSpeed = effectiveStats(actor).SPD;
+      const targetSpeed = effectiveStats(target).SPD;
+      return (
+        actorSpeed !== null && targetSpeed !== null && actorSpeed > targetSpeed
+      );
+    }
+    case 'target-full-hp':
+      return Boolean(
+        target && target.currentHp === target.character.baseStats.HP,
+      );
+    case 'all':
+      return condition.conditions.every((part) =>
+        conditionMatches(part, actor, target, weapon),
+      );
+  }
 }
 
 export function evaluateAttackPassives(
   character: BattleCharacterState,
   weapon?: WeaponType,
-): { attackBonus: number; skillIds: string[] } {
+  target?: BattleCharacterState,
+  attackStat: 'ATK' | 'MAG' = 'ATK',
+): { attackBonus: number; defenseIgnorePercent: number; skillIds: string[] } {
   let attackBonus = 0;
+  let defenseIgnorePercent = 0;
   const skillIds: string[] = [];
   for (const skill of character.character.skills) {
     if (
       skill.type !== 'Passive' ||
       skill.trigger !== 'on-attack' ||
-      !conditionMatches(skill.condition, weapon) ||
-      skill.effect.kind !== 'attack-bonus'
+      !conditionMatches(skill.condition, character, target, weapon)
     )
       continue;
-    attackBonus += skill.effect.amount;
+    if (
+      skill.effect.kind === 'attack-bonus' &&
+      skill.effect.stat === attackStat
+    )
+      attackBonus += skill.effect.amount;
+    else if (skill.effect.kind === 'ignore-defense')
+      defenseIgnorePercent += skill.effect.percent;
+    else continue;
     skillIds.push(skill.id);
   }
-  return { attackBonus, skillIds };
+  return {
+    attackBonus,
+    defenseIgnorePercent: Math.min(100, defenseIgnorePercent),
+    skillIds,
+  };
 }
 
-/** Declares an attack and reports ATK. Damage is intentionally resolved elsewhere. */
+function evaluateAttackTriggers(
+  actor: BattleCharacterState,
+  target: BattleCharacterState,
+  weapon?: WeaponType,
+  attackStat: 'ATK' | 'MAG' = 'ATK',
+): { attackBonus: number; damageBonus: number; skillIds: string[] } {
+  let attackBonus = 0;
+  let damageBonus = 0;
+  const skillIds: string[] = [];
+  for (const skill of actor.character.skills) {
+    if (
+      skill.type !== 'Trigger' ||
+      skill.trigger !== 'on-attack' ||
+      !conditionMatches(skill.condition, actor, target, weapon)
+    )
+      continue;
+    if (
+      skill.effect.kind === 'attack-bonus' &&
+      skill.effect.stat === attackStat
+    )
+      attackBonus += skill.effect.amount;
+    else if (skill.effect.kind === 'damage-bonus')
+      damageBonus += skill.effect.amount;
+    else continue;
+    skillIds.push(skill.id);
+  }
+  return { attackBonus, damageBonus, skillIds };
+}
+
+/** Declares an attack using ATK or MAG. Damage is intentionally resolved elsewhere. */
 export function processAttackAction(
   state: BattleState,
   action: BattleAction,
@@ -236,22 +309,54 @@ export function processAttackAction(
     action.weapon !== actor.character.equippedItem.weaponType
   )
     throw new Error('Attack weapon does not match equipped item');
-  const attackStat = effectiveStats(actor.character).ATK;
-  if (attackStat === null) throw new Error('ATK is unavailable');
-  const passive = evaluateAttackPassives(actor.character, weapon);
+  const attackStatKey = weapon === 'Magic' ? 'MAG' : 'ATK';
+  const attackStat = effectiveStats(actor.character)[attackStatKey];
+  if (attackStat === null) throw new Error(`${attackStatKey} is unavailable`);
+  const passive = evaluateAttackPassives(
+    actor.character,
+    weapon,
+    target.character,
+    attackStatKey,
+  );
+  const trigger = evaluateAttackTriggers(
+    actor.character,
+    target.character,
+    weapon,
+    attackStatKey,
+  );
   const attack: AttackDeclaration = {
     kind: 'attack-declared',
     id: `attack-${state.events.filter((event) => event.kind === 'attack-declared').length + 1}`,
     actorId: action.actorId,
     targetId: action.targetId,
-    attack: attackStat + passive.attackBonus,
+    attack: attackStat + passive.attackBonus + trigger.attackBonus,
+    attackStat: attackStatKey,
+    damageBonus: trigger.damageBonus,
+    defenseIgnorePercent: passive.defenseIgnorePercent,
     weapon,
-    skillIds: passive.skillIds,
+    skillIds: [...passive.skillIds, ...trigger.skillIds],
   };
   return { state: { ...state, events: [...state.events, attack] }, attack };
 }
 
-/** Accepts damage supplied by a future rule module; this module defines no damage formula. */
+/** Effective physical DEF for an already declared attack; callers retain control of the damage formula. */
+export function effectiveDefenseForAttack(
+  state: BattleState,
+  attackId: string,
+): number {
+  const attack = state.events.find(
+    (event): event is AttackDeclaration =>
+      event.kind === 'attack-declared' && event.id === attackId,
+  );
+  if (!attack) throw new Error(`Unknown attack: ${attackId}`);
+  const defense = effectiveStats(
+    findCharacter(state, attack.targetId).character,
+  ).DEF;
+  if (defense === null) throw new Error('DEF is unavailable');
+  return Math.floor(defense * (1 - attack.defenseIgnorePercent / 100));
+}
+
+/** Applies externally calculated base damage plus declared skill damage bonuses. */
 export function applyResolvedDamage(
   state: BattleState,
   attackId: string,
@@ -264,6 +369,9 @@ export function applyResolvedDamage(
       event.kind === 'attack-declared' && event.id === attackId,
   );
   if (!attack) throw new Error(`Unknown attack: ${attackId}`);
+  const incomingDamage = damage + attack.damageBonus;
+  if (!Number.isSafeInteger(incomingDamage))
+    throw new Error('Total damage must be a safe integer');
   if (
     state.events.some(
       (event) => event.kind === 'damage-applied' && event.attackId === attackId,
@@ -273,7 +381,26 @@ export function applyResolvedDamage(
   const target = findCharacter(state, attack.targetId);
   if (target.character.currentHp <= 0)
     throw new Error('Target is already defeated');
-  const remainingHp = Math.max(0, target.character.currentHp - damage);
+  const reduction = target.character.character.skills
+    .filter(
+      (skill) =>
+        skill.type === 'Passive' &&
+        skill.trigger === 'on-damage' &&
+        skill.effect.kind === 'incoming-damage-reduction' &&
+        conditionMatches(skill.condition, target.character),
+    )
+    .reduce(
+      (percent, skill) =>
+        percent +
+        (skill.effect.kind === 'incoming-damage-reduction'
+          ? skill.effect.percent
+          : 0),
+      0,
+    );
+  const totalDamage = Math.floor(
+    incomingDamage * (1 - Math.min(100, reduction) / 100),
+  );
+  const remainingHp = Math.max(0, target.character.currentHp - totalDamage);
   let next = updateCharacter(state, attack.targetId, (current) => ({
     ...current,
     currentHp: remainingHp,
@@ -286,12 +413,73 @@ export function applyResolvedDamage(
         kind: 'damage-applied',
         attackId,
         targetId: attack.targetId,
-        amount: damage,
+        amount: totalDamage,
         remainingHp,
       },
     ],
   };
-  if (remainingHp > 0) return next;
+  if (remainingHp > 0) {
+    const attacker = findCharacter(next, attack.actorId);
+    for (const skill of target.character.character.skills) {
+      if (
+        skill.type !== 'Trigger' ||
+        skill.trigger !== 'on-hit' ||
+        skill.effect.kind !== 'counter-damage' ||
+        attacker.team.id === target.team.id ||
+        attacker.character.currentHp <= 0 ||
+        !conditionMatches(
+          skill.condition,
+          findCharacter(next, attack.targetId).character,
+          attacker.character,
+          attack.weapon,
+        ) ||
+        (skill.effect.limit === 'once-per-enemy-turn' &&
+          next.events.some(
+            (event) =>
+              event.kind === 'counter-damage-applied' &&
+              event.sourceId === attack.targetId &&
+              event.skillId === skill.id &&
+              event.turnNumber === next.turn.number,
+          ))
+      )
+        continue;
+      const counterHp = Math.max(
+        0,
+        attacker.character.currentHp - skill.effect.amount,
+      );
+      next = updateCharacter(next, attack.actorId, (current) => ({
+        ...current,
+        currentHp: counterHp,
+      }));
+      next = {
+        ...next,
+        events: [
+          ...next.events,
+          {
+            kind: 'counter-damage-applied',
+            sourceId: attack.targetId,
+            targetId: attack.actorId,
+            skillId: skill.id,
+            amount: skill.effect.amount,
+            remainingHp: counterHp,
+            turnNumber: next.turn.number,
+          },
+          ...(counterHp === 0
+            ? [
+                {
+                  kind: 'character-defeated' as const,
+                  actorId: attack.targetId,
+                  targetId: attack.actorId,
+                },
+              ]
+            : []),
+        ],
+      };
+      // Counter damage is applied directly and cannot start another attack.
+      if (counterHp === 0) break;
+    }
+    return next;
+  }
 
   next = {
     ...next,
@@ -305,11 +493,17 @@ export function applyResolvedDamage(
     ],
   };
   const actor = findCharacter(next, attack.actorId);
+  const defeated = findCharacter(next, attack.targetId).character;
   for (const skill of actor.character.character.skills) {
     if (
       skill.type !== 'Trigger' ||
       skill.trigger !== 'on-kill' ||
-      !conditionMatches(skill.condition, attack.weapon) ||
+      !conditionMatches(
+        skill.condition,
+        actor.character,
+        defeated,
+        attack.weapon,
+      ) ||
       skill.effect.kind !== 'team-buff'
     )
       continue;

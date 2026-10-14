@@ -37,7 +37,10 @@ test('registered hero cards have unique IDs and resolvable artwork', async () =>
   for (const card of heroCards) {
     const paths = [
       card.image,
-      ...Object.values(card.artwork ?? {}),
+      card.artwork?.background,
+      card.artwork?.midground,
+      card.artwork?.character,
+      card.artwork?.foreground,
       card.magicEffects?.foilArtwork,
       card.magicEffects?.foilMask,
       card.magicEffects?.backgroundArtwork,

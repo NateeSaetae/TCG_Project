@@ -13,6 +13,13 @@ export function HeroArtwork({
     objectPosition: card.imagePosition ?? 'center',
   } as CSSProperties;
   if (layered && card.artwork) {
+    const characterStyle: CSSProperties = card.artwork.characterTopFade
+      ? {
+          ...style,
+          maskImage: `linear-gradient(to bottom, transparent, #000 ${card.artwork.characterTopFade}%, #000)`,
+          WebkitMaskImage: `linear-gradient(to bottom, transparent, #000 ${card.artwork.characterTopFade}%, #000)`,
+        }
+      : style;
     return (
       <>
         {(['background', 'midground', 'character', 'foreground'] as const).map(
@@ -24,7 +31,16 @@ export function HeroArtwork({
                 src={card.artwork[layer]}
                 alt={layer === 'character' ? card.name : ''}
                 draggable={false}
-                style={layer === 'character' ? style : undefined}
+                style={
+                  layer === 'character'
+                    ? characterStyle
+                    : layer === 'background' &&
+                        card.artwork.backgroundBrightness !== undefined
+                      ? {
+                          filter: `brightness(${card.artwork.backgroundBrightness})`,
+                        }
+                      : undefined
+                }
               />
             ),
         )}

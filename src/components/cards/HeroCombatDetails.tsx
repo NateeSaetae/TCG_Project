@@ -7,32 +7,18 @@ import type {
 import './hero-combat-details.css';
 
 const statOrder: StatKey[] = ['HP', 'ATK', 'DEF', 'MAG', 'RES', 'SPD'];
-const weaponImages: Partial<Record<WeaponType, string>> = {
+const weaponImages: Record<WeaponType, string> = {
   Sword: '/art/aether/icons/weapons/sword.svg',
   Lance: '/art/aether/icons/weapons/lance.svg',
   Axe: '/art/aether/icons/weapons/axe.svg',
+  Bow: '/art/aether/icons/weapons/bow.svg',
+  Magic: '/art/aether/icons/weapons/magic.svg',
+  Staff: '/art/aether/icons/weapons/staff.svg',
+  Dagger: '/art/aether/icons/weapons/dagger.svg',
 };
 
 function WeaponGlyph({ weapon }: { weapon: WeaponType }) {
-  const image = weaponImages[weapon];
-  if (image) return <img src={image} alt="" draggable={false} />;
-
-  return (
-    <svg viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
-      {weapon === 'Magic' ? (
-        <>
-          <circle cx="16" cy="16" r="7" />
-          <path d="M16 2v7M16 23v7M2 16h7M23 16h7" />
-        </>
-      ) : weapon === 'Staff' ? (
-        <>
-          <path d="M16 8v21M11 6l5-4 5 4-5 5-5-5ZM11 18h10" />
-        </>
-      ) : (
-        <path d="m21 3 5 5-12 12-5-5L21 3ZM7 18l7 7M5 27l4-4" />
-      )}
-    </svg>
-  );
+  return <img src={weaponImages[weapon]} alt="" draggable={false} />;
 }
 
 export function HeroWeaponIcons({

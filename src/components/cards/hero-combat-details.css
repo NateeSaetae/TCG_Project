@@ -46,22 +46,11 @@
   border-width: 0.75cqw;
 }
 
-.hero-weapon-icon svg,
 .hero-weapon-icon img {
   width: 65%;
   height: 65%;
   filter: drop-shadow(0 1px 1px #071a2f);
-}
-
-.hero-weapon-icon img {
   object-fit: contain;
-}
-
-.hero-weapon-icon svg {
-  stroke: currentColor;
-  stroke-width: 2.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
 }
 
 .hero-weapon-icon[data-equipped='true'] {

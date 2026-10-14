@@ -18,7 +18,7 @@ export const marthGameplay: CharacterGameplayData = {
     {
       id: 'heroes-resolve',
       name: "Hero's Resolve",
-      description: 'Sword/Lance/Aex attack: +200 ATK for that attack.',
+      description: 'Sword attack: +200 ATK for that attack.',
       type: 'Passive',
       trigger: 'on-attack',
       condition: { kind: 'weapon-is', weapon: 'Sword' },

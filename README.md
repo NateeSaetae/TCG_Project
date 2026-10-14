@@ -31,7 +31,7 @@ npm test
 - `src/combat/engine.ts` — ฐานคำนวณการต่อสู้แบบไม่พึ่ง React; ดู [docs/combat-foundation.md](docs/combat-foundation.md)
 - `public/art/aether/heroes/<name>/` — รูปตัวละคร พื้นหลัง และ effect แยกโฟลเดอร์
 
-ตอนนี้ลงทะเบียน Marth 6 ใบ (`FE-001`–`FE-006`) และ Roy C/U/R/SR (`FE-007`–`FE-010`) แล้ว ส่วนข้อมูล Roy ระดับ UR/SER อยู่ใน `src/data/characters/roy/roy.ts` ในสถานะร่าง ยังไม่เข้าซองหรือคลัง เพราะรูปยังไม่ครบและ ID ยังซ้ำกับ Marth
+ตอนนี้ลงทะเบียน Marth 6 ใบ (`FE-001`–`FE-006`), Roy C/U/R/SR/UR (`FE-007`–`FE-011`), Hector C/U/R/SR/UR (`FE-012`–`FE-016`), Ephraim C/U/R/SR/UR (`FE-018`–`FE-022`), Lilina C/U/R/SR/UR (`FE-023`–`FE-027`) และ Lyn C/U/R/SR/UR (`FE-028`–`FE-032`) แล้ว Cost/Power ของตัวละครที่เพิ่มหลัง Roy ยังเป็นค่าชั่วคราว ส่วน SER ของ Roy, Hector, Ephraim, Lilina และ Lyn ยังไม่เข้าซองหรือคลังจนกว่าภาพและข้อมูลหน้าการ์ดจะพร้อม
 
 ดูขั้นตอนเพิ่มตัวละครใน [docs/adding-character.md](docs/adding-character.md)
 

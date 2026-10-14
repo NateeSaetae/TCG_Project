@@ -1,12 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Lance weapon icon">
- <defs><linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff8e8"/><stop offset=".5" stop-color="#d9e7ee"/><stop offset="1" stop-color="#789ab5"/></linearGradient><linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff0b8"/><stop offset=".55" stop-color="#d4a44a"/><stop offset="1" stop-color="#946527"/></linearGradient></defs>
- <g transform="rotate(42 128 128)" stroke-linejoin="round" stroke-linecap="round">
-  <path d="M122 110H134V233H122Z" fill="#284861" stroke="#e5bd69" stroke-width="4"/>
-  <path d="M128 12 150 61 142 104 128 121 114 104 106 61Z" fill="url(#steel)" stroke="#d6a34d" stroke-width="5"/>
-  <path d="M128 23V110" stroke="#57748b" stroke-width="4"/>
-  <path d="M106 68 88 94 106 106 119 100M150 68 168 94 150 106 137 100" fill="url(#gold)" stroke="#ffe5a5" stroke-width="3"/>
-  <path d="M113 118Q128 126 143 118L147 132Q128 143 109 132Z" fill="url(#gold)" stroke="#fff0c5" stroke-width="3"/>
-  <path d="M122 147H134M122 166H134M122 185H134M122 204H134" stroke="#e6bd68" stroke-width="4"/>
-  <path d="M116 230H140L136 241H120Z" fill="url(#gold)" stroke="#fff0c5" stroke-width="3"/>
- </g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="lance weapon icon"><defs><linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffffff"/><stop offset=".43" stop-color="#dce9f5"/><stop offset=".6" stop-color="#8295b1"/><stop offset="1" stop-color="#f5faff"/></linearGradient><linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff3b5"/><stop offset=".4" stop-color="#e7ae42"/><stop offset=".75" stop-color="#916024"/><stop offset="1" stop-color="#ffe18b"/></linearGradient><linearGradient id="navy" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#253f6c"/><stop offset="1" stop-color="#09172e"/></linearGradient><radialGradient id="gem"><stop stop-color="#aaf7ff"/><stop offset=".5" stop-color="#25bfff"/><stop offset="1" stop-color="#0952bc"/></radialGradient></defs><g stroke="#18243c" stroke-width="3" stroke-linejoin="round"><path fill="url(#navy)" d="M122 99h12v133h-12z"/><path fill="url(#gold)" d="M119 217h18v12h-18zM128 226l13 14-13 13-13-13z"/><path fill="url(#steel)" d="M128 12 151 69 138 98 128 112 118 98 105 69Z"/><path fill="#fff" stroke="none" d="m128 20 6 53-6 28-6-28z"/><path fill="url(#gold)" d="m106 86-20 20 26-5 16 17 16-17 26 5-20-20-22 7z"/><path fill="url(#gem)" d="m128 86 12 13-12 14-12-14z"/></g></svg>
