@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import {
   animate,
   motion,
@@ -29,10 +30,13 @@ export function StackedCardReveal({
   const [held, setHeld] = useState(false);
   const gate = useRef(false);
   const cancelled = useRef(false);
+  const dragged = useRef(false);
   const alive = useRef(true);
   const animation = useRef<ReturnType<typeof animate> | null>(null);
-  const x = useMotionValue(0);
-  const rotate = useTransform(x, [-300, 0, 300], [-14, 0, 14]);
+  const tiltX = useMotionValue(0);
+  const exitX = useMotionValue(0);
+  const rotate = useTransform(tiltX, [-220, 0, 220], [-11, 0, 11]);
+  const rotateY = useTransform(tiltX, [-220, 0, 220], [-14, 0, 14]);
   const reduced = useReducedMotion();
   const card = cards[index];
   useEffect(() => {
@@ -63,18 +67,25 @@ export function StackedCardReveal({
     setBusy(true);
     setHeld(false);
     animation.current?.stop();
-    animation.current = animate(x, reduced ? 0 : direction * 560, {
-      duration: reduced ? 0 : 0.3,
-      ease: 'easeIn',
-    });
+    const exitDistance =
+      typeof window === 'undefined' ? 600 : window.innerWidth / 2 + 320;
+    animation.current = animate(
+      exitX,
+      reduced ? 0 : direction * exitDistance,
+      {
+        duration: reduced ? 0 : 0.22,
+        ease: 'easeIn',
+      },
+    );
     await animation.current;
     if (!alive.current) return;
     if (index === cards.length - 1) {
       onComplete();
       return;
     }
-    x.set(0);
-    setIndex(index + 1);
+    flushSync(() => setIndex(index + 1));
+    exitX.set(0);
+    tiltX.set(0);
     // Keep the newly promoted card locked until its position settles.
   }
 
@@ -86,67 +97,99 @@ export function StackedCardReveal({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: reduced ? 0 : 0.45 }}
       >
-        {cards.slice(index + 1).map((behind, offset) => {
-          const depth = offset + 1;
-          return (
-            <motion.div
-              key={`${index + depth}-${behind.id}`}
-              className="stack-edge"
-              aria-hidden="true"
-              inert
-              style={{ zIndex: cards.length - depth }}
-              initial={false}
-              animate={{ x: depth * 12, y: depth * -3 }}
-              transition={{ duration: reduced ? 0 : 0.3 }}
-            >
-              <CardRenderer
-                card={behind}
-                small
-                hidden
-                managedPointer
-                effectsActive={false}
-              />
-            </motion.div>
-          );
-        })}
+        {cards.slice(index + 1).map((behind, offset) => (
+          <div
+            key={`${index + offset + 1}-${behind.id}`}
+            className="stack-preview"
+            aria-hidden="true"
+            inert
+            style={{ zIndex: cards.length - offset - 1 }}
+          >
+            <CardRenderer
+              card={behind}
+              small
+              managedPointer
+              effectsActive={false}
+            />
+          </div>
+        ))}
         <motion.div
           key={`${index}-${card.id}`}
           className="stack-card"
           data-held={held}
-          style={{ x, rotate: reduced ? 0 : rotate, zIndex: cards.length + 1 }}
+          role="button"
+          tabIndex={busy ? -1 : 0}
+          aria-label={
+            index === cards.length - 1
+              ? `View pack summary after ${card.name}`
+              : `Drag to reveal next card after ${card.name}`
+          }
+          style={{
+            x: exitX,
+            rotate: reduced ? 0 : rotate,
+            rotateY: reduced ? 0 : rotateY,
+            transformPerspective: 900,
+            zIndex: cards.length + 1,
+          }}
           initial={{ y: reduced || index === 0 ? 0 : -3, opacity: 1 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: reduced ? 0 : 0.3 }}
-          drag={busy ? false : 'x'}
-          dragMomentum={false}
-          dragElastic={0.8}
-          dragConstraints={{ left: -220, right: 220 }}
           onPointerDownCapture={(event) => {
             if (busy || !event.isPrimary || event.button !== 0) return;
             cancelled.current = false;
+            dragged.current = false;
             animation.current?.stop();
             setHeld(true);
+          }}
+          onClick={() => {
+            if (
+              index === cards.length - 1 &&
+              !dragged.current &&
+              !cancelled.current
+            )
+              void next();
+          }}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              void next();
+            }
           }}
           onPointerUpCapture={() => setHeld(false)}
           onPointerCancel={() => {
             cancelled.current = true;
             setHeld(false);
-            animation.current = animate(x, 0, { duration: reduced ? 0 : 0.25 });
+            animation.current = animate(tiltX, 0, {
+              duration: reduced ? 0 : 0.25,
+            });
           }}
-          onDragEnd={(_, info) => {
+          onPanStart={() => {
+            dragged.current = true;
+          }}
+          onPan={(_, info) => {
+            if (gate.current || cancelled.current) return;
+            animation.current?.stop();
+            tiltX.set(Math.max(-220, Math.min(220, info.offset.x)));
+          }}
+          onPanEnd={(_, info) => {
             setHeld(false);
             if (gate.current || cancelled.current) return;
             if (Math.abs(info.offset.x) >= 80)
               void next(info.offset.x < 0 ? -1 : 1);
             else {
-              animation.current = animate(x, 0, {
+              animation.current = animate(tiltX, 0, {
                 duration: reduced ? 0 : 0.25,
                 ease: 'easeOut',
               });
             }
           }}
         >
-          <CardRenderer card={card} small effectsActive />
+          <CardRenderer
+            card={card}
+            small
+            managedPointer={newCards.includes(index)}
+            effectsActive
+          />
           {newCards.includes(index) && <NewCardBadge />}
         </motion.div>
       </motion.div>
@@ -154,7 +197,11 @@ export function StackedCardReveal({
         <span>
           {card.rarity} · {index + 1} / {cards.length}
         </span>
-        <small>Drag sideways to reveal the next card</small>
+        <small>
+          {index === cards.length - 1
+            ? 'Click or drag this card to view your pack'
+            : 'Hold and drag sideways to reveal the next card'}
+        </small>
       </div>
       <button
         type="button"

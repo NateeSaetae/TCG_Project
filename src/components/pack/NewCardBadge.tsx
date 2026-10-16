@@ -1,7 +1,7 @@
 export function NewCardBadge() {
   return (
     <span className="new-card-badge" aria-label="New discovery">
-      <span aria-hidden="true">✦</span> New
+      <img src="/art/aether/ui/new-card-badge.png" alt="" aria-hidden="true" />
     </span>
   );
 }

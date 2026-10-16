@@ -9,21 +9,28 @@
 .card-stack {
   --stack-width: min(290px, calc(100vw - 112px));
   position: relative;
-  width: var(--stack-width);
-  aspect-ratio: 0.686;
-  margin: 22px 48px 28px 0;
+  display: grid;
+  grid-template-columns: 20px var(--stack-width) 20px;
+  width: calc(var(--stack-width) + 40px);
+  margin: 22px auto 28px;
   isolation: isolate;
 }
 .stack-card,
-.stack-edge {
-  position: absolute;
-  inset: 0;
+.stack-preview {
+  grid-column: 2;
+  grid-row: 1;
+  position: relative;
+  aspect-ratio: 0.686;
 }
 .stack-card {
   touch-action: pan-y;
   cursor: grab;
   user-select: none;
   -webkit-user-select: none;
+}
+.stack-card:focus-visible {
+  outline: 2px solid var(--fe-gold-light);
+  outline-offset: 5px;
 }
 .stack-card[data-held='true'] {
   cursor: grabbing;
@@ -39,14 +46,12 @@
 .stack-card[data-held='true'] > .sr-card {
   pointer-events: none;
 }
-.stack-edge {
+.stack-preview {
   pointer-events: none;
-  /* Only the existing frame's right edge is visible, even during a swipe. */
-  clip-path: inset(0 0 0 calc(100% - 12px) round 2px);
   filter: drop-shadow(2px 2px 2px #0005);
 }
-.stack-edge .common-hero-body,
-.stack-edge .sr-body {
+.stack-preview .common-hero-body,
+.stack-preview .sr-body {
   transform: none;
 }
 .stack-status {

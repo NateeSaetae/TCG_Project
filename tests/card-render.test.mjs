@@ -352,7 +352,7 @@ test('pending SER pack resumes as a face-up active card in the stack', async () 
   assert.ok(html.includes('View pack summary'));
 });
 
-test('stack renders the active hero and four actual hidden rarity frames', async () => {
+test('stack layers every full card face behind the current card', async () => {
   const { StackedCardReveal } = await server.ssrLoadModule(
     '/src/components/pack/StackedCardReveal.tsx',
   );
@@ -369,15 +369,36 @@ test('stack renders the active hero and four actual hidden rarity frames', async
     sound: false,
     onComplete() {},
   });
-  assert.equal((html.match(/class="stack-edge"/g) ?? []).length, 4);
+  assert.equal((html.match(/class="stack-preview"/g) ?? []).length, 4);
   assert.equal((html.match(/class="stack-card"/g) ?? []).length, 1);
+  assert.deepEqual(
+    [...html.matchAll(/class="stack-preview"[^>]*z-index:(\d+)/g)].map(
+      (match) => Number(match[1]),
+    ),
+    [4, 3, 2, 1],
+  );
   assert.ok(html.includes('New discovery'));
   assert.ok(html.includes('Next Card'));
   assert.ok(html.includes('1 / 5'));
-  // Underlying previews omit all character artwork; only the active card loads art.
+  assert.ok(html.includes('Hold and drag sideways'));
   for (const card of cards.slice(1)) {
-    assert.ok(!html.includes(card.artwork?.character ?? card.image));
+    assert.ok(html.includes(card.artwork?.character ?? card.image), card.id);
   }
+});
+
+test('the last card offers click or drag to finish the pack', async () => {
+  const { StackedCardReveal } = await server.ssrLoadModule(
+    '/src/components/pack/StackedCardReveal.tsx',
+  );
+  const html = render(StackedCardReveal, {
+    cards: [marthCards[0]],
+    newCards: [],
+    sound: false,
+    onComplete() {},
+  });
+  assert.ok(html.includes('role="button"'));
+  assert.ok(html.includes('aria-label="View pack summary after Marth"'));
+  assert.ok(html.includes('Click or drag this card'));
 });
 
 test('saved legacy IDs are ignored while owned heroes and pending pulls survive', async () => {
