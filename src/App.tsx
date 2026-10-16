@@ -136,6 +136,8 @@ export default function App() {
         ) : page === 'packs' ? (
           <PackOpening
             pending={save.pending}
+            view={setViewer}
+            pendingNew={save.pendingNew}
             addPack={addPack}
             finish={finish}
             sound={save.sound}

@@ -5,13 +5,17 @@ import { CARD_FLIP_MS } from '../cards/TwoSidedCard';
 import type { HeroCardData } from '../../types/heroCard';
 import { rank } from '../../config/rarity';
 import { playTone } from '../../utils/sound';
+import { useRevealDrag } from '../../hooks/useRevealDrag';
+import { NewCardBadge } from './NewCardBadge';
 export function CardReveal({
   card,
+  isNew = false,
   onReveal,
   onContinue,
   sound,
 }: {
   card: HeroCardData;
+  isNew?: boolean;
   onReveal: () => void;
   onContinue: () => void;
   sound: boolean;
@@ -49,14 +53,15 @@ export function CardReveal({
     locked.current = true;
     setStage('charging');
   }
+  const drag = useRevealDrag(activate, stage === 'idle' || stage === 'ready');
   return (
     <div className="normal-reveal" data-stage={stage}>
       <button
-        className="reveal-button"
+        {...drag}
         disabled={stage === 'charging' || stage === 'flipping'}
-        onClick={activate}
         aria-label={stage === 'ready' ? 'Continue to next card' : 'Reveal card'}
       >
+        {isNew && stage === 'ready' && <NewCardBadge />}
         <CardRenderer
           card={card}
           face={stage === 'idle' || stage === 'charging' ? 'back' : 'front'}

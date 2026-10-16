@@ -18,6 +18,7 @@ export const rarityWeights: Record<Rarity, number> = {
   'Secret Rare': 0.5,
 };
 export const PACK_SIZE = 5;
+export const MAX_PACKS = 6;
 export function rarityName(rarity: RarityIdentifier): Rarity {
   if (rarity === 'SER') return 'Secret Rare';
   const name = rarities.find(

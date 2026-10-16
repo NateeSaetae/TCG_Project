@@ -41,6 +41,27 @@ const { CARD_BACK_IMAGE } = await server.ssrLoadModule(
 const render = (component, props) =>
   renderToStaticMarkup(React.createElement(component, props));
 
+test('sealed opening offers six individual five-card packs with identical odds', async () => {
+  const { PackOpening } = await server.ssrLoadModule(
+    '/src/pages/PackOpening.tsx',
+  );
+  const markup = render(PackOpening, {
+    pending: [],
+    addPack() {},
+    finish() {},
+    sound: false,
+    collect() {},
+  });
+  assert.equal(
+    (markup.match(/class="pack-button booster-choice"/g) ?? []).length,
+    6,
+  );
+  for (let i = 1; i <= 6; i++) {
+    assert.ok(markup.includes(`Open booster pack ${i}, five cards, same odds`));
+  }
+  assert.ok(!markup.includes('pack-quantity'));
+});
+
 test('catalog contains only registered HeroCard data with unique IDs', () => {
   assert.equal(archiveCards, heroCards);
   assert.equal(
@@ -314,7 +335,7 @@ test('every rarity supports the shared physical card back and front', () => {
   }
 });
 
-test('pending SER pack resumes at the card back', async () => {
+test('pending SER pack resumes as a face-up active card in the stack', async () => {
   const { PackOpening } = await server.ssrLoadModule(
     '/src/pages/PackOpening.tsx',
   );
@@ -325,8 +346,38 @@ test('pending SER pack resumes at the card back', async () => {
     sound: false,
     collect() {},
   });
-  assert.ok(html.includes('secret-reveal'));
-  assert.ok(html.includes('data-face="back"'));
+  assert.ok(html.includes('stacked-reveal'));
+  assert.ok(html.includes('scr-hero-card'));
+  assert.ok(!html.includes('data-face="back"'));
+  assert.ok(html.includes('View pack summary'));
+});
+
+test('stack renders the active hero and four actual hidden rarity frames', async () => {
+  const { StackedCardReveal } = await server.ssrLoadModule(
+    '/src/components/pack/StackedCardReveal.tsx',
+  );
+  const cards = [
+    marthCards[0],
+    marthCards[1],
+    marthCards[2],
+    marthCards[4],
+    marthCards[5],
+  ];
+  const html = render(StackedCardReveal, {
+    cards,
+    newCards: [0],
+    sound: false,
+    onComplete() {},
+  });
+  assert.equal((html.match(/class="stack-edge"/g) ?? []).length, 4);
+  assert.equal((html.match(/class="stack-card"/g) ?? []).length, 1);
+  assert.ok(html.includes('New discovery'));
+  assert.ok(html.includes('Next Card'));
+  assert.ok(html.includes('1 / 5'));
+  // Underlying previews omit all character artwork; only the active card loads art.
+  for (const card of cards.slice(1)) {
+    assert.ok(!html.includes(card.artwork?.character ?? card.image));
+  }
 });
 
 test('saved legacy IDs are ignored while owned heroes and pending pulls survive', async () => {

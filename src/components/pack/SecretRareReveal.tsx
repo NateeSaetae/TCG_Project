@@ -4,12 +4,15 @@ import { CardRenderer } from '../cards/CardRenderer';
 import { secretRevealTiming } from '../../config/cardEffects';
 import { playTone } from '../../utils/sound';
 import type { HeroCardData } from '../../types/heroCard';
+import { useRevealDrag } from '../../hooks/useRevealDrag';
+import { NewCardBadge } from './NewCardBadge';
 
 type Stage = 'idle' | 'charging' | 'flipping' | 'settling' | 'ready';
 
 /** Pack reveal animation; it never mutates the collection. */
 export function SecretRareReveal({
   card,
+  isNew = false,
   revealed,
   onReveal,
   onContinue,
@@ -18,6 +21,7 @@ export function SecretRareReveal({
   autoPlay = false,
 }: {
   card: HeroCardData;
+  isNew?: boolean;
   revealed: boolean;
   onReveal: () => void;
   onContinue: () => void;
@@ -75,6 +79,7 @@ export function SecretRareReveal({
     } else setStage('charging');
   }
 
+  const drag = useRevealDrag(activate, !busy);
   return (
     <div className="secret-reveal" data-stage={stage} aria-busy={busy}>
       <div className="sr-reveal-light" aria-hidden="true" />
@@ -91,8 +96,7 @@ export function SecretRareReveal({
       </div>
       <div className="sr-reveal-float">
         <button
-          className="reveal-button"
-          onClick={activate}
+          {...drag}
           disabled={busy}
           aria-label={
             stage === 'ready'
@@ -102,6 +106,7 @@ export function SecretRareReveal({
                 : 'Reveal Secret Rare card'
           }
         >
+          {isNew && stage === 'ready' && <NewCardBadge />}
           <CardRenderer
             card={card}
             face={stage === 'idle' || stage === 'charging' ? 'back' : 'front'}

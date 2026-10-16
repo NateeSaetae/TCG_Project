@@ -21,6 +21,35 @@ const { marthCards } = await server.ssrLoadModule(
 );
 const { PACK_SIZE, rank, rarityName, rarityWeights } =
   await server.ssrLoadModule('/src/config/rarity.ts');
+const { valuePack, playPrices } = await server.ssrLoadModule(
+  '/src/utils/packValue.ts',
+);
+
+test('play appraisals use rarity bases, bounded variation, and independent per-copy premiums', () => {
+  const normal = valuePack(marthCards, () => 0.5);
+  assert.deepEqual(
+    normal.map((value) => value.price),
+    marthCards.map((card) => playPrices[rarityName(card.rarity)]),
+  );
+  assert.ok(normal.every((value) => !value.premium));
+  const rolls = [0, 0.5, 0.5, 0.5];
+  const copies = valuePack([marthCards[0], marthCards[0]], () => rolls.shift());
+  assert.equal(copies[0].price, Math.round(copies[1].price * 1.5));
+  assert.deepEqual(
+    copies.map((value) => value.premium),
+    [true, false],
+  );
+  for (const roll of [0, 0.999999]) {
+    const values = valuePack(marthCards, () => roll);
+    values.forEach((value, i) => {
+      const base = playPrices[rarityName(marthCards[i].rarity)];
+      assert.ok(Number.isInteger(value.price));
+      assert.ok(value.price >= Math.round(base * 0.8));
+      assert.ok(value.price <= Math.round(base * 1.8));
+    });
+  }
+  assert.deepEqual(valuePack([]), []);
+});
 
 function seededRandom(seed = 9137) {
   return () => {
@@ -64,6 +93,24 @@ test('packs draw registered hero cards and keep the Rare+ guarantee', () => {
       assert.ok(heroCards.includes(card));
     }
   }
+});
+
+test('pulls retain random draw order, including lower rarities after a high rarity', () => {
+  const rolls = [0.999, 0, 0, 0, 0.6, 0, 0, 0, 0, 0];
+  const pack = generatePack(() => rolls.shift() ?? 0);
+  assert.deepEqual(
+    pack.map((card) => rank(card.rarity)),
+    [5, 0, 1, 0, 0],
+  );
+});
+
+test('final slot guarantees Rare+ only when earlier slots have no Rare+', () => {
+  const pack = generatePack(() => 0);
+  assert.deepEqual(
+    pack.slice(0, -1).map((card) => rank(card.rarity)),
+    [0, 0, 0, 0],
+  );
+  assert.ok(rank(pack.at(-1).rarity) >= 2);
 });
 
 test('weighted rarity selection follows the existing configured weights', () => {

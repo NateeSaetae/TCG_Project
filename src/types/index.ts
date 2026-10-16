@@ -16,5 +16,6 @@ export interface SaveData {
   owned: Record<string, number>;
   packs: number;
   pending: string[];
+  pendingNew: number[];
   sound: boolean;
 }

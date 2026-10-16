@@ -57,5 +57,6 @@ export function generatePack(
       pool[Math.min(pool.length - 1, Math.floor(random() * pool.length))],
     );
   }
-  return selected.sort((a, b) => rank(a.rarity) - rank(b.rarity));
+  // Reveal in draw order so every slot can rise or fall in rarity.
+  return selected;
 }
