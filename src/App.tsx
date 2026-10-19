@@ -11,10 +11,19 @@ import type { HeroCardData } from './types/heroCard';
 const DevHeroes = import.meta.env.DEV
   ? lazy(() => import('./pages/dev/HeroPreview'))
   : null;
+const DevGameplaySandbox = import.meta.env.DEV
+  ? lazy(() => import('./gameplay/mvp/ui/GameplaySandbox'))
+  : null;
 
-type Page = 'home' | 'packs' | 'collection' | 'heroes';
+type Page = 'home' | 'packs' | 'collection' | 'heroes' | 'sandbox';
 
 function currentPage(): Page {
+  if (
+    import.meta.env.DEV &&
+    (location.hash === '#/dev/gameplay-sandbox' ||
+      (location.pathname === '/dev/gameplay-sandbox' && !location.hash))
+  )
+    return 'sandbox';
   if (
     import.meta.env.DEV &&
     (location.hash === '#/dev/heroes' ||
@@ -100,6 +109,18 @@ export default function App() {
                   : 'Hero Archive'}
             </button>
           ))}
+          {import.meta.env.DEV && (
+            <button
+              onClick={() => {
+                location.hash = '/dev/gameplay-sandbox';
+                setPage('sandbox');
+              }}
+              className={page === 'sandbox' ? 'active' : ''}
+              aria-current={page === 'sandbox' ? 'page' : undefined}
+            >
+              Gameplay Sandbox
+            </button>
+          )}
         </nav>
         <div className="header-actions">
           <span className="local-badge">
@@ -122,7 +143,11 @@ export default function App() {
         </div>
       )}
       <main id="main-content" tabIndex={-1}>
-        {page === 'heroes' && DevHeroes ? (
+        {page === 'sandbox' && DevGameplaySandbox ? (
+          <Suspense fallback={<p>Loading Gameplay Sandbox…</p>}>
+            <DevGameplaySandbox />
+          </Suspense>
+        ) : page === 'heroes' && DevHeroes ? (
           <Suspense fallback={<p>Loading hero preview…</p>}>
             <DevHeroes />
           </Suspense>
