@@ -17,9 +17,7 @@
 .mvp-heading,
 .mvp-scoreboard,
 .mvp-setup,
-.mvp-action-counts,
-.mvp-selection,
-.mvp-control-footer {
+.mvp-action-counts {
   display: flex;
   align-items: center;
   gap: 16px;
@@ -74,6 +72,7 @@
   font-weight: 700;
 }
 .mvp-battlefield {
+  position: relative;
   margin-top: 20px;
   padding: 22px;
   border: 1px solid #b692535c;
@@ -108,11 +107,296 @@
   box-shadow: inset 0 0 0 2px #ffffff0a;
   color: #fff1d2;
 }
-.mvp-slot.is-selected {
-  border: 2px solid #f1c976;
+.mvp-slot.is-slot-selected {
+  border-color: #f1c976;
   box-shadow:
-    0 0 0 3px #f1c97633,
-    0 0 22px #efc16e3c;
+    inset 0 0 0 1px #f1c97688,
+    0 0 0 2px #f1c97630;
+}
+.mvp-slot.is-attacker-selected {
+  border-color: #68b8ee;
+  box-shadow:
+    inset 0 0 0 1px #68b8ee9c,
+    0 0 0 2px #68b8ee42;
+}
+.mvp-slot.is-valid-target {
+  border-color: #67c997;
+  box-shadow:
+    inset 0 0 0 1px #67c9978a,
+    0 0 0 2px #67c99736;
+}
+.mvp-slot.is-target-selected {
+  border-color: #ee886e;
+  box-shadow:
+    inset 0 0 0 1px #ee886ec2,
+    0 0 0 2px #ee886e5c;
+}
+.mvp-slot.is-hand-target {
+  border-color: #d9be79;
+  box-shadow:
+    inset 0 0 0 1px #d9be7980,
+    0 0 0 2px #d9be7930;
+}
+.mvp-slot.is-drop-hovered {
+  border-color: #fff0b6;
+  box-shadow:
+    0 0 0 3px #f5cd6790,
+    0 0 22px #e1bd6670;
+}
+.mvp-slot.is-drag-source,
+.mvp-hand-card.is-drag-source {
+  opacity: 0.38;
+}
+.mvp-slot.is-striking-up {
+  animation: mvp-strike-up 360ms ease-out both;
+}
+.mvp-slot.is-striking-down {
+  animation: mvp-strike-down 360ms ease-out both;
+}
+.mvp-slot.is-combat-impacted::after {
+  content: '';
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle, #ffe7a782, #e2a45124 60%, transparent);
+  animation: mvp-impact 360ms ease-out both;
+}
+.mvp-damage-popup,
+.mvp-ko-popup {
+  position: absolute;
+  z-index: 4;
+  top: 36%;
+  left: 50%;
+  color: #fff1d2;
+  font:
+    700 2rem Georgia,
+    serif;
+  text-shadow:
+    0 2px 7px #000,
+    0 0 14px #a93b28;
+  pointer-events: none;
+  animation: mvp-damage-rise 650ms ease-out both;
+}
+.mvp-damage-popup.is-advantage {
+  color: #f7c96b;
+  text-shadow:
+    0 2px 7px #000,
+    0 0 16px #e9b25d;
+}
+.mvp-ko-popup {
+  color: #ed917f;
+  letter-spacing: 0.12em;
+  animation: mvp-ko-label 480ms ease-out both;
+}
+.mvp-slot.is-combat-ko > :not(.mvp-ko-popup) {
+  animation: mvp-ko-fade 480ms ease-in both;
+}
+.mvp-slot.is-action-deploy {
+  animation: mvp-deploy 920ms ease-out both;
+}
+.mvp-slot.is-action-moving-right {
+  z-index: 2;
+  animation: mvp-move-right 920ms ease-in-out both;
+}
+.mvp-slot.is-action-moving-left {
+  z-index: 2;
+  animation: mvp-move-left 920ms ease-in-out both;
+}
+.mvp-slot.is-action-destination,
+.mvp-slot.is-action-focus {
+  animation: mvp-action-glow 920ms ease-in-out both;
+}
+.mvp-slot.is-action-retreat {
+  animation: mvp-action-retreat 920ms ease-in both;
+}
+.mvp-action-cue {
+  position: absolute;
+  z-index: 5;
+  top: 50%;
+  left: 50%;
+  width: fit-content;
+  max-width: 90%;
+  transform: translate(-50%, -50%);
+  padding: 8px 20px;
+  border: 1px solid #cfac69a0;
+  border-radius: 999px;
+  background: #14243cec;
+  color: #f5dca8;
+  font-size: 0.86rem;
+  text-align: center;
+  box-shadow: 0 0 20px #d7af4530;
+  animation: mvp-cue-appear 920ms ease-out both;
+}
+.mvp-skip-animation {
+  position: absolute;
+  z-index: 6;
+  right: 22px;
+  bottom: 8px;
+}
+@keyframes mvp-strike-up {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  48% {
+    transform: translateY(-11px);
+  }
+}
+@keyframes mvp-strike-down {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  48% {
+    transform: translateY(11px);
+  }
+}
+@keyframes mvp-impact {
+  from {
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes mvp-damage-rise {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+  25% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -24px);
+  }
+}
+@keyframes mvp-ko-label {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 7px);
+  }
+  45% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -8px);
+  }
+}
+@keyframes mvp-ko-fade {
+  from {
+    opacity: 1;
+    filter: grayscale(0);
+  }
+  to {
+    opacity: 0;
+    filter: grayscale(1);
+  }
+}
+@keyframes mvp-deploy {
+  from {
+    opacity: 0.25;
+    filter: brightness(1.8);
+    transform: scale(0.9);
+  }
+  55% {
+    opacity: 1;
+    filter: brightness(1.3);
+    transform: scale(1.035);
+  }
+  to {
+    opacity: 1;
+    filter: brightness(1);
+    transform: scale(1);
+  }
+}
+@keyframes mvp-move-right {
+  0%,
+  15% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  80%,
+  100% {
+    transform: translateX(calc(100% + 12px));
+    opacity: 0.6;
+  }
+}
+@keyframes mvp-move-left {
+  0%,
+  15% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  80%,
+  100% {
+    transform: translateX(calc(-100% - 12px));
+    opacity: 0.6;
+  }
+}
+@keyframes mvp-action-glow {
+  0%,
+  100% {
+    box-shadow: inset 0 0 0 2px #ffffff0a;
+  }
+  40%,
+  75% {
+    box-shadow:
+      inset 0 0 0 2px #f5d18daa,
+      0 0 22px #dab35d80;
+  }
+}
+@keyframes mvp-action-retreat {
+  0%,
+  25% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.84);
+  }
+}
+@keyframes mvp-cue-appear {
+  from {
+    opacity: 0;
+  }
+  20%,
+  85% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.9;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mvp-slot.is-striking-up,
+  .mvp-slot.is-striking-down,
+  .mvp-slot.is-combat-impacted::after,
+  .mvp-damage-popup,
+  .mvp-ko-popup,
+  .mvp-slot.is-combat-ko > :not(.mvp-ko-popup) {
+    animation-duration: 1ms;
+  }
+  .mvp-slot.is-action-deploy,
+  .mvp-slot.is-action-moving-right,
+  .mvp-slot.is-action-moving-left,
+  .mvp-slot.is-action-destination,
+  .mvp-slot.is-action-focus,
+  .mvp-slot.is-action-retreat,
+  .mvp-action-cue {
+    animation-duration: 1ms;
+  }
+}
+.mvp-slot[data-mvp-drop-side='friendly']:has(.mvp-portrait),
+.mvp-hand-card {
+  touch-action: none;
 }
 .mvp-slot-number {
   position: absolute;
@@ -170,24 +454,204 @@
   color: #d5af66;
   letter-spacing: 0.3em;
 }
-.mvp-lower {
+.mvp-starting-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 265px;
-  gap: 20px;
-  margin-top: 22px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin: 24px 0;
 }
-.mvp-controls,
-.mvp-aside {
-  padding: 22px;
+.mvp-starting-player,
+.mvp-hand {
+  padding: 20px;
+  border: 1px solid #b692535c;
+  border-radius: 12px;
+  background: #101d30;
+}
+.mvp-starting-choice,
+.mvp-hand-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+.mvp-starting-choice label {
+  display: grid;
+  gap: 6px;
+  color: #d3b778;
+}
+.mvp-hand {
+  margin-top: 20px;
+}
+.mvp-hand-heading h2 {
+  margin: 0;
+}
+.mvp-hand p {
+  font-size: 0.8rem;
+}
+.mvp-hand-cards {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 8px 2px;
+}
+.mvp-hand-card {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  flex: 0 0 120px;
+  min-height: 108px;
+  padding: 8px;
+  border: 1px solid #63809b;
+  border-radius: 8px;
+  background: #1b324c;
+  color: #f4ead4;
+  text-align: center;
+}
+.mvp-hand-card img {
+  width: 75px;
+  height: 75px;
+  object-fit: contain;
+}
+.mvp-hand-card strong {
+  font-size: 0.8rem;
+}
+.mvp-hand-card small {
+  color: #d3b778;
+}
+.mvp-hand-card.is-selected {
+  border-color: #d9be79;
+  box-shadow: 0 0 0 2px #d9be7960;
+}
+.mvp-hand-card:not(:disabled),
+.mvp-slot[data-mvp-drop-side='friendly']:has(.mvp-portrait) {
+  cursor: grab;
+}
+.mvp-drag-ghost {
+  position: fixed;
+  z-index: 200;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  width: 112px;
+  min-height: 90px;
+  padding: 9px;
+  border: 1px solid #e9c579;
+  border-radius: 9px;
+  background: #17314de8;
+  box-shadow: 0 16px 32px #000a;
+  color: #fff0d0;
+  font-size: 0.75rem;
+  text-align: center;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+.mvp-drag-ghost img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+.mvp-drag-ghost.is-returning {
+  transition:
+    left 160ms ease-out,
+    top 160ms ease-out,
+    opacity 160ms ease-out;
+  opacity: 0.35;
+}
+.mvp-discard {
+  margin-top: 12px;
+  color: #c8d1df;
+  font-size: 0.82rem;
+}
+.mvp-discard summary {
+  cursor: pointer;
+  color: #d3b778;
+}
+.mvp-discard ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  padding-left: 20px;
+}
+.mvp-combat-preview {
+  margin-top: 16px;
+  padding: 18px 22px;
+  border: 1px solid #b6925380;
+  border-radius: 12px;
+  background: #14243c;
+  box-shadow: 0 12px 28px #0005;
+}
+.mvp-preview-heading,
+.mvp-preview-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.mvp-preview-heading h2 {
+  margin: 0;
+}
+.mvp-preview-heading span,
+.mvp-preview-side > span,
+.mvp-preview-details {
+  color: #aebed0;
+  font-size: 0.8rem;
+}
+.mvp-preview-sides {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 15px 0;
+}
+.mvp-preview-side {
+  display: grid;
+  gap: 5px;
+  padding: 13px;
+  border: 1px solid #63809b70;
+  border-radius: 8px;
+  background: #1b324c;
+}
+.mvp-preview-side strong {
+  font-family: Georgia, serif;
+  font-size: 1.25rem;
+}
+.mvp-preview-side p {
+  margin: 0;
+  color: #eee2c7;
+}
+.mvp-preview-ko,
+.mvp-preview-details .is-disadvantage {
+  color: #f39a83;
+  font-style: normal;
+}
+.mvp-preview-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 16px;
+  margin-bottom: 16px;
+}
+.mvp-preview-details .is-advantage {
+  color: #8ee1ab;
+}
+.mvp-preview-actions {
+  justify-content: flex-end;
+}
+.mvp-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 20px;
+  padding: 15px 20px;
   border: 1px solid #b692535c;
   border-radius: 12px;
   background: #101d30;
 }
 .mvp-action-counts {
+  display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
-  padding-bottom: 17px;
-  border-bottom: 1px solid #fff2;
+  gap: 10px 20px;
 }
 .mvp-action-counts span {
   color: #b8c1cd;
@@ -196,67 +660,17 @@
 .mvp-action-counts b {
   color: #ffd889;
 }
-.mvp-selection {
-  flex-wrap: wrap;
-  margin: 15px 0;
-  font-size: 0.86rem;
-}
-.mvp-selection b {
-  color: #ffd889;
-}
-.mvp-action-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 13px;
-}
-.mvp-control-group {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-  min-height: 155px;
-  padding: 17px;
-  border: 1px solid #63809b55;
-  border-radius: 8px;
-  background: #192c45;
-}
-.mvp-control-group p {
-  font-size: 0.78rem;
-  line-height: 1.4;
-}
-.mvp-control-group select {
-  width: 100%;
-}
-.mvp-control-group button {
-  margin-top: auto;
-  min-height: 41px;
-}
-.mvp-event-control {
-  grid-column: 1 / -1;
-}
-.mvp-control-footer {
-  flex-wrap: wrap;
-  margin-top: 18px;
-}
-.mvp-control-footer p {
-  flex: 1;
+.mvp-message {
+  min-height: 1.5em;
+  margin: 12px 0;
   font-size: 0.85rem;
 }
-.mvp-aside h2 {
-  margin-bottom: 10px;
+.mvp-match-log {
+  color: #d3b778;
+  font-size: 0.82rem;
 }
-.mvp-aside p {
-  font-size: 0.78rem;
-  line-height: 1.5;
-  margin: 10px 0;
-}
-.mvp-card-preview {
-  width: 185px;
-  margin: 10px auto 16px;
-}
-.mvp-card-preview .common-hero-card,
-.mvp-card-preview .scr-hero-card {
-  width: 100%;
+.mvp-match-log summary {
+  cursor: pointer;
 }
 .mvp-log {
   margin: 0;
@@ -269,9 +683,6 @@
 }
 
 @media (max-width: 850px) {
-  .mvp-lower {
-    grid-template-columns: 1fr;
-  }
   .mvp-slot {
     min-height: 150px;
   }
@@ -280,6 +691,9 @@
   }
 }
 @media (max-width: 600px) {
+  .mvp-starting-grid {
+    grid-template-columns: 1fr;
+  }
   .mvp-sandbox {
     padding: 25px 12px 60px;
   }
@@ -303,13 +717,10 @@
   .mvp-hp {
     font-size: 0.59rem;
   }
-  .mvp-action-grid {
-    grid-template-columns: 1fr;
-  }
-  .mvp-event-control {
-    grid-column: auto;
-  }
   .mvp-turn {
     margin-left: 0;
+  }
+  .mvp-preview-sides {
+    grid-template-columns: 1fr;
   }
 }

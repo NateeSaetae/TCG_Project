@@ -7,7 +7,7 @@
     "dev": "vite --host 127.0.0.1",
     "build": "tsc -b && vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "node --test tests/packGenerator.test.mjs && node --test tests/card-render.test.mjs && node --test tests/combat.test.mjs && node --test tests/gameplayMvp.test.mjs && node --test tests/gameplayMatch.test.mjs && node --test tests/gameplayBot.test.mjs",
+    "test": "node --test tests/packGenerator.test.mjs && node --test tests/card-render.test.mjs && node --test tests/combat.test.mjs && node --test tests/gameplayMvp.test.mjs && node --test tests/gameplayMatch.test.mjs && node --test tests/gameplayBot.test.mjs && node --test tests/gameplayDeck.test.mjs && node --test tests/gameplayDrag.test.mjs && node --test tests/gameplayCombatAnimation.test.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

@@ -2,7 +2,8 @@ import type { BattlefieldPosition, MvpAttackWeapon } from '../types';
 
 export const MVP_MAX_HP = 10;
 export const MVP_BOARD_SIZE = 5;
-export const MVP_BASE_ATTACK_DAMAGE = 1;
+// Balance experiment V1: keep this value centralized for attacks and counters.
+export const MVP_BASE_ATTACK_DAMAGE = 2;
 
 const triangleAdvantage: Partial<Record<MvpAttackWeapon, MvpAttackWeapon>> = {
   Sword: 'Axe',

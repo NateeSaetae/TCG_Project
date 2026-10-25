@@ -10,9 +10,9 @@ after(() => server.close());
 
 const rules = await server.ssrLoadModule('/src/gameplay/mvp/rules/combat.ts');
 
-test('MVP combat uses 10 HP and one base damage, without card stats', () => {
+test('MVP combat uses 10 HP and two base damage, without card stats', () => {
   assert.equal(rules.MVP_MAX_HP, 10);
-  assert.equal(rules.MVP_BASE_ATTACK_DAMAGE, 1);
+  assert.equal(rules.MVP_BASE_ATTACK_DAMAGE, 2);
   assert.deepEqual(
     rules.resolveBasicAttack({
       attackerPosition: 2,
@@ -20,7 +20,7 @@ test('MVP combat uses 10 HP and one base damage, without card stats', () => {
       attackerWeapon: 'Magic',
       defenderWeapon: 'Axe',
     }),
-    { damage: 1, weaponAdvantage: false },
+    { damage: 2, weaponAdvantage: false },
   );
   assert.equal(rules.remainingHp(10, 1), 9);
   assert.equal(rules.remainingHp(1, 2), 0);
@@ -39,7 +39,7 @@ test('weapon triangle grants exactly one extra damage in the winning direction',
         attackerWeapon,
         defenderWeapon,
       }),
-      { damage: 2, weaponAdvantage: true },
+      { damage: 3, weaponAdvantage: true },
     );
     assert.equal(
       rules.hasWeaponAdvantage(defenderWeapon, attackerWeapon),

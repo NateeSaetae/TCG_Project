@@ -16,20 +16,198 @@ const { createTestMatch } = await server.ssrLoadModule(
 const { applyMatchAction } = await server.ssrLoadModule(
   '/src/gameplay/mvp/state/match.ts',
 );
+const { legalAttackTargets } = await server.ssrLoadModule(
+  '/src/gameplay/mvp/ui/attackSelection.ts',
+);
+const { previewMatchAttack, confirmMatchAttack } = await server.ssrLoadModule(
+  '/src/gameplay/mvp/state/attackPreview.ts',
+);
 const act = applyMatchAction;
 
-test('development Sandbox renders both boards and its playable action controls', async () => {
+test('development Sandbox renders starter setup before the battle', async () => {
   const { default: GameplaySandbox } = await server.ssrLoadModule(
     '/src/gameplay/mvp/ui/GameplaySandbox.tsx',
   );
   const html = renderToStaticMarkup(createElement(GameplaySandbox));
   assert.match(html, /Gameplay Sandbox/);
-  assert.match(html, /Player one battlefield/);
-  assert.match(html, /Player two battlefield/);
+  assert.match(html, /Starting unit 1/);
+  assert.match(html, /Player one/);
+  assert.match(html, /Player two/);
   assert.match(html, /Test bot/);
-  assert.match(html, /Move \/ Swap/);
-  assert.match(html, /Swap with Lyn/);
-  assert.match(html, /End Turn/);
+  assert.match(html, /Start match/);
+});
+test('legal attack targets follow the engine for melee, Bow, and Magic without changing match state', () => {
+  const initial = createTestMatch();
+  const before = structuredClone(initial);
+  assert.deepEqual(legalAttackTargets(initial, null), []);
+  assert.deepEqual(legalAttackTargets(initial, 1), [1]); // Marth: Sword
+  assert.deepEqual(legalAttackTargets(initial, 2), [1]); // Lyn: Bow, not slot 2
+  assert.deepEqual(initial, before);
+
+  const magic = structuredClone(initial);
+  magic.players[0].board[2] = magic.players[0].hand.find(
+    (character) => character.characterId === 'lilina',
+  );
+  magic.players[1].board[3] = magic.players[1].board[2];
+  assert.deepEqual(legalAttackTargets(magic, 2), [1, 2, 3]);
+});
+
+test('illegal attackers and defeated targets receive no legal-target highlight', () => {
+  const initial = createTestMatch();
+  for (const status of ['newlyDeployed', 'exhausted']) {
+    const state = structuredClone(initial);
+    state.players[0].board[1][status] = true;
+    assert.deepEqual(legalAttackTargets(state, 1), []);
+  }
+  for (const [key, value] of [
+    ['mainActions', 0],
+    ['attacks', 2],
+  ]) {
+    const state = structuredClone(initial);
+    state.players[0][key] = value;
+    assert.deepEqual(legalAttackTargets(state, 1), []);
+  }
+  const noTarget = structuredClone(initial);
+  noTarget.players[1].board[1] = null;
+  assert.deepEqual(legalAttackTargets(noTarget, 1), []);
+  const attacked = act(initial, {
+    kind: 'attack',
+    attackerPosition: 1,
+    targetPosition: 1,
+  });
+  assert.deepEqual(legalAttackTargets(attacked, 1), []);
+});
+
+test('preview is non-mutating and matches a confirmed triangle attack and counter', () => {
+  const state = createTestMatch();
+  const before = structuredClone(state);
+  const log = state.log;
+  const preview = previewMatchAttack(state, {
+    kind: 'attack',
+    attackerPosition: 1,
+    targetPosition: 1,
+  });
+  assert.deepEqual(state, before);
+  assert.equal(state.log, log);
+  assert.equal(preview.triangle, 'advantage');
+  assert.equal(preview.attackDamage, 3);
+  assert.equal(preview.counterattackPossible, true);
+  assert.equal(preview.counterattackDamage, 2);
+  assert.equal(preview.attackerHpAfter, 8);
+  assert.equal(preview.defenderHpAfter, 7);
+  const confirmed = confirmMatchAttack(state, preview);
+  assert.equal(
+    confirmed.players[0].board[1].currentHp,
+    preview.attackerHpAfter,
+  );
+  assert.equal(
+    confirmed.players[1].board[1].currentHp,
+    preview.defenderHpAfter,
+  );
+  assert.equal(confirmed.players[0].mainActions, 2);
+  assert.equal(confirmed.players[0].attacks, 1);
+  assert.equal(state.players[0].mainActions, 3);
+});
+
+test('preview handles out-of-range counters, defender KO, and weapon disadvantage', () => {
+  const state = createTestMatch();
+  const bow = previewMatchAttack(state, {
+    kind: 'attack',
+    attackerPosition: 2,
+    targetPosition: 1,
+  });
+  assert.equal(bow.attackDamage, 2);
+  assert.equal(bow.counterattackPossible, false);
+  assert.equal(bow.counterattackDamage, 0);
+  assert.equal(bow.attackerHpAfter, 10);
+
+  const weakDefender = structuredClone(state);
+  weakDefender.players[1].board[1].currentHp = 1;
+  const lethal = previewMatchAttack(weakDefender, {
+    kind: 'attack',
+    attackerPosition: 1,
+    targetPosition: 1,
+  });
+  assert.equal(lethal.defenderHpAfter, 0);
+  assert.equal(lethal.attackDamage, 3); // Full dealt damage, even when HP was 1
+  assert.equal(lethal.counterattackPossible, false);
+  assert.equal(lethal.attackerHpAfter, 10);
+  const lethalResult = confirmMatchAttack(weakDefender, lethal);
+  assert.match(lethalResult.log.at(-2), /attacked .* for 3/);
+
+  const disadvantage = structuredClone(state);
+  disadvantage.players[0].board[1].weapon = 'Axe';
+  disadvantage.players[1].board[1].weapon = 'Sword';
+  const preview = previewMatchAttack(disadvantage, {
+    kind: 'attack',
+    attackerPosition: 1,
+    targetPosition: 1,
+  });
+  assert.equal(preview.triangle, 'disadvantage');
+  assert.equal(preview.attackDamage, 2);
+  assert.equal(preview.counterattackDamage, 3);
+});
+
+test('preview matches equipped weapon, Rally cap, and Defensive Stance timing', () => {
+  let state = createTestMatch();
+  state = act(state, { kind: 'equip', position: 1, weapon: 'Lance' });
+  state = act(state, { kind: 'event', event: 'rally', position: 1 });
+  const defender = {
+    ...state.players[1],
+    board: state.players[1].board.map((character, position) =>
+      position === 1
+        ? { ...character, weapon: 'Sword', defensiveStance: true }
+        : character,
+    ),
+  };
+  const attacker = {
+    ...state.players[0],
+    board: state.players[0].board.map((character, position) =>
+      position === 1 ? { ...character, defensiveStance: true } : character,
+    ),
+  };
+  state = { ...state, players: [attacker, defender] };
+  const preview = previewMatchAttack(state, {
+    kind: 'attack',
+    attackerPosition: 1,
+    targetPosition: 1,
+  });
+  assert.equal(preview.attacker.weapon, 'Lance');
+  assert.equal(preview.attacker.rally, true);
+  assert.equal(preview.defender.defensiveStance, true);
+  assert.equal(preview.attackDamage, 2); // Lance > Sword: capped at 3, then Stance -1
+  assert.equal(preview.counterattackDamage, 1); // Base 2, then Stance -1
+  const confirmed = confirmMatchAttack(state, preview);
+  assert.equal(
+    confirmed.players[1].board[1].currentHp,
+    preview.defenderHpAfter,
+  );
+  assert.equal(
+    confirmed.players[0].board[1].currentHp,
+    preview.attackerHpAfter,
+  );
+});
+
+test('discarding a preview spends nothing; stale and illegal confirmations are rejected', () => {
+  const state = createTestMatch();
+  const preview = previewMatchAttack(state, {
+    kind: 'attack',
+    attackerPosition: 1,
+    targetPosition: 1,
+  });
+  // Cancel only discards UI preview state; it never dispatches an action.
+  assert.equal(state.players[0].mainActions, 3);
+  assert.equal(state.players[0].attacks, 0);
+  assert.equal(state.log.length, 1);
+  const changed = act(state, { kind: 'event', event: 'heal', position: 1 });
+  assert.throws(() => confirmMatchAttack(changed, preview), /stale/);
+  assert.equal(changed.players[0].attacks, 0);
+  const illegal = structuredClone(state);
+  illegal.players[0].board[1].exhausted = true;
+  assert.throws(
+    () => previewMatchAttack(illegal, preview.action),
+    /cannot attack/,
+  );
 });
 
 test('test setup starts two selected heroes per side at 10 HP and picks first player explicitly', () => {
@@ -52,8 +230,8 @@ test('attack uses MVP triangle damage, counters once without action cost, then e
     attackerPosition: 1,
     targetPosition: 1,
   });
-  assert.equal(next.players[1].board[1].currentHp, 8); // Sword > Axe
-  assert.equal(next.players[0].board[1].currentHp, 9); // Axe counters for 1
+  assert.equal(next.players[1].board[1].currentHp, 7); // Sword > Axe
+  assert.equal(next.players[0].board[1].currentHp, 8); // Axe counters for 2
   assert.equal(next.players[0].board[1].exhausted, true);
   assert.equal(next.players[0].mainActions, 2);
   assert.equal(next.players[0].attacks, 1);
@@ -75,7 +253,7 @@ test('Bow attacks adjacent slots but an out-of-range surviving defender cannot c
     attackerPosition: 2,
     targetPosition: 1,
   });
-  assert.equal(next.players[1].board[1].currentHp, 9);
+  assert.equal(next.players[1].board[1].currentHp, 8);
   assert.equal(next.players[0].board[2].currentHp, 10);
   assert.equal(
     next.log.some((entry) => entry.includes('counterattacked')),
@@ -215,7 +393,7 @@ test('Defensive Stance reduces the next counterattack and can target Exhausted h
     attackerPosition: 1,
     targetPosition: 1,
   });
-  assert.equal(state.players[0].board[1].currentHp, 10);
+  assert.equal(state.players[0].board[1].currentHp, 9);
   assert.equal(state.players[0].board[1].defensiveStance, false);
   assert.throws(
     () =>
@@ -415,4 +593,58 @@ test('turn change clears Exhausted and unused Rally', () => {
   assert.equal(state.players[0].board[1].exhausted, true);
   state = act(state, { kind: 'end-turn' });
   assert.equal(state.players[0].board[1].exhausted, false);
+});
+
+test('equipped Item weapon lasts through the opponent turn, then returns to the base weapon', () => {
+  const initial = createTestMatch();
+  assert.equal(initial.players[0].board[1].baseWeapon, 'Sword');
+  assert.equal(initial.players[0].board[2].baseWeapon, 'Bow');
+  let state = act(initial, { kind: 'equip', position: 1, weapon: 'Lance' });
+  assert.equal(state.players[0].board[1].weapon, 'Lance');
+  assert.equal(state.players[0].board[1].temporaryItemEquipped, true);
+  state = act(state, { kind: 'end-turn' });
+  assert.equal(state.activePlayerId, 'two');
+  assert.equal(state.players[0].board[1].weapon, 'Lance');
+  state = act(state, {
+    kind: 'attack',
+    attackerPosition: 1,
+    targetPosition: 1,
+  });
+  assert.equal(state.players[1].board[1].currentHp, 8); // Lance counters Axe for 2.
+  assert.equal(state.players[0].board[1].currentHp, 7); // Axe advantage deals 3.
+  state = act(state, { kind: 'end-turn' });
+  assert.equal(state.activePlayerId, 'one');
+  assert.equal(state.players[0].board[1].weapon, 'Sword');
+  assert.equal(state.players[0].board[1].temporaryItemEquipped, false);
+  assert.equal(state.players[0].board[1].itemUsedThisTurn, false);
+  assert.equal(initial.players[0].board[1].weapon, 'Sword');
+});
+
+test('temporary Item expires even when Tactical Retreat moves its character to hand', () => {
+  let state = createTestMatch();
+  const id = state.players[0].board[1].instanceId;
+  state = act(state, { kind: 'equip', position: 1, weapon: 'Lance' });
+  state = act(state, { kind: 'event', event: 'retreat', position: 1 });
+  assert.equal(
+    state.players[0].hand.find((card) => card.instanceId === id).weapon,
+    'Lance',
+  );
+  state = act(act(state, { kind: 'end-turn' }), { kind: 'end-turn' });
+  const returned = state.players[0].hand.find((card) => card.instanceId === id);
+  assert.equal(returned.weapon, 'Sword');
+  assert.equal(returned.temporaryItemEquipped, false);
+  state = act(state, { kind: 'deploy', handId: id, position: 0 });
+  assert.equal(state.players[0].board[0].weapon, 'Sword');
+});
+
+test('automatic turn end keeps the Item through the opponent turn, then expires it', () => {
+  let state = createTestMatch();
+  state = act(state, { kind: 'equip', position: 1, weapon: 'Lance' });
+  state = act(state, { kind: 'event', event: 'heal', position: 1 });
+  state = act(state, { kind: 'move', fromPosition: 1, toPosition: 0 });
+  state = act(state, { kind: 'move', fromPosition: 2, toPosition: 3 });
+  assert.equal(state.activePlayerId, 'two');
+  assert.equal(state.players[0].board[0].weapon, 'Lance');
+  state = act(state, { kind: 'end-turn' });
+  assert.equal(state.players[0].board[0].weapon, 'Sword');
 });

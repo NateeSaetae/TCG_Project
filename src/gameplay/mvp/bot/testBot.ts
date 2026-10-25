@@ -7,6 +7,7 @@ import {
   type PlayerState,
 } from '../state/match';
 import type { BattlefieldPosition, MvpCombatant } from '../types';
+import { isCombatant } from '../state/deck';
 
 const positions: readonly BattlefieldPosition[] = [0, 1, 2, 3, 4];
 
@@ -113,14 +114,30 @@ export function chooseBotAction(
       for (const position of positions) {
         const character = bot.board[position];
         if (!character) continue;
-        if (bot.availableEvents.includes('heal')) {
-          consider({ kind: 'event', event: 'heal', position }, () =>
-            character.currentHp <= 6
-              ? Math.min(2, 10 - character.currentHp) * 8
-              : 0,
+        const eventHandId = (event: 'heal' | 'rally' | 'stance' | 'retreat') =>
+          bot.hand.find(
+            (card) =>
+              'kind' in card && card.kind === 'event' && card.event === event,
+          )?.instanceId;
+        const hasEvent = (event: 'heal' | 'rally' | 'stance' | 'retreat') =>
+          bot.deckMode
+            ? Boolean(eventHandId(event))
+            : bot.availableEvents.includes(event);
+        if (hasEvent('heal')) {
+          consider(
+            {
+              kind: 'event',
+              event: 'heal',
+              position,
+              handId: eventHandId('heal'),
+            },
+            () =>
+              character.currentHp <= 6
+                ? Math.min(2, 10 - character.currentHp) * 8
+                : 0,
           );
         }
-        if (bot.availableEvents.includes('rally') && canAttack(character)) {
+        if (hasEvent('rally') && canAttack(character)) {
           let useful = false;
           for (const target of positions) {
             const defender = opponent.board[target];
@@ -141,12 +158,17 @@ export function chooseBotAction(
               useful = true;
           }
           if (useful)
-            consider({ kind: 'event', event: 'rally', position }, () => 20);
+            consider(
+              {
+                kind: 'event',
+                event: 'rally',
+                position,
+                handId: eventHandId('rally'),
+              },
+              () => 20,
+            );
         }
-        if (
-          bot.availableEvents.includes('stance') &&
-          !character.defensiveStance
-        ) {
+        if (hasEvent('stance') && !character.defensiveStance) {
           const threatened = positions.some((enemyPosition) => {
             const enemy = opponent.board[enemyPosition];
             return (
@@ -154,15 +176,32 @@ export function chooseBotAction(
             );
           });
           if (threatened && character.currentHp <= 3)
-            consider({ kind: 'event', event: 'stance', position }, () => 16);
+            consider(
+              {
+                kind: 'event',
+                event: 'stance',
+                position,
+                handId: eventHandId('stance'),
+              },
+              () => 16,
+            );
         }
-        if (bot.availableEvents.includes('retreat') && character.currentHp <= 2)
-          consider({ kind: 'event', event: 'retreat', position }, () => 24);
+        if (hasEvent('retreat') && character.currentHp <= 2)
+          consider(
+            {
+              kind: 'event',
+              event: 'retreat',
+              position,
+              handId: eventHandId('retreat'),
+            },
+            () => 24,
+          );
       }
     }
 
     if (bot.hand.length) {
       for (const member of bot.hand) {
+        if (!isCombatant(member)) continue;
         for (const position of positions) {
           if (bot.board[position]) continue;
           const facingEnemy = opponent.board[position] != null;
@@ -232,14 +271,31 @@ export function chooseBotAction(
       const before = futureAttackValue(bot, opponent, position);
       for (const weapon of character.allowedWeapons) {
         if (weapon === character.weapon) continue;
-        consider({ kind: 'equip', position, weapon }, (next) => {
-          const after = next.players.find(
-            (player) => player.id === botPlayerId,
-          )!;
-          const improvement =
-            futureAttackValue(after, opponent, position) - before;
-          return improvement > 0 ? 25 + improvement * 4 : 0;
-        });
+        const item = bot.deckMode
+          ? bot.hand.find(
+              (card) =>
+                'kind' in card &&
+                card.kind === 'item' &&
+                card.weapon === weapon,
+            )
+          : null;
+        if (bot.deckMode && !item) continue;
+        consider(
+          {
+            kind: 'equip',
+            position,
+            weapon,
+            ...(item ? { handId: item.instanceId } : {}),
+          },
+          (next) => {
+            const after = next.players.find(
+              (player) => player.id === botPlayerId,
+            )!;
+            const improvement =
+              futureAttackValue(after, opponent, position) - before;
+            return improvement > 0 ? 25 + improvement * 4 : 0;
+          },
+        );
       }
     }
   }
