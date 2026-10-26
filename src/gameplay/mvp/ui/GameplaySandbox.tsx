@@ -15,7 +15,7 @@ import { previewMatchAttack, type CombatPreview } from '../state/attackPreview';
 import { legalAttackTargets } from './attackSelection';
 import { visibleCardInstance, visiblePlayers } from './sandboxView';
 import { GameplayCardFace } from './GameplayCard';
-import { nameOfCombatant } from './gameplayCardData';
+import { cardForCombatant, nameOfCombatant } from './gameplayCardData';
 import { CardPreviewOverlay } from './CardPreviewOverlay';
 import { InspectButton } from './InspectButton';
 import { GameplayModal } from './GameplayModal';
@@ -44,6 +44,7 @@ import './gameplay-sandbox.css';
 import './gameplay-board.css';
 import './gameplay-view.css';
 import './gameplay-scene.css';
+import './combat-preview.css';
 
 const boardPositions: BattlefieldPosition[] = [0, 1, 2, 3, 4];
 const nameOf = nameOfCombatant;
@@ -209,7 +210,7 @@ function Board({
               key={position}
               onClick={() => onSelect(position)}
               onPointerDown={
-                kind === 'friendly' && character
+                kind === 'friendly' && character && !character.exhausted
                   ? (event) => onPointerStart?.(position, event)
                   : undefined
               }
@@ -297,8 +298,8 @@ export default function GameplaySandbox() {
   const [dragSource, setDragSource] = useState<DragSource | null>(null);
   const [hoverTarget, setHoverTarget] = useState<DropTarget | null>(null);
   const [dragVisual, setDragVisual] = useState<{
-    label: string;
-    image?: string;
+    card: MvpHandCard;
+    width: number;
     x: number;
     y: number;
   } | null>(null);
@@ -308,6 +309,8 @@ export default function GameplaySandbox() {
     source: DragSource;
     startX: number;
     startY: number;
+    offsetX: number;
+    offsetY: number;
     moved: boolean;
   } | null>(null);
   const suppressClickRef = useRef(false);
@@ -375,6 +378,12 @@ export default function GameplaySandbox() {
     combatPreview.action.targetPosition === selectedTarget
       ? combatPreview
       : null;
+  const attackerArt = visiblePreview
+    ? cardForCombatant(visiblePreview.attacker)
+    : undefined;
+  const defenderArt = visiblePreview
+    ? cardForCombatant(visiblePreview.defender)
+    : undefined;
 
   useEffect(
     () => () => {
@@ -552,24 +561,30 @@ export default function GameplaySandbox() {
         ? active.hand.find((entry) => entry.instanceId === source.instanceId)
         : active.board[source.position];
     if (!card) return;
-    const image = isCombatant(card)
-      ? heroCards.find((hero) => hero.id === card.cardId)?.image
-      : undefined;
+    if (source.kind === 'board' && isCombatant(card) && card.exhausted) return;
+    const face = event.currentTarget.querySelector<HTMLElement>(
+      source.kind === 'hand' ? '.mvp-hand-print' : '.mvp-board-card',
+    );
+    const rect = (face ?? event.currentTarget).getBoundingClientRect();
+    const offsetX = event.clientX - rect.left;
+    const offsetY = event.clientY - rect.top;
     gestureRef.current = {
       pointerId: event.pointerId,
       source,
       startX: event.clientX,
       startY: event.clientY,
+      offsetX,
+      offsetY,
       moved: false,
     };
     event.currentTarget.setPointerCapture(event.pointerId);
     setDragSource(source);
     setHoverTarget(null);
     setDragVisual({
-      label: handLabel(card),
-      image,
-      x: event.clientX,
-      y: event.clientY,
+      card,
+      width: rect.width,
+      x: rect.left,
+      y: rect.top,
     });
   }
 
@@ -587,8 +602,8 @@ export default function GameplaySandbox() {
     gesture.moved = true;
     event.preventDefault();
     if (dragGhostRef.current) {
-      dragGhostRef.current.style.left = `${event.clientX}px`;
-      dragGhostRef.current.style.top = `${event.clientY}px`;
+      dragGhostRef.current.style.left = `${event.clientX - gesture.offsetX}px`;
+      dragGhostRef.current.style.top = `${event.clientY - gesture.offsetY}px`;
     }
     const target = targetAt(event.clientX, event.clientY);
     setHoverTarget((previous) =>
@@ -621,8 +636,8 @@ export default function GameplaySandbox() {
     setMessage('Invalid drop. No action was spent.');
     if (dragGhostRef.current) {
       dragGhostRef.current.classList.add('is-returning');
-      dragGhostRef.current.style.left = `${gesture.startX}px`;
-      dragGhostRef.current.style.top = `${gesture.startY}px`;
+      dragGhostRef.current.style.left = `${gesture.startX - gesture.offsetX}px`;
+      dragGhostRef.current.style.top = `${gesture.startY - gesture.offsetY}px`;
     }
     snapTimerRef.current = window.setTimeout(() => setDragVisual(null), 180);
   }
@@ -643,10 +658,18 @@ export default function GameplaySandbox() {
     )
       return;
     if (selectedHand) {
-      attemptDrop(
+      const played = attemptDrop(
         { kind: 'hand', instanceId: selectedHand.instanceId },
         { side: 'friendly', position },
       );
+      const character = active.board[position];
+      if (!played && character?.exhausted)
+        setInspected({ playerId: active.id, instanceId: character.instanceId });
+      return;
+    }
+    const character = active.board[position];
+    if (character?.exhausted) {
+      setInspected({ playerId: active.id, instanceId: character.instanceId });
       return;
     }
     if (selected && ownPosition !== null && ownPosition !== position) {
@@ -852,7 +875,7 @@ export default function GameplaySandbox() {
       }}
     >
       <div className="mvp-heading">
-        <h1>Gameplay Sandbox</h1>
+        <h1>The Hero Collection · Duel Table</h1>
         <details className="mvp-settings-menu">
           <summary>Match Settings</summary>
           <div className="mvp-setup">
@@ -918,7 +941,9 @@ export default function GameplaySandbox() {
               <span className="mvp-table-sigil">✦</span>
             </div>
           </div>
-          <div className="mvp-side-label">OPPONENT · PLAYER {opponent.id}</div>
+          <div className="mvp-side-label">
+            OPPONENT LINE · PLAYER {opponent.id}
+          </div>
           <div
             className={`mvp-field-row is-enemy ${displayedMatch.activePlayerId === opponent.id ? 'is-turn-active' : ''}`}
           >
@@ -958,7 +983,7 @@ export default function GameplaySandbox() {
           </div>
           <div className="mvp-divider">VS</div>
           <div className="mvp-side-label">
-            {mode === 'bot' ? 'YOUR FIELD' : 'ACTIVE'} · PLAYER {active.id}
+            {mode === 'bot' ? 'YOUR LINE' : 'ACTIVE LINE'} · PLAYER {active.id}
           </div>
           <div
             className={`mvp-field-row is-friendly ${displayedMatch.activePlayerId === active.id ? 'is-turn-active' : ''}`}
@@ -1039,37 +1064,73 @@ export default function GameplaySandbox() {
             }}
           >
             <div className="mvp-preview-heading">
-              <h2>Combat Preview</h2>
-              <span>1 Main Action on confirmation</span>
+              <h2>
+                <span aria-hidden="true">⚔</span> Attack
+              </h2>
+              <span>Confirm this action?</span>
             </div>
             <div className="mvp-preview-sides">
-              <div className="mvp-preview-side">
-                <span>Attacker · {visiblePreview.attacker.weapon}</span>
-                <strong>{nameOf(visiblePreview.attacker)}</strong>
-                <p>
-                  HP {visiblePreview.attacker.currentHp} →{' '}
-                  <b>{visiblePreview.attackerHpAfter}</b>
-                  {visiblePreview.attackerHpAfter === 0 && (
-                    <em className="mvp-preview-ko"> KO</em>
-                  )}
-                </p>
-                <p>Attack damage: {visiblePreview.attackDamage}</p>
+              <div className="mvp-preview-side is-attacker">
+                {(attackerArt?.artwork?.character ?? attackerArt?.image) && (
+                  <img
+                    className="mvp-preview-art"
+                    src={attackerArt?.artwork?.character ?? attackerArt?.image}
+                    alt=""
+                  />
+                )}
+                <div className="mvp-preview-side-content">
+                  <span>Attacker · {visiblePreview.attacker.weapon}</span>
+                  <strong>{nameOf(visiblePreview.attacker)}</strong>
+                  <p className="mvp-preview-hp">
+                    HP <b>{visiblePreview.attacker.currentHp}</b>
+                    <span aria-hidden="true">→</span>
+                    <b
+                      className={
+                        visiblePreview.attackerHpAfter === 0 ? 'is-ko' : ''
+                      }
+                    >
+                      {visiblePreview.attackerHpAfter}
+                    </b>
+                    {visiblePreview.attackerHpAfter === 0 && (
+                      <em className="mvp-preview-ko">KO</em>
+                    )}
+                  </p>
+                  <p>
+                    Attack damage: <b>{visiblePreview.attackDamage}</b>
+                  </p>
+                </div>
               </div>
-              <div className="mvp-preview-side">
-                <span>Defender · {visiblePreview.defender.weapon}</span>
-                <strong>{nameOf(visiblePreview.defender)}</strong>
-                <p>
-                  HP {visiblePreview.defender.currentHp} →{' '}
-                  <b>{visiblePreview.defenderHpAfter}</b>
-                  {visiblePreview.defenderHpAfter === 0 && (
-                    <em className="mvp-preview-ko"> KO</em>
-                  )}
-                </p>
-                <p>
-                  {visiblePreview.counterattackPossible
-                    ? `Counterattack damage: ${visiblePreview.counterattackDamage}`
-                    : 'No counterattack'}
-                </p>
+              <div className="mvp-preview-side is-defender">
+                {(defenderArt?.artwork?.character ?? defenderArt?.image) && (
+                  <img
+                    className="mvp-preview-art"
+                    src={defenderArt?.artwork?.character ?? defenderArt?.image}
+                    alt=""
+                  />
+                )}
+                <div className="mvp-preview-side-content">
+                  <span>Defender · {visiblePreview.defender.weapon}</span>
+                  <strong>{nameOf(visiblePreview.defender)}</strong>
+                  <p className="mvp-preview-hp">
+                    HP <b>{visiblePreview.defender.currentHp}</b>
+                    <span aria-hidden="true">→</span>
+                    <b
+                      className={
+                        visiblePreview.defenderHpAfter === 0 ? 'is-ko' : ''
+                      }
+                    >
+                      {visiblePreview.defenderHpAfter}
+                    </b>
+                    {visiblePreview.defenderHpAfter === 0 && (
+                      <em className="mvp-preview-ko">KO</em>
+                    )}
+                  </p>
+                  <p>
+                    {visiblePreview.counterattackPossible
+                      ? `Counterattack damage: ${visiblePreview.counterattackDamage}`
+                      : 'No counterattack'}
+                  </p>
+                </div>
               </div>
             </div>
             <div className="mvp-preview-details">
@@ -1117,17 +1178,11 @@ export default function GameplaySandbox() {
         className="mvp-hand"
         aria-label={mode === 'bot' ? 'Your hand' : "Current player's hand"}
       >
-        <div className="mvp-hand-heading">
-          <h2>
-            Player {active.id} hand · {active.hand.length} cards
-          </h2>
-          <span>Drag to play · Click to select / Use Inspect to preview</span>
-        </div>
         <div className="mvp-hand-cards">
           {active.hand.map((card, index) => {
             return (
               <div
-                className="mvp-hand-card-container"
+                className={`mvp-hand-card-container ${dragVisual?.card.instanceId === card.instanceId ? 'is-drag-source' : ''}`}
                 key={card.instanceId}
                 style={{
                   rotate: `${Math.max(-4, Math.min(4, (index - (active.hand.length - 1) / 2) * 1.2))}deg`,
@@ -1163,7 +1218,6 @@ export default function GameplaySandbox() {
                   <div className="mvp-hand-print" aria-hidden="true">
                     <GameplayCardFace card={card} initialWidth={100} />
                   </div>
-                  <span className="mvp-hand-label">{handLabel(card)}</span>
                 </button>
                 {isCombatant(card) && (
                   <InspectButton
@@ -1225,11 +1279,17 @@ export default function GameplaySandbox() {
         <div
           ref={dragGhostRef}
           className="mvp-drag-ghost"
-          style={{ left: dragVisual.x, top: dragVisual.y }}
+          style={{
+            left: dragVisual.x,
+            top: dragVisual.y,
+            width: dragVisual.width,
+          }}
           aria-hidden="true"
         >
-          {dragVisual.image && <img src={dragVisual.image} alt="" />}
-          <strong>{dragVisual.label}</strong>
+          <GameplayCardFace
+            card={dragVisual.card}
+            initialWidth={dragVisual.width}
+          />
         </div>
       )}{' '}
     </section>

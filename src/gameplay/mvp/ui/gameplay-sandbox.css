@@ -538,17 +538,10 @@
   pointer-events: none;
   transform: translate(-50%, -50%);
 }
-.mvp-drag-ghost img {
-  width: 80px;
-  height: 80px;
-  object-fit: contain;
-}
 .mvp-drag-ghost.is-returning {
   transition:
     left 160ms ease-out,
-    top 160ms ease-out,
-    opacity 160ms ease-out;
-  opacity: 0.35;
+    top 160ms ease-out;
 }
 .mvp-discard {
   margin-top: 12px;

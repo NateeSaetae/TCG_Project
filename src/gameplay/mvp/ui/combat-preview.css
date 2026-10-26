@@ -1,0 +1,280 @@
+.mvp-combat-dialog {
+  position: fixed;
+  inset: 0 0 0 auto;
+  width: min(570px, 100vw);
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  overflow: hidden;
+  border: 0;
+  border-left: 3px solid #d5ad61;
+  border-radius: 0;
+  background: #0c1729;
+  box-shadow: -18px 0 50px #000c;
+  color: #f2e7cf;
+}
+.mvp-combat-dialog[open] {
+  animation: mvp-combat-panel-in 360ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.mvp-combat-dialog::backdrop {
+  background: #03091685;
+  backdrop-filter: blur(2px);
+  animation: mvp-combat-backdrop-in 280ms ease-out both;
+}
+.mvp-combat-dialog .mvp-combat-preview {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: #0c1729;
+  box-shadow: none;
+}
+.mvp-combat-dialog .mvp-preview-heading {
+  z-index: 2;
+  min-height: 86px;
+  padding: 22px 30px;
+  border-bottom: 1px solid #aa854a;
+  background: linear-gradient(100deg, #0b182b, #17243a 72%, #0b1728);
+}
+.mvp-combat-dialog .mvp-preview-heading h2 {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #f3dfb4;
+  font:
+    700 clamp(1.55rem, 2vw, 2rem) Georgia,
+    serif;
+  letter-spacing: 0.03em;
+}
+.mvp-preview-heading h2 span {
+  color: #dab978;
+  font-family: Georgia, serif;
+  font-size: 1.4em;
+}
+.mvp-combat-dialog .mvp-preview-heading > span {
+  color: #aeb7c4;
+  white-space: nowrap;
+}
+.mvp-combat-dialog .mvp-preview-sides {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  min-height: 0;
+  gap: 0;
+  margin: 0;
+  overflow: hidden;
+}
+.mvp-combat-dialog .mvp-preview-side {
+  position: relative;
+  display: block;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  isolation: isolate;
+}
+.mvp-preview-side.is-attacker {
+  background:
+    radial-gradient(circle at 76% 36%, #365b96 0, transparent 54%),
+    linear-gradient(125deg, #0a1932, #172e52 58%, #0a1629);
+}
+.mvp-preview-side.is-defender {
+  border-top: 2px solid #c09a59;
+  background:
+    radial-gradient(circle at 76% 36%, #8b3536 0, transparent 56%),
+    linear-gradient(125deg, #2a101d, #4a2029 58%, #190f1a);
+}
+.mvp-preview-side::before {
+  content: '';
+  position: absolute;
+  inset: 9px;
+  z-index: 2;
+  border: 1px solid #d4b97b65;
+  clip-path: polygon(0 0, 100% 0, 100% 83%, 94% 100%, 0 100%);
+  pointer-events: none;
+}
+.mvp-preview-side::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(90deg, #0a142bd9 0%, #0b162798 43%, transparent 82%),
+    linear-gradient(0deg, #090f1ee6 0%, transparent 68%);
+  pointer-events: none;
+}
+.mvp-preview-side.is-defender::after {
+  background:
+    linear-gradient(90deg, #1b0c18e0 0%, #1b101b99 43%, transparent 82%),
+    linear-gradient(0deg, #160b18e6 0%, transparent 68%);
+}
+.mvp-preview-art {
+  position: absolute;
+  top: -8%;
+  right: -7%;
+  z-index: 0;
+  width: 86%;
+  height: auto;
+  max-width: none;
+  filter: drop-shadow(-12px 10px 13px #0008);
+  pointer-events: none;
+  user-select: none;
+}
+.mvp-preview-side-content {
+  position: absolute;
+  left: 30px;
+  right: 18px;
+  bottom: 26px;
+  z-index: 3;
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  text-shadow: 0 2px 4px #000d;
+}
+.mvp-preview-side-content > span {
+  color: #d4ccbd;
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+}
+.mvp-preview-side-content > strong {
+  color: #fff0d0;
+  font:
+    700 clamp(1.5rem, 2vw, 2rem) Georgia,
+    serif;
+}
+.mvp-preview-side-content > p {
+  margin: 0;
+  color: #f4ead5;
+  font-size: 0.88rem;
+}
+.mvp-preview-side-content .mvp-preview-hp {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 5px 14px;
+  border: 1px solid #c6a668bb;
+  border-radius: 40px;
+  background: #071222cb;
+  font:
+    700 1.25rem Georgia,
+    serif;
+}
+.mvp-preview-hp b:last-of-type:not(.is-ko) {
+  color: #82dcad;
+}
+.mvp-preview-hp .is-ko {
+  color: #f3a08d;
+}
+.mvp-preview-hp em {
+  font:
+    700 0.75rem system-ui,
+    sans-serif;
+}
+.mvp-combat-dialog .mvp-preview-details {
+  display: flex;
+  align-items: center;
+  gap: 6px 18px;
+  min-height: 58px;
+  margin: 0;
+  padding: 9px 30px;
+  border-top: 1px solid #b7955b;
+  background: linear-gradient(#172238, #111b2c);
+  color: #d7d6d3;
+  font-size: 0.78rem;
+}
+.mvp-combat-dialog .mvp-preview-actions {
+  position: static;
+  justify-content: flex-end;
+  gap: 14px;
+  min-height: 94px;
+  padding: 18px 30px;
+  border-top: 1px solid #706951;
+  background: #0c1729;
+}
+.mvp-preview-actions button {
+  min-height: 50px;
+  padding: 10px 20px;
+  border-radius: 3px;
+  font:
+    700 0.95rem Georgia,
+    serif;
+}
+.mvp-preview-actions .secondary {
+  border-color: #958168;
+  background: #101c2c;
+  color: #d9c7a4;
+}
+.mvp-preview-actions .primary {
+  border-color: #f0d69a;
+  background: linear-gradient(#e8cf97, #b68c50);
+  color: #142033;
+}
+@keyframes mvp-combat-panel-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes mvp-combat-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (max-height: 720px) {
+  .mvp-combat-dialog .mvp-combat-preview {
+    grid-template-rows: auto minmax(470px, 1fr) auto auto;
+    overflow-y: auto;
+  }
+  .mvp-combat-dialog .mvp-preview-heading,
+  .mvp-combat-dialog .mvp-preview-actions {
+    min-height: 66px;
+    padding: 12px 20px;
+  }
+  .mvp-preview-side-content {
+    left: 22px;
+    bottom: 16px;
+  }
+}
+@media (max-width: 600px) {
+  .mvp-combat-dialog {
+    width: 100vw;
+  }
+  .mvp-combat-dialog .mvp-preview-heading {
+    padding-inline: 18px;
+  }
+  .mvp-combat-dialog .mvp-preview-heading > span {
+    font-size: 0.7rem;
+  }
+  .mvp-preview-side-content {
+    left: 20px;
+  }
+  .mvp-preview-art {
+    width: 95%;
+    right: -15%;
+  }
+  .mvp-combat-dialog .mvp-preview-details {
+    padding-inline: 18px;
+  }
+  .mvp-combat-dialog .mvp-preview-actions {
+    padding-inline: 18px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mvp-combat-dialog[open],
+  .mvp-combat-dialog::backdrop {
+    animation: none;
+  }
+}
