@@ -38,6 +38,12 @@ export type CombatAnimationStep =
       action: OtherAction;
       side: CombatSide;
       durationMs: number;
+    }
+  | {
+      kind: 'draw';
+      side: CombatSide;
+      playerId: string;
+      durationMs: number;
     };
 
 export interface CombatAnimationSession {
@@ -60,10 +66,14 @@ export function beginCombatAnimation(
   attackerSide: CombatSide = 'friendly',
 ): CombatAnimationSession {
   if (animationInProgress) throw new Error('Combat animation in progress');
+  const after = confirmMatchAttack(state, preview);
   return {
     before: state,
-    after: confirmMatchAttack(state, preview),
-    steps: combatAnimationSteps(preview, attackerSide),
+    after,
+    steps: [
+      ...combatAnimationSteps(preview, attackerSide),
+      ...drawSteps(state, after, attackerSide),
+    ],
     index: 0,
   };
 }
@@ -167,9 +177,10 @@ export function beginActionAnimation(
             : action.kind === 'event'
               ? `${EVENT_NAMES[action.event]} on ${subject}`
               : `Player ${active.id} ends the turn`;
+  const after = applyMatchAction(state, action);
   return {
     before: state,
-    after: applyMatchAction(state, action),
+    after,
     steps: [
       {
         kind: 'action',
@@ -177,8 +188,32 @@ export function beginActionAnimation(
         side,
         durationMs: action.kind === 'end-turn' ? 780 : 920,
       },
+      ...drawSteps(state, after, side),
     ],
     index: 0,
     label,
   };
+}
+
+/** A draw cue exists only when the authoritative transition added a hand instance. */
+function drawSteps(
+  before: MatchState,
+  after: MatchState,
+  actorSide: CombatSide,
+): CombatAnimationStep[] {
+  if (after.activePlayerId === before.activePlayerId) return [];
+  const entering = after.players.find(
+    (player) => player.id === after.activePlayerId,
+  )!;
+  const previous = before.players.find((player) => player.id === entering.id)!;
+  const priorIds = new Set(previous.hand.map((card) => card.instanceId));
+  if (!entering.hand.some((card) => !priorIds.has(card.instanceId))) return [];
+  return [
+    {
+      kind: 'draw',
+      side: actorSide === 'friendly' ? 'enemy' : 'friendly',
+      playerId: entering.id,
+      durationMs: 780,
+    },
+  ];
 }

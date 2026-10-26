@@ -398,14 +398,6 @@
 .mvp-hand-card {
   touch-action: none;
 }
-.mvp-slot-number {
-  position: absolute;
-  top: 6px;
-  left: 9px;
-  z-index: 1;
-  color: #e1c486;
-  font-size: 0.72rem;
-}
 .mvp-portrait {
   height: 98px;
   width: 100%;
@@ -418,7 +410,7 @@
   object-fit: contain;
   object-position: center top;
 }
-.mvp-slot strong {
+.mvp-slot > strong {
   font-family: Georgia, serif;
   font-size: clamp(0.9rem, 1.4vw, 1.35rem);
 }
@@ -508,15 +500,15 @@
   color: #f4ead4;
   text-align: center;
 }
-.mvp-hand-card img {
+.mvp-hand-card > img {
   width: 75px;
   height: 75px;
   object-fit: contain;
 }
-.mvp-hand-card strong {
+.mvp-hand-card > strong {
   font-size: 0.8rem;
 }
-.mvp-hand-card small {
+.mvp-hand-card > small {
   color: #d3b778;
 }
 .mvp-hand-card.is-selected {
@@ -710,7 +702,7 @@
   .mvp-portrait {
     height: 52px;
   }
-  .mvp-slot strong {
+  .mvp-slot > strong {
     font-size: 0.7rem;
   }
   .mvp-weapon,

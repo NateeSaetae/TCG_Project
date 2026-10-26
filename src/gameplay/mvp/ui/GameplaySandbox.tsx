@@ -5,15 +5,19 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from 'react';
 import { heroCards } from '../../../data/catalog';
-import type { HeroCardData } from '../../../types/heroCard';
-import type { BattlefieldPosition, MvpCombatant, MvpHandCard } from '../types';
+import { CardBack } from '../../../components/cards/CardBack';
+import type { BattlefieldPosition, MvpHandCard } from '../types';
 import { createTestMatch } from '../data/testMatch';
 import { createStarterMatch, starterCharacterCards } from '../data/starterDeck';
 import { isCombatant } from '../state/deck';
 import { chooseBotAction } from '../bot/testBot';
 import { previewMatchAttack, type CombatPreview } from '../state/attackPreview';
 import { legalAttackTargets } from './attackSelection';
-import { visiblePlayers } from './sandboxView';
+import { visibleCardInstance, visiblePlayers } from './sandboxView';
+import { GameplayCardFace } from './GameplayCard';
+import { nameOfCombatant } from './gameplayCardData';
+import { CardInspectionPanel } from './CardInspectionPanel';
+import { GameplayPiles } from './GameplayPiles';
 import {
   beginActionAnimation,
   beginCombatAnimation,
@@ -35,18 +39,10 @@ import {
   type PlayerState,
 } from '../state/match';
 import './gameplay-sandbox.css';
+import './gameplay-board.css';
 
 const boardPositions: BattlefieldPosition[] = [0, 1, 2, 3, 4];
-const commonCards = new Map<string, HeroCardData>();
-for (const card of heroCards) {
-  const id = card.gameplay?.id;
-  if (id && !commonCards.has(id)) commonCards.set(id, card);
-}
-
-function nameOf(character: MvpCombatant) {
-  const name = commonCards.get(character.characterId)?.name;
-  return name ?? character.characterId;
-}
+const nameOf = nameOfCombatant;
 
 function handLabel(card: MvpHandCard) {
   return isCombatant(card)
@@ -110,7 +106,6 @@ function Board({
     >
       {boardPositions.map((position) => {
         const character = player.board[position];
-        const card = character ? commonCards.get(character.characterId) : null;
         const isLegalTarget =
           kind === 'enemy' && legalTargets.includes(position);
         const isSelected = selected === position;
@@ -153,8 +148,6 @@ function Board({
             ? afterPlayer?.board[position]
             : null;
         const shownCharacter = character ?? arriving;
-        const shownCard =
-          card ?? (arriving ? commonCards.get(arriving.characterId) : null);
         return (
           <button
             type="button"
@@ -173,6 +166,11 @@ function Board({
               hovered === position &&
                 (handTargets.includes(position) || isLegalTarget) &&
                 'is-drop-hovered',
+              hovered === position &&
+                !handTargets.includes(position) &&
+                !isLegalTarget &&
+                'is-invalid-drop',
+              character?.exhausted && 'is-exhausted',
               dragSource === position && 'is-drag-source',
               isSelected && kind === 'enemy' && 'is-target-selected',
               striking &&
@@ -213,19 +211,19 @@ function Board({
             data-mvp-drop-side={kind}
             data-mvp-drop-position={position}
             aria-pressed={isSelected}
-            aria-label={`Player ${player.id} slot ${position}: ${character ? nameOf(character) : 'empty'}`}
+            aria-label={`Player ${player.id} slot ${position}: ${character ? `${nameOf(character)}, HP ${character.currentHp}/10, ${character.weapon}${character.exhausted ? ', Exhausted' : ''}${character.newlyDeployed ? ', Newly deployed' : ''}` : 'empty'}`}
           >
-            <span className="mvp-slot-number">{position}</span>
             {shownCharacter ? (
               <>
-                <span className="mvp-portrait">
-                  {shownCard && (
-                    <img src={shownCard.image} alt="" draggable={false} />
-                  )}
+                <div className="mvp-board-card" aria-hidden="true">
+                  <GameplayCardFace card={shownCharacter} initialWidth={112} />
+                </div>
+                <span className="mvp-board-card-hud" aria-hidden="true">
+                  <strong>{nameOf(shownCharacter)}</strong>
+                  <span>
+                    HP {shownCharacter.currentHp}/10 · {shownCharacter.weapon}
+                  </span>
                 </span>
-                <strong>{nameOf(shownCharacter)}</strong>
-                <span className="mvp-weapon">{shownCharacter.weapon}</span>
-                <span className="mvp-hp">HP {shownCharacter.currentHp}/10</span>
                 <span className="mvp-flags">
                   {shownCharacter.newlyDeployed && <small>New</small>}
                   {shownCharacter.exhausted && <small>Exhausted</small>}
@@ -274,6 +272,10 @@ export default function GameplaySandbox() {
   const combatLockRef = useRef(false);
   const cancelPreviewRef = useRef<HTMLButtonElement>(null);
   const [handId, setHandId] = useState('');
+  const [inspected, setInspected] = useState<{
+    playerId: PlayerId;
+    instanceId: string;
+  } | null>(null);
   const [dragSource, setDragSource] = useState<DragSource | null>(null);
   const [hoverTarget, setHoverTarget] = useState<DropTarget | null>(null);
   const [dragVisual, setDragVisual] = useState<{
@@ -298,10 +300,22 @@ export default function GameplaySandbox() {
 
   const displayedMatch = combatAnimation?.before ?? match;
   const combatStep = combatAnimation?.steps[combatAnimation.index] ?? null;
+  const animationLabel =
+    combatStep?.kind === 'draw'
+      ? `Player ${combatStep.playerId} draws a card`
+      : combatAnimation?.label;
   const { friendly: active, enemy: opponent } = visiblePlayers(
     displayedMatch,
     mode,
   );
+  const inspectedCard = inspected
+    ? visibleCardInstance(
+        displayedMatch,
+        mode,
+        inspected.playerId,
+        inspected.instanceId,
+      )
+    : null;
   const selected = ownPosition === null ? null : active.board[ownPosition];
   const selectedHand = active.hand.find((entry) => entry.instanceId === handId);
   const botTurn =
@@ -607,6 +621,12 @@ export default function GameplaySandbox() {
   }
 
   function selectFriendly(position: BattlefieldPosition) {
+    const inspectedUnit = active.board[position];
+    if (inspectedUnit && !combatLockRef.current)
+      setInspected({
+        playerId: active.id,
+        instanceId: inspectedUnit.instanceId,
+      });
     if (
       botTurn ||
       match.winner ||
@@ -667,6 +687,7 @@ export default function GameplaySandbox() {
     setTargetPosition(null);
     setCombatPreview(null);
     setHandId('');
+    setInspected(null);
     cancelDrag();
     setMessage('Choose two starting units and positions for each player.');
   }
@@ -685,6 +706,7 @@ export default function GameplaySandbox() {
       setTargetPosition(null);
       setCombatPreview(null);
       setHandId('');
+      setInspected(null);
       cancelDrag();
       setMessage(
         'Starter match started. Select a card in hand or a unit on the board.',
@@ -818,6 +840,7 @@ export default function GameplaySandbox() {
         setOwnPosition(null);
         setTargetPosition(null);
         setCombatPreview(null);
+        setInspected(null);
       }}
     >
       <div className="eyebrow">DEVELOPMENT · GAMEPLAY MVP VER.1</div>
@@ -886,77 +909,117 @@ export default function GameplaySandbox() {
                 : `Player ${displayedMatch.activePlayerId} to act`}
         </div>
       </div>
-      <div className="mvp-battlefield">
-        <div className="mvp-side-label">OPPONENT · PLAYER {opponent.id}</div>
-        <Board
-          player={opponent}
-          kind="enemy"
-          combatStep={combatStep}
-          afterPlayer={combatAnimation?.after.players.find(
-            (player) => player.id === opponent.id,
-          )}
-          selected={selectedTarget}
-          legalTargets={legalTargets}
-          hovered={hoverTarget?.side === 'enemy' ? hoverTarget.position : null}
-          onSelect={(position) => {
-            if (
-              suppressClickRef.current ||
-              botTurn ||
-              combatLockRef.current ||
-              match.winner ||
-              ownPosition === null
-            )
-              return;
-            openCombatPreview(ownPosition, position);
-          }}
-        />
-        <div className="mvp-divider">VS</div>
-        <div className="mvp-side-label">
-          {mode === 'bot' ? 'YOUR FIELD' : 'ACTIVE'} · PLAYER {active.id}
-        </div>
-        <Board
-          player={active}
-          kind="friendly"
-          combatStep={combatStep}
-          afterPlayer={combatAnimation?.after.players.find(
-            (player) => player.id === active.id,
-          )}
-          selected={ownPosition}
-          handTargets={handTargets}
-          hovered={
-            hoverTarget?.side === 'friendly' ? hoverTarget.position : null
-          }
-          dragSource={dragSource?.kind === 'board' ? dragSource.position : null}
-          onSelect={selectFriendly}
-          onPointerStart={(position, event) => {
-            const character = active.board[position];
-            if (character)
-              startDrag(
-                { kind: 'board', position, instanceId: character.instanceId },
-                event,
-              );
-          }}
-          onPointerMove={moveDrag}
-          onPointerEnd={endDrag}
-          onPointerCancel={cancelDrag}
-        />
-        {combatAnimation?.label && (
-          <div className="mvp-action-cue" role="status">
-            {combatAnimation.label}
-          </div>
-        )}
-        {combatAnimation && (
-          <button
-            className="mvp-skip-animation secondary"
-            type="button"
-            onClick={() => {
-              combatLockRef.current = false;
-              setCombatAnimation(null);
-            }}
+      <div className="mvp-play-area">
+        <div className="mvp-battlefield">
+          <div className="mvp-side-label">OPPONENT · PLAYER {opponent.id}</div>
+          <div
+            className={`mvp-field-row is-enemy ${displayedMatch.activePlayerId === opponent.id ? 'is-turn-active' : ''}`}
           >
-            Skip animation
-          </button>
-        )}
+            <GameplayPiles player={opponent} />
+            <Board
+              player={opponent}
+              kind="enemy"
+              combatStep={combatStep}
+              afterPlayer={combatAnimation?.after.players.find(
+                (player) => player.id === opponent.id,
+              )}
+              selected={selectedTarget}
+              legalTargets={legalTargets}
+              hovered={
+                hoverTarget?.side === 'enemy' ? hoverTarget.position : null
+              }
+              onSelect={(position) => {
+                const character = opponent.board[position];
+                if (character && !combatLockRef.current)
+                  setInspected({
+                    playerId: opponent.id,
+                    instanceId: character.instanceId,
+                  });
+                if (
+                  suppressClickRef.current ||
+                  botTurn ||
+                  combatLockRef.current ||
+                  match.winner ||
+                  ownPosition === null
+                )
+                  return;
+                openCombatPreview(ownPosition, position);
+              }}
+            />
+            {combatStep?.kind === 'draw' && combatStep.side === 'enemy' && (
+              <div className="mvp-draw-flight" aria-hidden="true">
+                <CardBack interactive={false} />
+              </div>
+            )}
+          </div>
+          <div className="mvp-divider">VS</div>
+          <div className="mvp-side-label">
+            {mode === 'bot' ? 'YOUR FIELD' : 'ACTIVE'} · PLAYER {active.id}
+          </div>
+          <div
+            className={`mvp-field-row is-friendly ${displayedMatch.activePlayerId === active.id ? 'is-turn-active' : ''}`}
+          >
+            <GameplayPiles player={active} />
+            <Board
+              player={active}
+              kind="friendly"
+              combatStep={combatStep}
+              afterPlayer={combatAnimation?.after.players.find(
+                (player) => player.id === active.id,
+              )}
+              selected={ownPosition}
+              handTargets={handTargets}
+              hovered={
+                hoverTarget?.side === 'friendly' ? hoverTarget.position : null
+              }
+              dragSource={
+                dragSource?.kind === 'board' ? dragSource.position : null
+              }
+              onSelect={selectFriendly}
+              onPointerStart={(position, event) => {
+                const character = active.board[position];
+                if (character)
+                  startDrag(
+                    {
+                      kind: 'board',
+                      position,
+                      instanceId: character.instanceId,
+                    },
+                    event,
+                  );
+              }}
+              onPointerMove={moveDrag}
+              onPointerEnd={endDrag}
+              onPointerCancel={cancelDrag}
+            />
+            {combatStep?.kind === 'draw' && combatStep.side === 'friendly' && (
+              <div className="mvp-draw-flight" aria-hidden="true">
+                <CardBack interactive={false} />
+              </div>
+            )}
+          </div>
+          {animationLabel && (
+            <div className="mvp-action-cue" role="status">
+              {animationLabel}
+            </div>
+          )}
+          {combatAnimation && (
+            <button
+              className="mvp-skip-animation secondary"
+              type="button"
+              onClick={() => {
+                combatLockRef.current = false;
+                setCombatAnimation(null);
+              }}
+            >
+              Skip animation
+            </button>
+          )}
+        </div>
+        <CardInspectionPanel
+          card={inspectedCard}
+          onClose={() => setInspected(null)}
+        />
       </div>
       {visiblePreview && (
         <section
@@ -1048,29 +1111,20 @@ export default function GameplaySandbox() {
           <h2>
             Player {active.id} hand · {active.hand.length} cards
           </h2>
-          <span>
-            Deck {active.deck.length} · Discard {active.discard.length}
-          </span>
+          <span>Drag to play · Click to inspect and select</span>
         </div>
-        <p>
-          Drag a card onto a highlighted slot, or select it and click a target.
-          Opponent: {opponent.hand.length} in hand · {opponent.deck.length} in
-          deck · {opponent.discard.length} discarded.
-        </p>
         <div className="mvp-hand-cards">
           {active.hand.map((card) => {
-            const art = isCombatant(card)
-              ? heroCards.find((hero) => hero.id === card.cardId)?.image
-              : null;
             return (
               <button
                 type="button"
                 key={card.instanceId}
-                className={`mvp-hand-card ${handId === card.instanceId ? 'is-selected' : ''} ${dragSource?.kind === 'hand' && dragSource.instanceId === card.instanceId ? 'is-drag-source' : ''}`}
+                className={`mvp-hand-card ${handId === card.instanceId ? 'is-selected' : ''} ${dragSource?.kind === 'hand' && dragSource.instanceId === card.instanceId ? 'is-drag-source' : ''} ${combatStep?.kind === 'action' && 'handId' in combatStep.action && combatStep.action.handId === card.instanceId ? 'is-playing' : ''}`}
                 disabled={
                   botTurn || Boolean(match.winner) || Boolean(combatAnimation)
                 }
                 aria-pressed={handId === card.instanceId}
+                aria-label={handLabel(card)}
                 data-drag-source={card.instanceId}
                 onPointerDown={(event) =>
                   startDrag(
@@ -1087,36 +1141,20 @@ export default function GameplaySandbox() {
                   setOwnPosition(null);
                   setTargetPosition(null);
                   setCombatPreview(null);
+                  setInspected({
+                    playerId: active.id,
+                    instanceId: card.instanceId,
+                  });
                 }}
               >
-                {art && <img src={art} alt="" draggable={false} />}
-                <strong>{handLabel(card)}</strong>
-                <small>
-                  {isCombatant(card)
-                    ? 'Character'
-                    : card.kind === 'item'
-                      ? 'Item'
-                      : 'Event'}
-                </small>
+                <div className="mvp-hand-print" aria-hidden="true">
+                  <GameplayCardFace card={card} initialWidth={100} />
+                </div>
+                <span className="mvp-hand-label">{handLabel(card)}</span>
               </button>
             );
           })}
         </div>
-        <details className="mvp-discard">
-          <summary>Used / KO pile · {active.discard.length}</summary>
-          {active.discard.length ? (
-            <ul>
-              {active.discard.map((card) => (
-                <li key={card.instanceId}>
-                  {handLabel(card)}
-                  {isCombatant(card) ? ' · KO' : ''}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>No cards discarded yet.</p>
-          )}
-        </details>
       </section>
       <div className="mvp-action-bar">
         <div className="mvp-action-counts">
