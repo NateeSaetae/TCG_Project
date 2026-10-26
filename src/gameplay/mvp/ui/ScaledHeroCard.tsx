@@ -9,9 +9,11 @@ const PRINT_WIDTH = 290;
 export function ScaledHeroCard({
   card,
   initialWidth = PRINT_WIDTH,
+  interactive = false,
 }: {
   card: HeroCardData;
   initialWidth?: number;
+  interactive?: boolean;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(initialWidth);
@@ -36,12 +38,15 @@ export function ScaledHeroCard({
   }, []);
 
   return (
-    <div ref={containerRef} className="mvp-scaled-card">
+    <div
+      ref={containerRef}
+      className={`mvp-scaled-card ${interactive ? 'is-interactive' : ''}`}
+    >
       <div
         className="mvp-scaled-card-print"
         style={{ transform: `scale(${width / PRINT_WIDTH})` }}
       >
-        <CardRenderer card={card} managedPointer />
+        <CardRenderer card={card} managedPointer={!interactive} />
       </div>
     </div>
   );

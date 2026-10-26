@@ -1,0 +1,320 @@
+/* Only the dedicated game route owns the viewport; header height stays intrinsic. */
+.app-shell.gameplay-shell {
+  height: 100dvh;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+}
+.gameplay-shell > .site-header {
+  flex: 0 0 auto;
+  width: 100%;
+  margin: 0 auto;
+}
+.gameplay-shell > main {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+.gameplay-shell > .royal-footer {
+  display: none;
+}
+.mvp-sandbox.mvp-game-view {
+  --game-gold: #d7b876;
+  height: 100%;
+  min-height: 0;
+  max-width: none;
+  margin: 0;
+  padding: 6px 16px;
+  display: grid;
+  grid-template-rows:
+    30px 36px minmax(0, 1fr) clamp(145px, 24dvh, 220px)
+    48px 22px;
+  gap: 5px;
+  position: relative;
+}
+.mvp-game-view .mvp-heading {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.mvp-game-view .mvp-heading h1 {
+  font-size: 1rem;
+  margin: 0;
+}
+.mvp-settings-menu {
+  position: relative;
+  z-index: 40;
+  font-size: 0.8rem;
+  color: var(--game-gold);
+}
+.mvp-settings-menu summary,
+.mvp-match-log summary {
+  cursor: pointer;
+  padding: 5px 10px;
+}
+.mvp-game-view .mvp-setup {
+  flex-direction: column;
+  align-items: stretch;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 300px;
+  padding: 16px;
+  background: #10213b;
+  border: 1px solid var(--game-gold);
+  border-radius: 10px;
+  box-shadow: 0 12px 30px #0009;
+}
+.mvp-game-view .mvp-scoreboard {
+  margin: 0;
+  padding: 3px 12px;
+  gap: 16px;
+  align-items: center;
+}
+.mvp-game-view .mvp-scoreboard > div {
+  padding: 2px 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 0.78rem;
+}
+.mvp-game-view .mvp-play-area {
+  min-height: 0;
+  margin: 0;
+  display: block;
+  container-type: size;
+}
+.mvp-game-view .mvp-battlefield {
+  height: 100%;
+  min-height: 0;
+  padding: 4px 10px;
+  display: grid;
+  grid-template-rows: 14px minmax(0, 1fr) 14px 14px minmax(0, 1fr);
+  overflow: visible;
+  position: relative;
+}
+.mvp-game-view .mvp-side-label {
+  margin: 0;
+  font-size: 0.6rem;
+  min-width: 0;
+}
+.mvp-game-view .mvp-divider {
+  margin: 0 5%;
+  min-width: 0;
+}
+.mvp-game-view .mvp-field-row {
+  min-height: 0;
+  min-width: 0;
+  padding: 0 8px;
+}
+.mvp-game-view .mvp-board {
+  height: 100%;
+  min-height: 0;
+  align-items: stretch;
+}
+.mvp-game-view .mvp-slot-container {
+  min-height: 0;
+}
+.mvp-game-view .mvp-slot {
+  height: 100%;
+  min-height: 0;
+  padding: 2px;
+  gap: 1px;
+}
+/* Size the whole 290px print via ScaledHeroCard, never individual artwork layers. */
+.mvp-game-view .mvp-board-card,
+.mvp-game-view .mvp-board-card-hud {
+  width: min(100%, 136px, max(48px, calc((100cqh - 144px) * 0.343)));
+}
+.mvp-game-view .mvp-slot:not(:has(.mvp-board-card))::before {
+  width: min(96%, 136px, max(48px, calc((100cqh - 144px) * 0.343)));
+}
+.mvp-game-view .mvp-flags {
+  min-height: 0;
+  gap: 2px;
+}
+.mvp-game-view .mvp-hand {
+  min-height: 0;
+  margin: 0;
+  padding: 4px 12px;
+  display: grid;
+  grid-template-rows: 18px minmax(0, 1fr);
+  container-type: size;
+}
+.mvp-game-view .mvp-hand-heading {
+  margin: 0;
+  flex-wrap: nowrap;
+}
+.mvp-game-view .mvp-hand-heading h2 {
+  font-size: 0.8rem;
+}
+.mvp-game-view .mvp-hand-cards {
+  min-height: 0;
+  padding: 20px 8px 4px;
+  align-items: flex-start;
+  gap: 8px;
+  overflow: auto;
+}
+.mvp-game-view .mvp-hand-card-container {
+  width: clamp(62px, calc((100cqh - 66px) * 0.686), 112px);
+  flex-basis: clamp(62px, calc((100cqh - 66px) * 0.686), 112px);
+}
+.mvp-game-view .mvp-hand-card-container:has(:hover),
+.mvp-game-view .mvp-hand-card-container:focus-within {
+  z-index: 12;
+}
+.mvp-game-view .mvp-action-bar {
+  margin: 0;
+  padding: 4px 12px;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+.mvp-game-view .mvp-action-counts {
+  gap: 6px 18px;
+}
+.mvp-game-view .mvp-action-counts span {
+  font-size: 0.75rem;
+}
+.mvp-game-view .mvp-action-bar > button {
+  flex-shrink: 0;
+  padding: 8px 20px;
+}
+.mvp-game-view .mvp-message {
+  margin: 0;
+  min-height: 0;
+  padding-right: 110px;
+  font-size: 0.72rem;
+  overflow: auto;
+}
+.mvp-game-view .mvp-match-log {
+  position: absolute;
+  z-index: 35;
+  bottom: 4px;
+  right: 16px;
+}
+.mvp-game-view .mvp-log {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  width: min(460px, 85vw);
+  max-height: min(360px, 65dvh);
+  overflow: auto;
+  padding: 16px 16px 16px 32px;
+  border: 1px solid var(--game-gold);
+  border-radius: 10px;
+  background: #10213bf5;
+  box-shadow: 0 12px 30px #0009;
+}
+.mvp-game-view .mvp-action-cue {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.mvp-game-view .mvp-skip-animation {
+  position: absolute;
+  right: 10px;
+  top: 46%;
+}
+.mvp-combat-dialog {
+  width: min(620px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  border: 1px solid #d7b876;
+  border-radius: 14px;
+  background: #14243c;
+  color: #fff1d6;
+}
+.mvp-combat-dialog[open] {
+  animation: mvp-preview-enter 180ms ease-out;
+}
+.mvp-combat-dialog::backdrop {
+  background: #030a16a8;
+}
+.mvp-combat-dialog .mvp-combat-preview {
+  margin: 0;
+  border: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  max-height: calc(100dvh - 36px);
+}
+.mvp-combat-dialog .mvp-preview-heading h2 {
+  font-size: 1.2rem;
+}
+.mvp-combat-dialog .mvp-preview-sides {
+  min-height: 0;
+  overflow: auto;
+}
+.mvp-combat-dialog .mvp-preview-actions {
+  position: sticky;
+  bottom: 0;
+  background: #14243c;
+  padding-top: 8px;
+}
+/* A compact, internally scrollable board is deliberate below desktop usability. */
+@media (max-height: 650px), (max-width: 850px) {
+  .mvp-sandbox.mvp-game-view {
+    padding: 4px 8px;
+    grid-template-rows: 26px 32px minmax(0, 1fr) 138px 48px 22px;
+  }
+  .mvp-game-view .mvp-hand-heading > span {
+    display: none;
+  }
+  .mvp-game-view .mvp-play-area {
+    overflow: auto;
+  }
+  .mvp-game-view .mvp-battlefield {
+    min-height: 248px;
+    min-width: 620px;
+  }
+  .mvp-game-view .mvp-action-counts {
+    gap: 3px 9px;
+  }
+  .mvp-game-view .mvp-board-card,
+  .mvp-game-view .mvp-board-card-hud {
+    width: 58px;
+  }
+  .mvp-game-view .mvp-slot:not(:has(.mvp-board-card))::before {
+    width: 58px;
+  }
+}
+@media (max-width: 580px) {
+  .mvp-game-view .mvp-scoreboard {
+    gap: 2px;
+    padding: 0;
+  }
+  .mvp-game-view .mvp-scoreboard > div {
+    font-size: 0.65rem;
+    padding: 1px 3px;
+    gap: 3px;
+  }
+  .mvp-game-view .mvp-action-counts span {
+    font-size: 0.65rem;
+  }
+  .mvp-game-view .mvp-action-bar > button {
+    padding: 7px 10px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mvp-combat-dialog[open] {
+    animation: none;
+  }
+}
+.gameplay-shell > main:has(> .mvp-sandbox:not(.mvp-game-view)) {
+  overflow: auto;
+}
+.mvp-game-view .mvp-scoreboard {
+  flex-wrap: nowrap;
+}
+.mvp-game-view .mvp-scoreboard > div:not(.mvp-turn) {
+  min-width: 0;
+}
+.mvp-game-view .mvp-skip-animation {
+  bottom: auto;
+}

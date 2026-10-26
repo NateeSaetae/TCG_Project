@@ -36,8 +36,8 @@ const { rarityName } = await server.ssrLoadModule('/src/config/rarity.ts');
 const { cardForCombatant } = await server.ssrLoadModule(
   '/src/gameplay/mvp/ui/gameplayCardData.ts',
 );
-const { CardInspectionPanel } = await server.ssrLoadModule(
-  '/src/gameplay/mvp/ui/CardInspectionPanel.tsx',
+const { CardPreviewContent } = await server.ssrLoadModule(
+  '/src/gameplay/mvp/ui/CardPreviewOverlay.tsx',
 );
 const { CardRenderer } = await server.ssrLoadModule(
   '/src/components/cards/CardRenderer.tsx',
@@ -175,10 +175,10 @@ test('the board and inspection use the selected instance print, with battle HP s
   };
   assert.equal(cardForCombatant(unit).id, rare.id);
   const html = renderToStaticMarkup(
-    createElement(CardInspectionPanel, { card: unit, onClose() {} }),
+    createElement(CardPreviewContent, { card: unit, onClose() {} }),
   );
   assert.match(html, /Battle HP 7\/10/);
-  assert.match(html, /Rare ·/);
+  assert.match(html, /aria-label="Rare"/);
   assert.match(
     html,
     new RegExp(rare.image.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')),

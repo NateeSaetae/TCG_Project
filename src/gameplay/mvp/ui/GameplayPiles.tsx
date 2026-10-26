@@ -4,6 +4,7 @@ import type { PlayerState } from '../state/match';
 import { isCombatant } from '../state/deck';
 import { EVENT_NAMES } from '../state/match';
 import { nameOfCombatant } from './gameplayCardData';
+import { GameplayCardFace } from './GameplayCard';
 
 function usedCardName(card: MvpHandCard) {
   return isCombatant(card)
@@ -32,7 +33,14 @@ export function GameplayPiles({ player }: { player: PlayerState }) {
           aria-label={`Player ${player.id} discard: ${player.discard.length} cards`}
         >
           <span className="mvp-pile-art mvp-used-card" aria-hidden="true">
-            ✦<small>USED</small>
+            {player.discard.length ? (
+              <GameplayCardFace
+                card={player.discard[player.discard.length - 1]}
+                initialWidth={48}
+              />
+            ) : (
+              <span className="mvp-discard-empty">✦</span>
+            )}
           </span>
           <span>
             DISCARD <b>{player.discard.length}</b>

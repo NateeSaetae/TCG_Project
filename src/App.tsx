@@ -64,7 +64,7 @@ export default function App() {
 
   return (
     <div
-      className="app-shell royal-theme"
+      className={`app-shell royal-theme ${page === 'sandbox' ? 'gameplay-shell' : ''}`}
       style={
         {
           '--court-art': 'url("' + brand.assets.background + '")',
